@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  pgadmin:
+    container_name: qr_pgadmin
+    image: docker.io/dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADM_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADM_PASS}
+    ports:
+      - ${PG_ADM_PORTS}
+    volumes:
+      - ${PG_ADM_VOLUME}
+  postgres:
+    container_name: qr_postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_USER: ${PG_DB_USER}
+      POSTGRES_PASSWORD: ${PG_DB_PASS}
+    volumes:
+      - ${PG_DB_VOLUME}
+    ports:
+      - ${PG_DB_PORTS}
+  minio:
+    container_name: qr_minio
+    image: quay.io/minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASS}
+    volumes:
+      - ${MINIO_VOLUME}
+    ports:
+      - ${MINIO_PORTS}
+      - ${MINIO_CLIENT_PORTS}
+    command: server --console-address ":9001" /data

@@ -1,0 +1,30 @@
+server:
+  servlet:
+    context-path: /qr
+  port: 9983
+
+spring:
+  application:
+    name: QRCodeDemo
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      enabled: true
+      max-request-size: 1GB
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    url: ${POSTGRES_URL}
+  jpa:
+    show-sql: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  lifetime: 24h
+
+minio:
+  url: ${MINIO_URL}
+  bucket: ${MINIO_BUCKET}
+  accessKey: ${MINIO_ACCESS_KEY}
+  secretKey: ${MINIO_SECRET_KEY}

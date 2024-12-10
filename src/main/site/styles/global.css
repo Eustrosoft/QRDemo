@@ -1,0 +1,268 @@
+body {
+    margin: 0;
+    font-family: 'Attractive Heavy', sans-serif;
+}
+
+:root {
+    --border-width: 1px;
+    --accent: gray;
+    --border-radius: 5px;
+    --transition: 1;
+}
+
+*,
+:after,
+:before {
+    box-sizing: border-box;
+}
+
+ul {
+    list-style-type: square;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 80%;
+    height: 100%;
+}
+
+/* First page */
+
+.welcome {
+    background-image: linear-gradient(to bottom, rgba(100,120,120,0.52) 0%, rgba(148,187,233,0.75) 100%), url("/P7010630.jpg");
+    color: white;
+    background-size: cover;
+    height: 100vh;
+    width: 100%;
+}
+
+.nav__menu {
+    background: #e5e5e5;
+
+    display: flex;
+    position: fixed;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    padding-left: 0.2em;
+    margin: 0;
+    display: block;
+}
+
+#logo__image {
+    height: 40px;
+    padding: 2px;
+}
+
+.welcome_main {
+    padding: 20px;
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.welcome__text {
+    font-size: 20em;
+    font-weight: 800;
+
+    margin: auto;
+    padding: 40px;
+
+    color: #074173;
+
+    text-align: center;
+}
+
+.welcome__login {
+    font-size: 3em;
+    font-weight: 600;
+
+    margin: auto;
+    padding: 10px;
+
+    color: #074173;
+
+    text-align: center;
+}
+
+.welcome__login form {
+    display: grid;
+    grid-template-columns: auto;
+    grid-gap: 0.5rem 1rem;
+    justify-items: center;
+    position: relative;
+}
+
+.welcome__login form input {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-width: calc(var(--border-width) * 1px);
+    border-style: solid;
+    border-color: var(--accent);
+    border-radius: calc(var(--border-radius) * 1px);
+    text-align: center;
+    outline: transparent;
+    width: 100%;
+    transition: border-color calc(var(--transition, 0.2) * 1s) ease;
+}
+
+.welcome__login form .login__button {
+    --size: 52;
+    --lightness: 45;
+    align-items: center;
+    background: hsl(100, 80%, calc(45 * 1%));
+    border-radius: calc(var(--border-radius) * 1px);
+    cursor: pointer;
+    display: flex;
+    height: calc(var(--size) * 1px);
+    justify-content: center;
+    padding: 16px 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #fff;
+    width: 100%;
+    transition: background calc(var(--transition, 0.2) * 1s) ease;
+}
+
+.fancy {
+    @supports (background-clip: text) or (-webkit-background-clip: text) {
+        background-image:
+                url("data:image/svg+xml,%3Csvg width='2250' height='900' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Cpath fill='%2300A080' d='M0 0h2255v899H0z'/%3E%3Ccircle cx='366' cy='207' r='366' fill='%2300FDCF'/%3E%3Ccircle cx='1777.5' cy='318.5' r='477.5' fill='%2300FDCF'/%3E%3Ccircle cx='1215' cy='737' r='366' fill='%23008060'/%3E%3C/g%3E%3C/svg%3E%0A");
+        background-size: 110% auto;
+        background-position: center;
+        color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+}
+
+.upside__menu {
+    padding: 20px;
+}
+
+.upside__menu a {
+    margin-right: 20px;
+
+    font-size: 18px;
+    font-style: normal;
+    color: #074173;
+    text-decoration: none;
+    text-transform: uppercase;
+
+    transition: color 0.3s linear;
+}
+
+.upside__menu a:hover {
+    color: blue;
+}
+
+/* Footer */
+
+.footer {
+    background: #e5e5e5;
+}
+
+.sites {
+    width: 100%;
+    text-align: center;
+
+}
+
+.sites__link {
+
+    padding: 0;
+    font-size: 14px;
+    font-style: italic;
+    color: #919191;
+    text-decoration: none;
+    text-transform: uppercase;
+
+    display: block;
+}
+
+.credentials__bottom {
+    padding: 0;
+    font-size: 12px;
+    font-style: normal;
+    color: black;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}

@@ -1,0 +1,26 @@
+package org.eustrosoft.dtos;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Collection;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RegistrationDto {
+    private String username;
+    private String password;
+    private String confirmPassword;
+    private String email;
+    private List<Long> roleIds;
+
+    public RegistrationDto(String username, String password, String confirmPassword, String email) {
+        this.username = username;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+        this.email = email;
+    }
+}

@@ -1,0 +1,8 @@
+@keyframes slideFromUp {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
