@@ -1,7 +1,7 @@
 package org.eustrosoft.configurations.security;
 
 import lombok.RequiredArgsConstructor;
-import org.eustrosoft.entitites.Role;
+import org.eustrosoft.entitites.enums.Roles;
 import org.eustrosoft.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class Security {
                 .cors().and()
                 .authorizeRequests()
                 .antMatchers("/v1/api/secured/**").authenticated()
-                .antMatchers("/v1/api/admin/**").hasRole(Role.Names.ADMIN.name())
+                .antMatchers("/v1/api/admin/**").hasRole(Roles.ADMIN.name())
                 .antMatchers("/v1/api/unsecured/**").permitAll()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

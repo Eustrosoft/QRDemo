@@ -13,4 +13,6 @@ public class EntityDto {
     private Long id;
     private Date created;
     private Date updated;
+    private String name;
+    private String description;
 }

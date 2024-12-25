@@ -41,7 +41,7 @@ public class QRRangeService {
         return CommonUtils.iterableToList(repository.findAll());
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public QRRange generateNextRange() throws IllegalArgumentException {
         List<QRRange> freeRanges = getFreeRanges();
         if (freeRanges == null || freeRanges.isEmpty()) {
@@ -64,7 +64,7 @@ public class QRRangeService {
         return foundRange;
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public QRRange create(QRRange qrRange) {
         long codes = qrRange.getTo() - qrRange.getFrom();
         if (codes != CODES_FOR_RANGE) {

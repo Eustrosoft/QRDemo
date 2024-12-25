@@ -1,6 +1,5 @@
 package org.eustrosoft.repositories;
 
-import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QR;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.springframework.data.repository.CrudRepository;
@@ -15,5 +14,5 @@ public interface QRRepository extends CrudRepository<QR, Long> {
 
     Iterable<QRSimpleProjection> findAllByOrderByUpdated();
 
-    Iterable<QRSimpleProjection> findAllByParticipantOrderByUpdatedDesc(Participant participant);
+    Iterable<QRSimpleProjection> findAllByParticipantIdOrderByUpdatedDesc(Long participantId);
 }

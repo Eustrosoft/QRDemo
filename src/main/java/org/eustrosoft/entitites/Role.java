@@ -2,8 +2,6 @@ package org.eustrosoft.entitites;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,18 +13,10 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "role", schema = "public")
+@Table(name = "role", schema = "qrdemo")
 public class Role extends DbEntity {
+    public static final String TYPE = "RL";
 
-    @Column(name = "name")
-    private String name;
-
-    @Getter
-    @RequiredArgsConstructor
-    public enum Names {
-        USER("ROLE_USER"),
-        ADMIN("ROLE_ADMIN");
-
-        final String name;
-    }
+    @Column(name = "active")
+    private Boolean active;
 }

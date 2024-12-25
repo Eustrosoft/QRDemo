@@ -2,6 +2,7 @@ package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.entitites.Role;
+import org.eustrosoft.entitites.enums.Roles;
 import org.eustrosoft.repositories.RoleRepository;
 import org.eustrosoft.utils.CommonUtils;
 import org.eustrosoft.utils.JwtTokenUtils;
@@ -27,7 +28,7 @@ public class RoleService {
         return roleRepository.findById(id).get();
     }
 
-    public List<Role> getRolesByName(Role.Names role) {
+    public List<Role> getRolesByName(Roles role) {
         return Collections.singletonList(roleRepository.findByName(role.getName()).get());
     }
 

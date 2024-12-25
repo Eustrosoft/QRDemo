@@ -1,8 +1,5 @@
 package org.eustrosoft.repositories.projections;
 
-public interface FormSimpleProjection extends SimpleProjection {
+public interface FormSimpleProjection extends EntityProjection {
 
-    String getName();
-
-    String getDescription();
 }

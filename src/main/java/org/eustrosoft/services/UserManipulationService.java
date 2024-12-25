@@ -4,7 +4,7 @@ import lombok.Setter;
 import org.eustrosoft.configurations.security.UserToken;
 import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.entitites.Participant;
-import org.eustrosoft.entitites.Role;
+import org.eustrosoft.entitites.enums.Roles;
 import org.eustrosoft.repositories.ParticipantRepository;
 import org.eustrosoft.utils.JwtTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ public class UserManipulationService extends UserService {
         participant.setUsername(registrationDto.getUsername());
         participant.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
         participant.setEmail(registrationDto.getEmail());
-        participant.setRoles(roleService.getRolesByName(Role.Names.USER));
+        participant.setRoles(roleService.getRolesByName(Roles.USER));
         userRepository.save(participant);
         return participant;
     }

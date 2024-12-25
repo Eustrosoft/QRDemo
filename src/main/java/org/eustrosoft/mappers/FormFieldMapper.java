@@ -7,41 +7,52 @@ import org.eustrosoft.dtos.FormFieldDto;
 import org.eustrosoft.entitites.FormField;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class FormFieldMapper extends EntityMapper {
 
     public FormFieldDto toDto(FormField formField) {
+        if (formField == null) {
+            return null;
+        }
         FormFieldDto dto = new FormFieldDto();
         dto.setId(formField.getId());
         dto.setIsPublic(formField.getIsPublic());
         dto.setName(formField.getName());
         dto.setIsStatic(formField.getIsStatic());
-        dto.setType(formField.getType());
+        dto.setFieldOrder(formField.getFieldOrder());
+        dto.setFieldType(formField.getFieldType());
         dto.setPlaceholder(formField.getPlaceholder());
-        dto.setCreated(formField.getCreated());
-        dto.setUpdated(formField.getUpdated());
         return dto;
     }
 
+    public List<FormFieldDto> toListDto(List<FormField> formField) {
+        if (formField == null) {
+            return null;
+        }
+        return formField.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
     public FormField fromCreationDto(FormFieldCreationDto dto) {
+        if (dto == null) {
+            return null;
+        }
         FormField formField = new FormField();
         formField.setName(dto.getName());
-        formField.setType(dto.getType());
+        formField.setFieldType(dto.getFieldType());
         formField.setPlaceholder(dto.getPlaceholder());
+        formField.setFieldOrder(dto.getFieldOrder());
         formField.setIsPublic(dto.getIsPublic());
         formField.setIsStatic(dto.getIsStatic());
         return formField;
     }
 
     public FormField fromChangeDto(FormFieldChangeDto dto) {
-        FormField formField = new FormField();
+        FormField formField = fromCreationDto(dto);
         formField.setId(dto.getId());
-        formField.setName(dto.getName());
-        formField.setType(dto.getType());
-        formField.setPlaceholder(dto.getPlaceholder());
-        formField.setIsPublic(dto.getIsPublic());
-        formField.setIsStatic(dto.getIsStatic());
         return formField;
     }
 }

@@ -6,7 +6,7 @@ import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.SettingsDto;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.Role;
-import org.eustrosoft.repositories.projections.ParticipantSettingsProjection;
+import org.eustrosoft.entitites.enums.Roles;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -59,7 +59,9 @@ public class ParticipantMapper extends EntityMapper {
         participantDto.setCreated(participant.getCreated());
         participantDto.setUpdated(participant.getUpdated());
         participantDto.setRoles(roleMapper.toListDto(participant.getRoles()));
-        participantDto.setRanges(qrRangeMapper.toDtoList(participant.getRanges()));
+        if (hasNoAdminRoles(participant.getRoles())) {
+            participantDto.setRanges(qrRangeMapper.toDtoList(participant.getRanges()));
+        }
         return participantDto;
     }
 
@@ -80,15 +82,22 @@ public class ParticipantMapper extends EntityMapper {
         return dto;
     }
 
-    private static List<Role> getRolesFromRegistrationDto(RegistrationDto registrationDto) {
-        if (registrationDto == null || CollectionUtils.isEmpty(registrationDto.getRoleIds())) {
+    private List<Role> getRolesFromRegistrationDto(RegistrationDto registrationDto) {
+        if (registrationDto == null || CollectionUtils.isEmpty(registrationDto.getRoles())) {
             return Collections.emptyList();
         }
+        return roleMapper.toListModels(registrationDto.getRoles());
+    }
 
-        return registrationDto.getRoleIds().stream().map(s -> {
-            Role role = new Role();
-            role.setId(s);
-            return role;
-        }).collect(Collectors.toList());
+    private boolean hasNoAdminRoles(List<Role> roles) {
+        if (CollectionUtils.isEmpty(roles)) {
+            return false;
+        }
+        for (Role role : roles) {
+            if (!Roles.ADMIN.getName().equals(role.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

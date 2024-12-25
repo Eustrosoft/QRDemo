@@ -12,9 +12,15 @@ import java.util.stream.Collectors;
 @Component
 public class RoleMapper extends EntityMapper {
 
+    public Role toModel(RoleDto dto) {
+        Role role = super.toEntity(dto, Role.class);
+        role.setActive(dto.getActive());
+        return role;
+    }
+
     public RoleDto toDto(Role role) {
         RoleDto dto = super.toDto(role, RoleDto.class);
-        dto.setName(role.getName());
+        dto.setActive(role.getActive());
         return dto;
     }
 
@@ -24,6 +30,14 @@ public class RoleMapper extends EntityMapper {
         }
         return roles.stream()
                 .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<Role> toListModels(Collection<RoleDto> dtos) {
+        if (dtos == null || dtos.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return dtos.stream().map(this::toModel)
                 .collect(Collectors.toList());
     }
 }

@@ -11,7 +11,8 @@ import org.eustrosoft.entitites.enums.FormFieldType;
 public class FormFieldCreationDto {
     private String name;
     private String placeholder;
-    private FormFieldType type;
+    private Integer fieldOrder;
+    private FormFieldType fieldType;
     private Boolean isStatic;
     private Boolean isPublic;
 }

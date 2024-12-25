@@ -42,7 +42,7 @@ export function getQRImage(code, x = 300) {
     return `
         <a href="?q=${code}">
             <img class="qr_line_image"
-                 src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=${x}&fileType=SVG&correctionLevel=M&site=${window.location.origin}/qrdemo/index.html"
+                 src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=${x}&fileType=SVG&correctionLevel=M"
                  alt="qrImage"
             />
         </a>
@@ -54,7 +54,7 @@ export function getQRImageDiv(code) {
     link.href = `?q=${code}`
     link.innerHTML = `
             <img class="qr_line_image"
-                 src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=300&fileType=SVG&correctionLevel=M&site=${window.location.origin}/qrdemo/index.html"
+                 src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=300&fileType=SVG&correctionLevel=M"
                  alt="qrImage"
             />
     `
@@ -92,69 +92,87 @@ export function clearHeaderParams(searchParams) {
 }
 
 export function fieldToHtml(field, fieldValue, edit = false, id = null, qrId = null) {
-    const type = field?.type
+    const type = field?.fieldType
     const placeholder = field?.placeholder
     const name = field?.name
 
-    const htmlType = 
-            type === 'TEXT' ? 'text' 
-            : type === 'NUMBER' ? 'number' 
-            : 'file'
     const editable = edit ? '' : 'readonly'
     const idField = notNullOrUndefined(id) ? `id="${id}"` : '';
 
-    if ('file' === htmlType) {
-        let fileName = fieldValue === null ? '' : '\t(File uploaded: ' + fieldValue + ')'
-        let variabilityTab = edit
-            ? `<input ${idField} name="${name}" value="${fieldValue}" ${editable} placeholder="${placeholder}" type="${htmlType}"/>`
-            : `<div class="custom_button"><a target="_" href="${qrApi().getFileLink(qrId, name)}">Download File</a></div>`
-        return `
-            <label>${name}${fileName}</label><br/>
-            ${variabilityTab}
-        `
-    }
-
     return `
         <label>${name}</label><br/>
-        <input ${idField} name="${name}" value="${fieldValue}" ${editable} placeholder="${placeholder}" type="${htmlType}"/>
+        <input ${idField} name="${name}" value="${fieldValue}" ${editable} placeholder="${placeholder}" type="${type}"/>
     `
 }
 
-export function fieldToEditFormRow(field, index) {
+export function fieldToEditFormRow(field, index, fieldTypes = []) {
     const name = field.name
     const placeholder = field.placeholder
     const isStatic = field.isStatic
     const isPublic = field.isPublic
-    const type = field.type
+    const type = field.fieldType
     const id = field.id
 
     let formField = document.createElement('div')
+    let fieldTypesStr = fieldTypesToOptions(fieldTypes, type)
+
     formField.className = 'form_field'
     formField.innerHTML = `
-            <label>Input Type</label> 
+            <label>Тип данных</label> 
             <select name="type">
-                 <option value="TEXT" ${getSelectedOrNot(type, 'TEXT')}>Text</option>
-                  <option value="NUMBER" ${getSelectedOrNot(type, 'NUMBER')}>Number</option>
-                  <option value="FILE" ${getSelectedOrNot(type, 'FILE')}>File</option>
+                  ${fieldTypesStr}
             </select>
             
-            <label>Name of Field</label> 
+            <label>Имя поля</label> 
             <input name="name" type="text" value="${name}">
             
-            <label>Placeholder</label> 
+            <label>Плейсхолдер</label> 
             <input name="placeholder" type="text" value="${placeholder}">
             
-            <label>Is Static</label> 
+            <label>Статическое</label> 
             <input name="isStatic" type="checkbox" ${isStatic ? 'checked' : ''}>
             
-            <label>Is Public</label> 
+            <label>Публичное</label> 
             <input name="isPublic" type="checkbox" ${isPublic ? 'checked' : ''}>
             
             <input name="id" type="hidden" value="${id}">
             
-            <button class="big_button" id="delete_btn_${index}">Удалить</button>
+            <button class="big_button" id="delete_btn_${index}"> X </button>
     `
     return formField
+}
+
+export function fieldToHtmlItems(field, index, fieldTypes = []) {
+    const name = field.name
+    const placeholder = field.placeholder
+    const isStatic = field.isStatic
+    const isPublic = field.isPublic
+    const order = field.fieldOrder
+    const type = field.fieldType
+    const id = field.id
+
+    let fieldTypesStr = fieldTypesToOptions(fieldTypes, type)
+
+    let items = [
+        `<select name="type">${fieldTypesStr}</select>`,
+        `<input name="name" type="text" value="${name}">`,
+        `<input name="placeholder" type="text" value="${placeholder}">`,
+        `<input name="isStatic" type="checkbox" ${isStatic ? 'checked' : ''}></input>`,
+        `<input name="isPublic" type="checkbox" ${isPublic ? 'checked' : ''}></input>`,
+        `<input name="fieldOrder" type="number" value="${order}">`,
+        `<button class="big_button" id="delete_btn_${index}">X</button>`
+    ]
+    return items
+}
+
+function fieldTypesToOptions(fieldTypes, type) {
+    if (fieldTypes == null || fieldTypes == undefined) {
+        return ''
+    }
+
+    return fieldTypes.map(ft => {
+        return `<option value="${ft.value}" ${getSelectedOrNot(type, ft.value)}>${ft.description}</option>`
+    }).join('')
 }
 
 function getSelectedOrNot(type, needToBe) {
@@ -192,4 +210,16 @@ export function hasAdminRole(roles) {
 export const USER_ROLES = {
     ADMIN: "ROLE_ADMIN",
     USER: "ROLE_USER"
+}
+
+export function formatBytes(bytes, decimals = 2) {
+    if (!+bytes) return '0 Bytes'
+
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }

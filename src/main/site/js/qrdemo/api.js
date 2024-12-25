@@ -1,5 +1,8 @@
-export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
-export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
+import { openFile } from "./files";
+import { emptyOrUndefined } from "./utils";
+
+export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
+export const QR_DEMO_API_PROD = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
 
 export function qrApi() {
     const headers = {
@@ -128,20 +131,35 @@ export function qrApi() {
             )
             return fetch(req)
         },
-        uploadFile: (id, name, fileInput) => {
+        uploadFormFile: (id, fileInput) => {
             let data = new FormData()
             let file = fileInput.files[0];
 
             data.append('file', file, file.name)
 
             const request = new XMLHttpRequest();
-            let url = `${QR_DEMO_API}secured/qrs/${id}/files/${name}`;
-            request.open('PUT', url, false)
+            let url = `${QR_DEMO_API}secured/forms/${id}/files/upload`;
+            request.open('POST', url, false)
+            request.withCredentials = true
+            request.send(data)
+        },
+        uploadQRFile: (id, fileInput) => {
+            let data = new FormData()
+            let file = fileInput.files[0];
+
+            data.append('file', file, file.name)
+
+            const request = new XMLHttpRequest();
+            let url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`;
+            request.open('POST', url, false)
             request.withCredentials = true
             request.send(data)
         },
         getFileLink: (id, name) => {
             return QR_DEMO_API + `unsecured/qrs/${id}/files/${name}`
+        },
+        getFileLinkV2: (id, fileId) => {
+            return QR_DEMO_API + `unsecured/qrs/${id}/files/v2/${fileId}`
         },
         getRanges: () => {
             let url = `${QR_DEMO_API}secured/ranges`;
@@ -169,6 +187,83 @@ export function qrApi() {
                 }
             )
             return fetch(req)
+        },
+        getAllFiles: () => {
+            let url = `${QR_DEMO_API}secured/files`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return fetch(req)
+        },
+        deleteFile: (id) => {
+            let url = `${QR_DEMO_API}secured/files/${id}`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'DELETE',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return fetch(req)
+        },
+        openFile: (id) => {
+            let url = `${QR_DEMO_API}secured/files/${id}/download`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            fetch(req)
+                .then(resp => resp.status === 200 ? resp.blob() : Promise.reject('Что-то пошло не так'))
+                .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.target = '_'
+                a.style.display = 'none';
+                a.href = url;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+                .catch(() => alert('oh no!'));
+        },
+        downloadFile: (id) => {
+            let url = `${QR_DEMO_API}secured/files/${id}/download`;
+
+            var link = document.createElement('a')
+            link.target = '_'
+            link.href = url
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+        },
+        uploadFile: (fileRequest) => {
+            let url = `${QR_DEMO_API}secured/files/upload`;
+
+            let data = new FormData()
+            let file = fileRequest.file.files[0];
+
+            data.append('file', file, file.name)
+            data.append('name', fileRequest.name)
+            data.append('description', fileRequest.description)
+            data.append('public', fileRequest.public)
+
+            const request = new XMLHttpRequest();
+            request.open('POST', url, false)
+            request.withCredentials = true
+            request.send(data)
         }
     }
 }
@@ -320,6 +415,32 @@ export function userApi() {
                     headers: headers,
                     credentials: 'include',
                     body: JSON.stringify(changePassw)
+                }
+            )
+            return fetch(req)
+        }
+    }
+}
+
+export function dictionaryApi() {
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+
+    return {
+        getDictionariesByCode: (code) => {
+            if (emptyOrUndefined(code)) {
+                throw Error('Illegal code, could not be empty or null')
+            }
+            let url = `${QR_DEMO_API}secured/dictionaries?code=${code}`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
                 }
             )
             return fetch(req)

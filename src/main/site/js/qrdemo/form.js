@@ -1,13 +1,26 @@
-import {fieldToEditFormRow, setQueryParamsAndRefresh, toLoginIfNotAuthorized} from "./utils.js";
-import {qrApi} from "./api.js";
+import {fieldToHtmlItems, setQueryParamsAndRefresh, toLoginIfNotAuthorized} from "./utils.js";
+import {dictionaryApi, qrApi} from "./api.js";
+import { notEmptyOrUndefined } from "../commons/common.js";
+import { getTextLabel } from "./components/labels.js";
+import { getInput } from "./components/inputs.js";
+import { DICTIONARIES } from "./domain/dictionaries.js";
+import { getFileScrollComponent } from "./components/fileScroll.js";
+import { getTable, TableHead } from "./components/tables.js";
 
 var formFields = []
+var fieldTypes = []
 var formId = ''
-var blockId = ''
+var lastElementIndex = 0
 
 export function setForm(formId) {
     toLoginIfNotAuthorized()
-        .then(x => init(formId))
+        .then(x => {
+        dictionaryApi().getDictionariesByCode(DICTIONARIES.INPUT_TYPES)
+            .then(resp => resp.json())
+            .then(json => fieldTypes = json)
+            .then(x => init(formId))
+            .catch(ex => alert(ex))
+    })
 }
 
 function init(formId) {
@@ -24,12 +37,10 @@ function init(formId) {
     const id = urlParams.get('id')
 
     if (create || id) {
-        mainBlock.innerHTML = mainBlock.innerHTML.concat(`
-            <label>Название формы</label>
-            <div> <input type="text" placeholder="Форма без имени" id="formName"> </div>
-            <label>Описание формы</label>
-            <div> <input type="text" placeholder="Форма без описания" id="formDescription"> </div>
-        `)
+        mainBlock.appendChild(getTextLabel('Название шаблона'))
+        mainBlock.appendChild(getInput(null, 'text', false, 'formName', 'Шаблон без имени'))
+        mainBlock.appendChild(getTextLabel('Описание шаблона'))
+        mainBlock.appendChild(getInput(null, 'text', false, 'formDescription', 'Шаблон без описания'))
 
         let formDiv = document.createElement('div')
         mainBlock.appendChild(formDiv)
@@ -37,12 +48,15 @@ function init(formId) {
         let addElementButton = document.createElement('button')
         addElementButton.className = 'custom_button'
         addElementButton.innerText = '+'
+
         addElementButton.addEventListener('click', () => {
-            const defField = Field.getDefault()
             formFields = Field.htmlToFields(formDiv)
+            lastElementIndex = Field.getLastFieldsIndex(formFields) + 1
+            const defField = Field.getDefault(lastElementIndex)
             formFields.push(defField)
             renderForm(formDiv, formFields)
         })
+
         mainBlock.appendChild(addElementButton)
 
         let formName = document.getElementById('formName')
@@ -53,12 +67,12 @@ function init(formId) {
         saveFormBtm.innerText = 'Сохранить'
         saveFormBtm.addEventListener('click', () => {
             if (formName.value === null || formName.value === undefined || formName.value === '') {
-                alert("Название формы не может быть пустое")
+                alert("Название шаблона не может быть пустое")
                 return
             }
             const collectedFields = Field.htmlToFields(formDiv);
             if (collectedFields === null || collectedFields.length === 0) {
-                alert("В форме не могут отсутствовать поля")
+                alert("В шаблоне не могут отсутствовать поля")
                 return
             }
 
@@ -73,17 +87,28 @@ function init(formId) {
                     .then(json => {
                         setQueryParamsAndRefresh([{name: 'form', value: true}, {name: 'id', value: json.id}])
                     })
-                    .then(() => alert('Форма была создана!'))
-                    .catch(() => alert('Ошибка при создании формы'))
+                    .then(() => alert('Шаблон был создан!'))
+                    .catch(() => alert('Ошибка при создании шаблона'))
             }
             if (id !== null) {
-                qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, formId, blockId))
-                    .then(() => alert('Форма была обновлена!'))
-                    .catch(() => alert('Ошибка при обновлении формы'))
+                qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, formId))
+                    .then((resp) => {
+                    if (resp.ok) {
+                        alert('Шаблон был обновлен!')
+                        window.location.reload()
+                    } else {
+                        throw Error('unexpected error')
+                    }
+                })
+                    .catch(() => {
+                    alert('Ошибка при обновлении шаблона')
+                    window.location.reload()
+                })
             }
         })
         mainBlock.appendChild(saveFormBtm)
-
+        let scrollableFiles = getTable()
+        mainBlock.appendChild(scrollableFiles)
         if (id) {
             qrApi().getFormById(id)
                 .then(resp => resp.json())
@@ -92,15 +117,13 @@ function init(formId) {
                     formName.value = json.name
                     formDescription.value = json.description
 
-                    const blocks = json.blocks;
-                    for (let i = 0; i < blocks.length; i++) {
-                        const block = blocks[i];
-                        blockId = block.id
-                        const fields = block.fields;
+                const fields = json?.fields;
+                if (notEmptyOrUndefined(fields)) {
                         for (let j = 0; j < fields.length; j++) {
                             formFields.push(fields[j])
                         }
                     }
+                formFields = Field.sortFields(formFields)
                     renderForm(formDiv, formFields)
                 })
         }
@@ -146,7 +169,7 @@ function printFormsList(parent, json) {
 }
 
 export function deleteForm(id) {
-    const toDelete = confirm("Уверены, что хотите удалить форму?")
+    const toDelete = confirm("Уверены, что хотите удалить шаблон?")
     if (toDelete) {
         qrApi().deleteForm(id)
             .then(resp => resp.ok)
@@ -157,20 +180,39 @@ export function deleteForm(id) {
 
 function renderForm(parentDiv, objects) {
     parentDiv.innerHTML = ''
+
+    let headers = [
+        new TableHead('Тип данных', '10%'), new TableHead('Название поля', '20%'),
+        new TableHead('Плейсхолдер', '20%'), new TableHead('Публичное', '8%'),
+        new TableHead('Статическое', '9%'), new TableHead('Поз.', '6%'),
+        new TableHead('Действия', '8%')
+    ]
+    let items = []
     for (let index in objects) {
         const formLine = objects[index];
-        const input = fieldToEditFormRow(formLine, index);
-        parentDiv.appendChild(input)
-        document.getElementById(`delete_btn_${index}`)
-            .addEventListener('click', () => {
-                const toDelete = confirm("Уверены, что хотите удалить поле?")
-                if (toDelete) {
-                    formFields = Field.htmlToFields(parentDiv)
-                    formFields.splice(index, 1)
-                    parentDiv.innerHTML = ''
-                    renderForm(parentDiv, formFields)
-                }
+        const item = fieldToHtmlItems(formLine, index, fieldTypes);
+        items.push(item)
+    }
+
+    let table = getTable(
+        headers,
+        items,
+        'formFieldRow',
+        'fields_table'
+    )
+    parentDiv.appendChild(table)
+    addDeleteRowActions(table)
+}
+
+function addDeleteRowActions(table) {
+    let rows = document.getElementsByClassName('formFieldRow')
+    for (let i = 0; i < rows.length; i++) {
+        let elem = document.getElementById(`delete_btn_${i}`)
+        if (elem) {
+            elem.addEventListener('click', () => {
+                elem.parentElement.parentElement.remove()
             })
+        }
     }
 }
 
@@ -178,10 +220,10 @@ function getStartPage() {
     return `
         <div class="toolbar">
             <button class="big_button" id="create_form_button">
-                    Создать новую форму
+                    Создать новый шаблон
             </button>
             <button class="big_button" id="list_forms_button">
-                    Список форм
+                    Список шаблонов
             </button>
         
         </div>
@@ -202,28 +244,30 @@ function setStartActions() {
 
 class Field {
 
-    constructor(id, name, placeholder, type, isPublic, isStatic) {
+    constructor(id, name, placeholder, fieldType, isPublic, isStatic, fieldOrder = 0) {
         this.id = Number(id)
         this.name = name
         this.placeholder = placeholder
-        this.type = type
+        this.fieldType = fieldType
+        this.fieldOrder = parseInt(fieldOrder)
         this.isPublic = isPublic
         this.isStatic = isStatic
     }
 
-    static getDefault() {
+    static getDefault(order = 0) {
         return new Field(
             0,
             'Название',
             '',
             'TEXT',
             true,
-            true
+            true,
+            parseInt(order)
         )
     }
 
     static htmlToFields(div) {
-        const formFields = div.getElementsByClassName('form_field');
+        const formFields = div.getElementsByClassName('formFieldRow');
         if (formFields.length === 0) {
             return []
         }
@@ -231,15 +275,33 @@ class Field {
         let fields = []
         for (let i = 0; i < formFields.length; i++) {
             // TODO: not depend on element index
-            const type = formFields[i].children[1].value;
-            const name = formFields[i].children[3].value;
-            const placeholder = formFields[i].children[5].value;
-            const isStatic = formFields[i].children[7].checked;
-            const isPublic = formFields[i].children[9].checked;
-            const id = formFields[i].children[10].value;
-            fields.push(new Field(id, name, placeholder, type, isPublic, isStatic))
+            const fieldType = formFields[i].children[0].firstElementChild.value;
+            const name = formFields[i].children[1].firstElementChild.value;
+            const placeholder = formFields[i].children[2].firstElementChild.value;
+            const isStatic = formFields[i].children[3].firstElementChild.checked;
+            const isPublic = formFields[i].children[4].firstElementChild.checked;
+            const order = formFields[i].children[5].firstElementChild.value;
+            fields.push(new Field(i, name, placeholder, fieldType, isPublic, isStatic, order))
         }
         return fields
+    }
+
+    static getLastFieldsIndex(fields) {
+        if (fields == null || fields == undefined || fields.length == 0) {
+            return 0
+        }
+        let orders = fields.map(field => field.fieldOrder);
+        return orders.reduce((accumulator, currentValue) =>
+        {return Math.max(accumulator, currentValue);},
+            orders[0]
+        );
+    }
+
+    static sortFields(fields) {
+        if (fields === null || fields === undefined || fields == []) {
+            return []
+        }
+        return fields.sort(function(a, b){ return a.fieldOrder - b.fieldOrder })
     }
 
     static fieldsToSaveForm(formName, formDescription, fields, formId, blockId) {
@@ -247,13 +309,7 @@ class Field {
             name: formName,
             description: formDescription,
             id: Number(formId),
-            blocks: [
-                {
-                    name: 'Block',
-                    id: Number(blockId),
-                    fields: fields
-                }
-            ]
+            fields: fields
         }
     }
 }

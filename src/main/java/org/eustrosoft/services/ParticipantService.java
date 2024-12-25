@@ -11,8 +11,9 @@ import org.eustrosoft.dtos.SettingsChangeDto;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.entitites.Role;
-import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
+import org.eustrosoft.entitites.enums.Roles;
 import org.eustrosoft.repositories.ParticipantRepository;
+import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
 import org.eustrosoft.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -125,8 +126,16 @@ public class ParticipantService {
         validateParticipant(participant);
         participant.setPassword(passwordEncoder.encode(participant.getPassword()));
         if (CollectionUtils.isEmpty(participant.getRoles())) {
-            List<Role> roles = roleService.getRolesByName(Role.Names.USER);
+            List<Role> roles = new ArrayList<>();
+            Role role = new Role();
+            role.setActive(true);
+            role.setName(Roles.ADMIN.getName());
             participant.setRoles(roles);
+        } else {
+            participant.getRoles().forEach(role -> {
+                role.setId(null);
+                role.setActive(true);
+            });
         }
         if (!containsRoleAdmin(participant.getRoles())) {
             QRRange qrRange = qrRangeService.generateNextRange();
@@ -210,16 +219,11 @@ public class ParticipantService {
         if (CollectionUtils.isEmpty(roles)) {
             return false;
         }
-        Role adminRole = roleService
-                .getRolesByName(Role.Names.ADMIN).get(0);
         for (Role r : roles) {
             if (StringUtils.isEmpty(r.getName())) {
-                Long roleId = r.getId();
-                if (adminRole.getId().equals(roleId)) {
-                    return true;
-                }
+                throw new IllegalArgumentException("Role name is not present");
             } else {
-                if (Role.Names.ADMIN.getName().equalsIgnoreCase(r.getName())) {
+                if (Roles.ADMIN.getName().equalsIgnoreCase(r.getName())) {
                     return true;
                 }
             }

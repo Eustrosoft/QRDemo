@@ -4,6 +4,7 @@ import {emptyOrUndefined, processFetchError, processFetchErrorToLogin} from "./u
 import {setForm} from "./form.js";
 import {userApi} from "./api.js";
 import {LOCAL_STORAGE_USER} from "./localStorage.js";
+import { setFiles } from "./files.js";
 
 (function (window, document, undefined) {
     window.onload = init
@@ -17,6 +18,7 @@ import {LOCAL_STORAGE_USER} from "./localStorage.js";
         const lk = urlParams.get('lk')
         const q = urlParams.get('q')
         const form = urlParams.get('form')
+        const files = urlParams.get('files')
         const login = urlParams.get('login')
 
         if (login) {
@@ -27,7 +29,9 @@ import {LOCAL_STORAGE_USER} from "./localStorage.js";
             setCard(q)
         } else if (form) {
             setForm(form)
-        } else {
+        } else if (files) {
+            setFiles(files)
+        }else {
             if (mainBlock) {
                 setMainPage(mainBlock)
             }

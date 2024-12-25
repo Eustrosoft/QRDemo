@@ -1,6 +1,7 @@
-import {fieldToHtml, getQRImageDiv, longToHex, toLoginIfNotAuthorized} from "./utils.js";
-import {qrApi} from "./api.js";
+import { fieldToHtml, getQRImageDiv, longToHex, toLoginIfNotAuthorized } from "./utils.js";
+import { qrApi } from "./api.js";
 import { getInput } from "./components/inputs.js";
+import { getModalWindow } from "./components/modals.js";
 
 const mainBlock = document.getElementById('main_block')
 let divCard = document.createElement('div')
@@ -46,9 +47,12 @@ function setQRInfo(q, div) {
             let divCardInfo = document.createElement('div')
             let cardInfoHtml = getCardInfoHtml(json)
             divCardInfo.className = 'code_info'
-    
+
             // const qrImageDiv = getQRImageDiv(longToHex(json?.code));
             // divCardInfo.append(qrImageDiv)
+        if (cardInfoHtml.innerHTML === null || cardInfoHtml.innerHTML === undefined || cardInfoHtml.innerHTML === '') {
+            cardInfoHtml.innerHTML = '<h1>Нет информации для этой карточки</h1>'
+        }
 
             divCardInfo.append(cardInfoHtml)
             div.appendChild(divCardInfo)
@@ -59,7 +63,7 @@ function setQRInfo(q, div) {
 
 function getCardInfoHtml(qr) {
     const qrForm = qr?.form
-    const blocks = qr?.form?.blocks
+    const fields = qr?.form?.fields
     const name = qr?.name
     const description = qr?.description
 
@@ -89,7 +93,7 @@ function getCardInfoHtml(qr) {
 
     if (edit) {
         let formLabel = document.createElement('label')
-        formLabel.innerHTML = 'Форма для отображения карточки:'
+        formLabel.innerHTML = 'Шаблон для отображения карточки:'
         let formChooseElement = document.createElement('select')
         formChooseElement.id = 'form_select'
         const opt = document.createElement('option');
@@ -124,28 +128,24 @@ function getCardInfoHtml(qr) {
         codeDiv.appendChild(descriptionElem)
     }
 
-    for (let block in blocks) {
-        const bk = blocks[block];
-        let fields = bk?.fields
+    // Header for block
+    // let codeHeader = document.createElement('h3')
+    // codeHeader.innerHTML = bk?.name
+    // codeDiv.append(codeHeader)
 
-        // Header for block
-        // let codeHeader = document.createElement('h3')
-        // codeHeader.innerHTML = bk?.name
-        // codeDiv.append(codeHeader)
-
-        for (let field in fields) {
-            const formFieldDiv = document.createElement('div');
-            formFieldDiv.className = 'form_field_div'
-            formFieldDiv.innerHTML = fieldToHtml(
-                fields[field],
-                getDataFromForm(qr, fields[field]?.name),
-                edit,
-                fields[field]?.id,
-                qrId
-            )
-            codeDiv.append(formFieldDiv)
-        }
+    for (let field in fields) {
+        const formFieldDiv = document.createElement('div');
+        formFieldDiv.className = 'form_field_div'
+        formFieldDiv.innerHTML = fieldToHtml(
+            fields[field],
+            getDataFromForm(qr, fields[field]?.name),
+            edit,
+            fields[field]?.id,
+            qrId
+        )
+        codeDiv.append(formFieldDiv)
     }
+
 
     if (edit) {
         const saveBtn = document.createElement('input');
@@ -161,6 +161,13 @@ function getCardInfoHtml(qr) {
         showPublicBtn.id = 'show_public_code_btn'
         showPublicBtn.style = 'width: 97%'
         codeDiv.append(showPublicBtn)
+
+        const showOnPhoneBtn = document.createElement('button');
+        showOnPhoneBtn.innerHTML = 'Посмотреть публичную версию на смартфоне'
+        showOnPhoneBtn.className = 'big_button'
+        showOnPhoneBtn.id = 'show_public_code_phone_btn'
+        showOnPhoneBtn.style = 'width: 97%'
+        codeDiv.append(showOnPhoneBtn)
     }
 
     return codeDiv
@@ -182,17 +189,10 @@ function addCodeBtnListeners() {
                 code: qrCode,
                 name: nameElem.value,
                 description: descriptionElem.value,
-                form: {id: formElement.options[formElement.selectedIndex].id},
+                form: { id: formElement.options[formElement.selectedIndex].id },
                 data: data
             }).then(resp => {
                 if (resp.ok) {
-
-                    for (let fileInput in filesInputArray) {
-                        let fi = filesInputArray[fileInput]
-                        if (fi.files.length !== 0) {
-                            qrApi().uploadFile(qrId, fi.name, fi)
-                        }
-                    }
                     alert('Карточка была обновлена!')
                     location.reload()
                 } else {
@@ -205,6 +205,20 @@ function addCodeBtnListeners() {
     if (showPublicBtn) {
         showPublicBtn.addEventListener('click', () => {
             location.href = `?q=${Number(qrCode).toString(16)}`
+        })
+    }
+    const showPublicPhoneBtn = document.getElementById('show_public_code_phone_btn')
+    if (showPublicPhoneBtn) {
+        showPublicPhoneBtn.addEventListener('click', () => {
+            let iframe = document.createElement('iframe')
+            iframe.id = 'phone_iframe'
+            iframe.src = `?q=${Number(qrCode).toString(16)}`
+            iframe.style.width = '500px'
+            iframe.style.height = '882px'
+            let modal = getModalWindow('Просмотр с телефона', iframe)
+            modal.style.display = 'block'
+            modal.firstChild.style.width = '500px'
+            modal.firstChild.style.height = '932px'
         })
     }
 }

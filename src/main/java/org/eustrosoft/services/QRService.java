@@ -7,14 +7,17 @@ import io.minio.Result;
 import io.minio.StatObjectResponse;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
+import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Form;
-import org.eustrosoft.entitites.FormBlock;
 import org.eustrosoft.entitites.FormField;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QR;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.repositories.QRRepository;
+import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.utils.CommonUtils;
@@ -24,20 +27,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.eustrosoft.Constants.EMPTY_JSON;
-import static org.eustrosoft.Constants.MINIO_FILES_PATTERN;
 import static org.eustrosoft.Constants.MINIO_FILE_DIR_PATTERN;
 import static org.eustrosoft.Constants.RANGE_END;
 import static org.eustrosoft.Constants.RANGE_START;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
+import static org.eustrosoft.utils.FileUtils.getFileIndex;
 
 @Service
 @RequiredArgsConstructor
@@ -46,17 +55,17 @@ public class QRService {
     private final ParticipantService participantService;
     private final SecurityComponent securityComponent;
     private final MinioService minioService;
-    private final ObjectMapper mapper;
+    private final FileService fileService;
 
     public Optional<QR> get(Long id) throws IllegalAccessException {
         Optional<QR> byId = qrRepository.findById(id);
-        securityComponent.checkUserRight(byId.get()::getParticipant);
+        securityComponent.checkUserRightById(byId.get()::getParticipantId);
         return byId;
     }
 
     public Optional<QR> getByCode(Long code) throws IllegalAccessException {
         Optional<QR> byId = qrRepository.findByCode(code);
-        securityComponent.checkUserRight(byId.get()::getParticipant);
+        securityComponent.checkUserRightById(byId.get()::getParticipantId);
         return qrRepository.findByCode(code);
     }
 
@@ -76,7 +85,9 @@ public class QRService {
 
     public List<QRSimpleProjection> findAllMine() throws IllegalAccessException {
         return CommonUtils.iterableToList(
-                qrRepository.findAllByParticipantOrderByUpdatedDesc(participantService.getCurrentSimpleOrThrow())
+                qrRepository.findAllByParticipantIdOrderByUpdatedDesc(
+                        participantService.getCurrentSimpleOrThrow().getId()
+                )
         );
     }
 
@@ -92,7 +103,7 @@ public class QRService {
         if (code < RANGE_START || code > RANGE_END) {
             throw new IllegalArgumentException("Code has illegal character");
         }
-        qr.setParticipant(current);
+        qr.setParticipantId(current.getId());
         return qrRepository.save(qr);
     }
 
@@ -100,7 +111,7 @@ public class QRService {
     public QR setFormForQR(Long id, Long formId) throws IllegalAccessException, JsonProcessingException {
         Optional<QR> qr = get(id);
         if (qr.isPresent()) {
-            securityComponent.checkUserRight(qr.get()::getParticipant);
+            securityComponent.checkUserRightById(qr.get()::getParticipantId);
             QR gotQr = qr.get();
             Form form = new Form();
             form.setId(formId);
@@ -113,7 +124,7 @@ public class QRService {
     @Transactional
     public QR update(QR qr) throws IllegalAccessException, JsonProcessingException {
         Optional<QR> gotQr = get(qr.getId());
-        qr.setParticipant(participantService.getCurrentSimpleOrThrow());
+        qr.setParticipantId(participantService.getCurrentSimpleOrThrow().getId());
         if (gotQr.isPresent()) {
             qr.setData(mergeDataAndGetString(gotQr.get().getData(), qr.getData()));
         }
@@ -127,14 +138,29 @@ public class QRService {
     }
 
     @Transactional
-    public void uploadFile(Long id, String name, MultipartFile file) throws IllegalAccessException, IOException {
+    public FileProjection uploadFile(Long id, FileUploadRequest fur) throws IllegalAccessException, IOException {
         QR qr = get(id).get();
-        minioService.deleteAllFilesInDirectory(String.format(MINIO_FILE_DIR_PATTERN, qr.getId(), name));
-        minioService.putObject(
-                String.format(MINIO_FILES_PATTERN, qr.getId(), name, file.getOriginalFilename()),
-                file.getInputStream(),
-                file.getContentType()
-        );
+        FileProjection file = fileService.uploadFile(fur);
+        List<File> files = qr.getFiles();
+        if (files == null) {
+            qr.setFiles(new ArrayList<>());
+        }
+        qr.getFiles().add(new File(file.getId()));
+        update(qr);
+        return file;
+    }
+
+    @Transactional
+    @SneakyThrows
+    public void deleteFile(Long id, Long fileId) {
+        QR qr = get(id).get();
+        List<File> files = qr.getFiles();
+        if (files == null) {
+            throw new IllegalArgumentException("There are no files in this qr");
+        }
+        int index = getFileIndex(fileId, files);
+        files.remove(index);
+        update(qr);
     }
 
     @Transactional
@@ -159,6 +185,23 @@ public class QRService {
                 .header(HttpHeaders.CONTENT_RANGE, "Bytes" + " " + 0 + "-" + fileLengthInBytes + "/" + fileLengthInBytes)
                 .header(HttpHeaders.CONTENT_LENGTH, fileLengthInBytes)
                 .body(objectBytes);
+    }
+
+    @Transactional
+    public ResponseEntity<byte[]> getFileBytesResponseV2(Long id) throws Exception {
+        FileProjection file = fileService.findById(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.CONTENT_TYPE, file.getFileType())
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        String.format(
+                                "attachment; filename*=UTF-8''%s",
+                                URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
+                        )
+                )
+                .header(HttpHeaders.ACCEPT_RANGES, "Bytes")
+                .header(HttpHeaders.CONTENT_RANGE, "Bytes" + " " + 0 + "-" + file.getFileSize() + "/" + file.getFileSize())
+                .header(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString())
+                .body(fileService.getFileBytes(id));
     }
 
     private void checkUsedQr(Collection<QRRange> ranges, Collection<QR> used, Long qr) throws IllegalArgumentException {
@@ -219,60 +262,30 @@ public class QRService {
             form = new Form();
             return qr;
         }
-        List<FormBlock> blocks = form.getBlocks();
-        if (blocks == null || blocks.isEmpty()) {
-            return qr;
-        }
         Form publicForm = new Form();
 
-        // Map<Integer, List<FormField>> fieldsToRemove = new HashMap<>();
-        for (int i = 0; i < blocks.size(); i++) {
-            FormBlock block = blocks.get(i);
-            List<FormField> fields = block.getFields();
-            if (fields == null || fields.isEmpty()) {
-                continue;
-            }
-            FormBlock publicBlock = new FormBlock();
-            publicBlock.setName(block.getName());
-            publicBlock.setDescription(block.getDescription());
-            if (publicForm.getBlocks() == null) {
-                publicForm.setBlocks(new ArrayList<>());
-            }
-            publicForm.getBlocks().add(publicBlock);
+        List<FormField> formFields = form.getFields();
 
-            for (int j = 0; j < fields.size(); j++) {
-                FormField field = fields.get(j);
-                Boolean isPublic = field.getIsPublic();
-                if (isPublic != null && isPublic) {
-                    List<FormField> pubFields = publicBlock.getFields();
-                    if (pubFields == null) {
-                        publicBlock.setFields(new ArrayList<>());
-                    }
-                    publicBlock.getFields().add(field);
+        if (formFields == null) {
+            return qr;
+        }
+
+        // Map<Integer, List<FormField>> fieldsToRemove = new HashMap<>();
+        for (int j = 0; j < formFields.size(); j++) {
+            FormField field = formFields.get(j);
+            Boolean isPublic = field.getIsPublic();
+            if (isPublic != null && isPublic) {
+                List<FormField> publicFields = publicForm.getFields();
+                if (publicFields == null) {
+                    publicForm.setFields(new ArrayList<>());
                 }
+                publicForm.getFields().add(field);
             }
         }
+
         qr.setForm(publicForm);
         qr.setData(getDataBasedOnForm(qr));
         return qr;
-    }
-
-    private void removeFieldsBasedOnMap(Form form, Map<Integer, List<FormField>> fieldsToRemove) {
-        if (form == null || fieldsToRemove == null || fieldsToRemove.isEmpty()) {
-            return;
-        }
-        List<FormBlock> blocks = form.getBlocks();
-        for (int i = 0; i < blocks.size(); i++) {
-            if (!fieldsToRemove.containsKey(i)) {
-                continue;
-            }
-            List<FormField> fields = blocks.get(i).getFields();
-            if (fields == null || fields.isEmpty()) {
-                continue;
-            }
-            List<FormField> toRemove = fieldsToRemove.get(i);
-            fields.removeAll(toRemove);
-        }
     }
 
     private String getDataBasedOnForm(QR qr) throws JsonProcessingException {
@@ -284,23 +297,21 @@ public class QRService {
         });
 
         Form form = qr.getForm();
-        List<FormBlock> blocks = form.getBlocks();
+
+        List<FormField> formFields = form.getFields();
+
+        if (formFields == null) {
+            return EMPTY_JSON;
+        }
+
         Set<String> dataToStand = new HashSet<>();
-        for (int i = 0; i < blocks.size(); i++) {
-            FormBlock block = blocks.get(i);
-            List<FormField> fields = block.getFields();
-            if (fields == null || fields.isEmpty()) {
-                continue;
-            }
-            for (int j = 0; j < fields.size(); j++) {
-                FormField field = fields.get(j);
-                dataToStand.add(field.getName());
-            }
+        for (FormField field : formFields) {
+            dataToStand.add(field.getName());
         }
         Map<Object, Object> processedData =
                 data.entrySet()
                         .stream().filter(entry -> dataToStand.contains(entry.getKey()))
-                        .collect(Collectors.toMap(v -> v.getKey(), v1 -> v1.getValue()));
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         if (processedData.isEmpty()) {
             return EMPTY_JSON;
         }

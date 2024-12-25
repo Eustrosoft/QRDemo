@@ -3,13 +3,24 @@ package org.eustrosoft.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.dtos.FileDto;
 import org.eustrosoft.dtos.QRChangeDto;
 import org.eustrosoft.dtos.QRCreationDto;
 import org.eustrosoft.dtos.QRDto;
+import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.mappers.QrMapper;
 import org.eustrosoft.services.QRService;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +32,7 @@ import java.util.stream.Collectors;
 public class QRController {
     private final QRService service;
     private final QrMapper mapper;
+    private final FileMapper fileMapper;
 
     @GetMapping
     public List<QRDto> findAll() throws IllegalAccessException {
@@ -53,13 +65,20 @@ public class QRController {
         return mapper.toDto(service.update(mapper.fromChangeDto(dto)));
     }
 
-    @PutMapping("/{id}/files/{name}")
-    public void uploadFile(
+    @PostMapping("/{id}/files/upload")
+    public FileDto uploadFile(
             @PathVariable Long id,
-            @PathVariable String name,
-            @RequestParam("file") MultipartFile file
+            FileUploadRequest fur
     ) throws IllegalAccessException, IOException {
-        service.uploadFile(id, name, file);
+        return fileMapper.toDto(service.uploadFile(id, fur));
+    }
+
+    @PostMapping("/{id}/files/{fileId}/delete")
+    public void deleteFile(
+            @PathVariable Long id,
+            @PathVariable Long fileId
+    ) throws IllegalAccessException {
+        service.deleteFile(id, fileId);
     }
 
     @DeleteMapping("/{id}")

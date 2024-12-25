@@ -3,6 +3,7 @@ package org.eustrosoft.mappers;
 import lombok.SneakyThrows;
 import org.eustrosoft.dtos.EntityDto;
 import org.eustrosoft.entitites.DbEntity;
+import org.eustrosoft.repositories.projections.EntityProjection;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +16,9 @@ public class EntityMapper {
         return new EntityDto(
                 entity.getId(),
                 entity.getCreated(),
-                entity.getUpdated()
+                entity.getUpdated(),
+                entity.getName(),
+                entity.getDescription()
         );
     }
 
@@ -28,18 +31,24 @@ public class EntityMapper {
         entityDto.setId(entity.getId());
         entityDto.setCreated(entity.getCreated());
         entityDto.setUpdated(entity.getUpdated());
+        entityDto.setName(entity.getName());
+        entityDto.setDescription(entity.getDescription());
+        entity.setParticipantId(entity.getParticipantId());
         return entityDto;
     }
 
-    public DbEntity toEntity(EntityDto dto) {
-        if (dto == null) {
+    @SneakyThrows
+    public <T extends EntityDto> T toDtoFromProjection(EntityProjection projection, Class<T> clazz) {
+        if (projection == null) {
             return null;
         }
-        DbEntity entity = new DbEntity();
-        entity.setId(dto.getId());
-        entity.setCreated(dto.getCreated());
-        entity.setUpdated(dto.getUpdated());
-        return entity;
+        T entityDto = clazz.getDeclaredConstructor().newInstance();
+        entityDto.setId(projection.getId());
+        entityDto.setCreated(projection.getCreated());
+        entityDto.setUpdated(projection.getUpdated());
+        entityDto.setName(projection.getName());
+        entityDto.setDescription(projection.getDescription());
+        return entityDto;
     }
 
     @SneakyThrows
@@ -51,6 +60,23 @@ public class EntityMapper {
         entity.setId(dto.getId());
         entity.setCreated(dto.getCreated());
         entity.setUpdated(dto.getUpdated());
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+        return entity;
+    }
+
+    @SneakyThrows
+    public <T extends DbEntity> T toEntity(EntityProjection projection, Class<T> clazz) {
+        if (projection == null) {
+            return null;
+        }
+        T entity = clazz.getDeclaredConstructor().newInstance();
+        entity.setId(projection.getId());
+        entity.setCreated(projection.getCreated());
+        entity.setUpdated(projection.getUpdated());
+        entity.setName(projection.getName());
+        entity.setDescription(projection.getDescription());
+        entity.setParticipantId(projection.getParticipantId());
         return entity;
     }
 

@@ -4,38 +4,39 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eustrosoft.repositories.projections.FormSimpleProjection;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "form", schema = "public")
+@Table(name = "form", schema = "qrdemo")
 public class Form extends DbEntity implements FormSimpleProjection {
+    public static final String TYPE = "FM";
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "description")
-    private String description;
-    
     @Column(name = "data")
     private String data;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "participant_form",
-            joinColumns = @JoinColumn(name = "form_id"),
-            inverseJoinColumns = @JoinColumn(name = "participant_id")
-    )
-    private Participant participant;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "form_id", updatable = false)
+    private List<FormField> fields;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "form_blocks",
-            joinColumns = @JoinColumn(name = "form_id"),
-            inverseJoinColumns = @JoinColumn(name = "form_block_id")
+            name = "form_file",
+            joinColumns = {@JoinColumn(name = "form_id")},
+            inverseJoinColumns = {@JoinColumn(name = "file_id")}
     )
-    private List<FormBlock> blocks;
+    private List<File> files;
 }

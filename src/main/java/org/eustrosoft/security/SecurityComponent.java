@@ -27,4 +27,18 @@ public class SecurityComponent {
         }
     }
 
+    public void checkUserRightById(Supplier<Long> participantIdSupplier) throws IllegalAccessException {
+        if (participantIdSupplier == null) {
+            throw new IllegalArgumentException("Supplier not provided");
+        }
+        Long participantId = participantIdSupplier.get();
+        if (participantId == null) {
+            throw new IllegalAccessException("Participant not found for this qr");
+        }
+        Participant current = participantService.getCurrentOrThrow();
+        if (!Objects.equals(current.getId(), participantId)) {
+            throw new IllegalAccessException("Participant is not the same as this qr");
+        }
+    }
+
 }

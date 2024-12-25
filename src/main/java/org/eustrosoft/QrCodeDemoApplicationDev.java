@@ -16,7 +16,7 @@ import java.util.List;
 public class QrCodeDemoApplicationDev {
 
     public static void main(String[] args) {
-        SpringApplication.run(QrCodeDemoApplication.class, args);
+        SpringApplication.run(QrCodeDemoApplicationDev.class);
     }
 
     @Bean

@@ -13,9 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FormDto extends EntityDto {
-    private String name;
-    private String description;
     @JsonRawValue
     private String data;
-    private List<FormBlockDto> blocks;
+    private List<FormFieldDto> fields;
+    private List<FileDto> files;
 }

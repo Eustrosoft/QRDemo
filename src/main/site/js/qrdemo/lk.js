@@ -1,5 +1,5 @@
 import { emptyOrUndefined, getQRImage, hasAdminRole, longToHex, notNullOrUndefined, toLoginIfNotAuthorized } from "./utils.js";
-import { adminApi, qrApi, userApi } from "./api.js";
+import { adminApi, dictionaryApi, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
 import { getModalWindow } from "./components/modals.js";
@@ -7,6 +7,7 @@ import { getInput, getSelect } from "./components/inputs.js";
 import { LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
 import { notEmptyOrUndefined } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
+import { DICTIONARIES } from "./domain/dictionaries.js";
 
 const mainBlock = document.getElementById('main_block')
 let divLk = document.createElement('div')
@@ -290,13 +291,22 @@ function setupQrsPart(div, settings) {
     let divFormCreatePart = document.createElement('button')
     divFormCreatePart.id = 'forms_create_part'
     divFormCreatePart.className = 'big_button'
-    divFormCreatePart.innerHTML = `Менеджер форм`
+    divFormCreatePart.innerHTML = `Менеджер шаблонов`
     divFormCreatePart.addEventListener('click', () => {
         window.location = '?form=true'
     })
 
+    let divFileCreatePart = document.createElement('button')
+    divFileCreatePart.id = 'files_create_part'
+    divFileCreatePart.className = 'big_button'
+    divFileCreatePart.innerHTML = `Менеджер файлов`
+    divFileCreatePart.addEventListener('click', () => {
+        window.location = '?files=true'
+    })
+
     buttonsDiv.appendChild(divQrCreatePart)
     buttonsDiv.appendChild(divFormCreatePart)
+    buttonsDiv.appendChild(divFileCreatePart)
     divQrsPart.appendChild(buttonsDiv)
 
     let qrsTable = document.createElement('table')
@@ -435,7 +445,7 @@ function setupAdminPanel(div) {
         const passw1 = getInput('Пароль', 'password', true, 'create_participant_password_1', 'Введите пароль...')
         const passw2 = getInput('Повтор пароля', 'password', true, 'create_participant_password_2', 'Повторите пароль...')
         const email = getInput('Емейл', 'email', true, 'create_participant_email', 'Введите электронную почту...')
-        const swtch = getSelect('Роль', 'role', ['ROLE_USER', 'ROLE_ADMIN'], 'ROLE_USER')
+        let swtch = getSelect('Роль', 'role', ['ROLE_USER', 'ROLE_ADMIN'], 'ROLE_USER')
         const saveBtn = getBigButton('Создать пользователя')
         saveBtn.style = 'margin-top: 8px;'
 
@@ -449,7 +459,7 @@ function setupAdminPanel(div) {
                         password: document.getElementById('create_participant_password_1').value,
                         confirmPassword: document.getElementById('create_participant_password_2').value,
                         email: document.getElementById('create_participant_email').value,
-                        roleIds: [ roles.find(x => x.name === document.getElementById('role').value).id ]
+                        roles: [ roles.find(x => x.name === document.getElementById('role').value) ]
                     }
                 ).then(resp => {
                     if (!resp.ok)
@@ -460,10 +470,11 @@ function setupAdminPanel(div) {
                 }).catch(ex => alert(ex))
         })
 
-        adminApi().getRoles()
+        dictionaryApi().getDictionariesByCode(DICTIONARIES.ROLES)
             .then(resp => resp.json())
             .then(json => {
                 roles = json
+            swtch = getSelect('Роль', 'role', roles.map((role => role.name)))
                 innerDiv.append(username, passw1, passw2, email, swtch, saveBtn)
                 const modal = getModalWindow('Создание нового пользователя', innerDiv);
                 modal.style.display = 'block'
@@ -559,9 +570,9 @@ function getParticipantTr(participantJson, parentDiv) {
     let td3 = document.createElement('td')
     td3.innerHTML = new Date(created).toLocaleString()
     let td4 = document.createElement('td')
-    td4.innerHTML = roles.map(getRoleName)
+    td4.innerHTML = roles?.map(getRoleName)
     let td5 = document.createElement('td')
-    td5.innerHTML = ranges.map(getRangeList)
+    td5.innerHTML = ranges?.map(getRangeList)
 
     tr.style = 'cursor: pointer;'
     tr.className = 'hoverable'

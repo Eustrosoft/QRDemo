@@ -40,10 +40,13 @@ build/
 
 ### Custom ###
 application.prod.yml
+application.dev.yml
 
 *.jar
 *.war
 env
 dev/docker-compose.yml
+
+dev/db/qrDemo/default_data.sql
 
 *.mp4

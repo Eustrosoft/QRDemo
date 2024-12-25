@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -15,7 +14,7 @@ public class RegistrationDto {
     private String password;
     private String confirmPassword;
     private String email;
-    private List<Long> roleIds;
+    private List<RoleDto> roles;
 
     public RegistrationDto(String username, String password, String confirmPassword, String email) {
         this.username = username;

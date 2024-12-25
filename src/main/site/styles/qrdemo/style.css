@@ -233,10 +233,6 @@ input[type='checkbox'] {
     }
 }
 
-.qrs_table {
-    width: 100%
-}
-
 .qr_line {
     padding: 4px;
     margin: 0.4rem auto;
@@ -289,10 +285,6 @@ select {
     padding: 46px;
     justify-items: center;
     justify-content: space-between;
-
-    input {
-
-    }
 }
 
 .code_block {
@@ -308,6 +300,7 @@ select {
 
 table {
     table-layout: fixed;
+    width: 99%;
 }
 
 table, td, th {
@@ -320,6 +313,13 @@ table, td, th {
     overflow: hidden;
     word-break: break-all;
     font-size: 1.4em;
+
+td > input, select, button {
+    font-size: 0.8em !important;
+    width: 94%;
+    height: 98%;
+}
+
 }
 
 .toolbar {
@@ -360,4 +360,72 @@ table, td, th {
 
 .hoverable:hover {
     background: rgb(0 0 0 / 20%);
+}
+
+.scrollable-x {
+    height: 120px;
+    width: 80vw;
+    margin: 40px;
+
+    border: solid 1px #dbdbdb;
+    border-radius: 10px;
+
+.upper_menu {
+    height: 30px;
+    border-bottom: solid 1px #dbdbdb;
+}
+}
+
+.upload-file-button {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    cursor: pointer;
+
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.upload-file-button:hover {
+    opacity: calc(0.6);
+}
+
+.upload-file-button:before {
+    width: auto;
+    height: auto;
+    content: url('/logos/file-upload-duotone.svg');
+}
+
+.files_list {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    overflow-x: scroll;
+}
+
+.file-item {
+    width: 120px;
+    display: flex;
+    flex-direction: column;
+}
+
+.file-metadata {
+    font-size: 0.95em;
+    font-style: italic;
+}
+
+.file-icon {
+    width: 40px;
+    height: 40px;
+    content: url('/logos/icons8-file.svg');
+}
+
+#phone_iframe {
+    width: 495px;
+    height: 875px;
+    border: 2px solid #888;
+    border-radius: 1%;
 }

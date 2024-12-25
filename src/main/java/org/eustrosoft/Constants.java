@@ -21,4 +21,14 @@ public class Constants {
 
     public static final Long RANGE_START = 0x01070000L;
     public static final Long RANGE_END = 0x0107FFFFL;
+
+    public static class Types {
+        public static final String TYPE_PARTICIPANT = "PT";
+        public static final String TYPE_ROLE = "RL";
+        public static final String TYPE_QR = "QR";
+        public static final String TYPE_QR_RANGE = "QRR";
+        public static final String TYPE_FORM = "FM";
+        public static final String TYPE_FORM_FIELD = "FF";
+        public static final String TYPE_FILE = "FILE";
+    }
 }

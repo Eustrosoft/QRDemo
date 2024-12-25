@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RoleDto extends EntityDto {
     private String name;
+    private Boolean active;
 }

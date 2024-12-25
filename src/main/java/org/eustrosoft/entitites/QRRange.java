@@ -3,14 +3,18 @@ package org.eustrosoft.entitites;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Entity
+@javax.persistence.Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "qr_range", schema = "public")
+@Table(name = "qr_range", schema = "qrdemo")
 public class QRRange extends DbEntity {
+    public static final String TYPE = "QRR";
 
     @Column(name = "from_range")
     private Long from;

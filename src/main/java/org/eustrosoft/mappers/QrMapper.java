@@ -17,28 +17,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QrMapper extends EntityMapper {
     private final FormMapper formMapper;
+    private final FileMapper fileMapper;
 
     public QRDto toDto(QRSimpleProjection qr) {
-        QRDto dto = new QRDto(
-                qr.getName(), qr.getDescription(),
-                qr.getCode(), null,
-                qr.getForm() == null ? null : formMapper.toDto(qr.getForm())
-        );
+        QRDto dto = new QRDto();
         dto.setId(qr.getId());
         dto.setCreated(qr.getCreated());
         dto.setUpdated(qr.getUpdated());
+        dto.setName(qr.getName());
+        dto.setDescription(qr.getDescription());
+        dto.setCode(qr.getCode());
+        dto.setForm(formMapper.toDto(qr.getForm()));
         return dto;
     }
 
     public QRDto toDto(QR qr) {
-        QRDto dto = new QRDto(
-                qr.getName(), qr.getDescription(),
-                qr.getCode(), qr.getData(),
-                qr.getForm() == null ? null : formMapper.toDto(qr.getForm())
-        );
-        dto.setId(qr.getId());
-        dto.setCreated(qr.getCreated());
-        dto.setUpdated(qr.getUpdated());
+        QRDto dto = super.toDto(qr, QRDto.class);
+        dto.setCode(qr.getCode());
+        dto.setData(qr.getData());
+        dto.setForm(formMapper.toDto(qr.getForm()));
+        dto.setFiles(fileMapper.toListDto(qr.getFiles()));
         return dto;
     }
 
