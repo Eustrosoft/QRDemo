@@ -1,0 +1,62 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <style>
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content:center;
+            align-items: center;
+        }
+        a {
+            text-decoration: none;
+            text-align: center;
+        }
+        .up {
+            height:10px;
+        }
+        span {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="up"></div>
+<div class="content">
+    <span>Сканируйте для <br>дополнительной информации<br></span>
+    <div id="mainBlock"><a class="qr_link" target="_"><img id="qr_image"></a></div>
+    <div>
+        <span><center>или перейдите по ссылке:<br/><a id="qr_text_link" target="_"></a></center></span>
+    </div>
+</div>
+</body>
+<script>
+    const urlParams = new URLSearchParams(window.location.search)
+    const q = urlParams.get('q')
+
+    if (!q) {
+        alert('Не предоставлен параметр q')
+    } else {
+        const schema = 'http://'
+        const baseQrHref = 'qr.qxyz.ru'
+        const queryQ = '/?q='
+
+        let qr_links = document.getElementsByClassName('qr_link')
+        let qr_text_link = document.getElementById('qr_text_link')
+        for (let i in qr_links) {
+            qr_links[i].href = schema + baseQrHref + queryQ + q
+        }
+        if (qr_text_link) {
+            qr_text_link.innerHTML = baseQrHref + queryQ + q
+            qr_text_link.href = schema + baseQrHref + queryQ + q
+        }
+
+        const baseGenerateHref = 'https://qrgen.qxyz.ru/generate?q='
+        let qr_image = document.getElementById('qr_image')
+        if (qr_image) {
+            qr_image.src = baseGenerateHref + q + '&color=%23000000&background=%23ffffff&x=165&fileType=SVG&correctionLevel=L&site=' + schema + baseQrHref
+        }
+    }
+</script>
+</html>
