@@ -42,7 +42,7 @@ export function getQRImage(code, x = 300) {
     return `
         <a href="?q=${code}">
             <img class="qr_line_image"
-                 src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=${x}&fileType=SVG&correctionLevel=M"
+                 src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=${x}&fileType=SVG&correctionLevel=L"
                  alt="qrImage"
             />
         </a>
@@ -54,7 +54,7 @@ export function getQRImageDiv(code) {
     link.href = `?q=${code}`
     link.innerHTML = `
             <img class="qr_line_image"
-                 src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=300&fileType=SVG&correctionLevel=M"
+                 src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=300&fileType=SVG&correctionLevel=L"
                  alt="qrImage"
             />
     `
@@ -154,7 +154,8 @@ export function fieldToHtmlItems(field, index, fieldTypes = []) {
     let fieldTypesStr = fieldTypesToOptions(fieldTypes, type)
 
     let items = [
-        `<select name="type">${fieldTypesStr}</select>`,
+        `<input name="id" type="hidden" value="${id}">
+         <select name="type">${fieldTypesStr}</select>`,
         `<input name="name" type="text" value="${name}">`,
         `<input name="placeholder" type="text" value="${placeholder}">`,
         `<input name="isStatic" type="checkbox" ${isStatic ? 'checked' : ''}></input>`,

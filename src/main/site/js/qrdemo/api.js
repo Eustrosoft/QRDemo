@@ -3,6 +3,7 @@ import { emptyOrUndefined } from "./utils";
 
 export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
 export const QR_DEMO_API_PROD = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
+export const QR_PRINTER_URL = `printer.html`
 
 export function qrApi() {
     const headers = {
@@ -131,26 +132,34 @@ export function qrApi() {
             )
             return fetch(req)
         },
-        uploadFormFile: (id, fileInput) => {
+        uploadFormFile: (id, fileRequest) => {
+            const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`;
+
             let data = new FormData()
-            let file = fileInput.files[0];
+            let file = fileRequest.file.files[0];
 
             data.append('file', file, file.name)
+            data.append('name', fileRequest.name)
+            data.append('description', fileRequest.description)
+            data.append('public', fileRequest.public)
 
             const request = new XMLHttpRequest();
-            let url = `${QR_DEMO_API}secured/forms/${id}/files/upload`;
             request.open('POST', url, false)
             request.withCredentials = true
             request.send(data)
         },
-        uploadQRFile: (id, fileInput) => {
+        uploadQRFile: (id, fileRequest) => {
+            const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`;
+
             let data = new FormData()
-            let file = fileInput.files[0];
+            let file = fileRequest.file.files[0];
 
             data.append('file', file, file.name)
+            data.append('name', fileRequest.name)
+            data.append('description', fileRequest.description)
+            data.append('public', fileRequest.public)
 
             const request = new XMLHttpRequest();
-            let url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`;
             request.open('POST', url, false)
             request.withCredentials = true
             request.send(data)
@@ -241,6 +250,16 @@ export function qrApi() {
         },
         downloadFile: (id) => {
             let url = `${QR_DEMO_API}secured/files/${id}/download`;
+
+            var link = document.createElement('a')
+            link.target = '_'
+            link.href = url
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+        },
+        downloadFileUnsecured: (id) => {
+            let url = `${QR_DEMO_API}unsecured/files/${id}/download`;
 
             var link = document.createElement('a')
             link.target = '_'

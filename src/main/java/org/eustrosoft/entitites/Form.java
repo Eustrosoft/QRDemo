@@ -32,7 +32,7 @@ public class Form extends DbEntity implements FormSimpleProjection {
     @JoinColumn(name = "form_id", updatable = false)
     private List<FormField> fields;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "form_file",
             joinColumns = {@JoinColumn(name = "form_id")},

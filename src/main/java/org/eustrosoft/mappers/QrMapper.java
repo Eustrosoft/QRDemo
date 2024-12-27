@@ -6,7 +6,9 @@ import org.eustrosoft.dtos.QRChangeDto;
 import org.eustrosoft.dtos.QRCreationDto;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.entitites.QR;
+import org.eustrosoft.repositories.projections.QRProjection;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
+import org.eustrosoft.repositories.projections.QRSimplestProjection;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -19,15 +21,28 @@ public class QrMapper extends EntityMapper {
     private final FormMapper formMapper;
     private final FileMapper fileMapper;
 
-    public QRDto toDto(QRSimpleProjection qr) {
+    public QRDto toDto(QRSimplestProjection qr) {
         QRDto dto = new QRDto();
         dto.setId(qr.getId());
         dto.setCreated(qr.getCreated());
         dto.setUpdated(qr.getUpdated());
+        dto.setCode(qr.getCode());
+        return dto;
+    }
+
+    public QRDto toDto(QRSimpleProjection qr) {
+        QRDto dto = toDto((QRSimplestProjection) qr);
         dto.setName(qr.getName());
         dto.setDescription(qr.getDescription());
+        dto.setForm(formMapper.toDto(qr.getForm()));
+        return dto;
+    }
+
+    public QRDto toDto(QRProjection qr) {
+        QRDto dto = toDto((QRSimplestProjection) qr);
         dto.setCode(qr.getCode());
         dto.setForm(formMapper.toDto(qr.getForm()));
+        dto.setFiles(fileMapper.toListDto(qr.getFiles()));
         return dto;
     }
 
@@ -55,6 +70,9 @@ public class QrMapper extends EntityMapper {
         if (dto.getData() != null) {
             qr.setData(dto.getData().toString());
         }
+        if (dto.getFiles() != null) {
+            qr.setFiles(fileMapper.toListEntityFromDtos(dto.getFiles()));
+        }
         return qr;
     }
 
@@ -69,6 +87,9 @@ public class QrMapper extends EntityMapper {
         }
         if (dto.getData() != null) {
             qr.setData(dto.getData().toString());
+        }
+        if (dto.getFiles() != null) {
+            qr.setFiles(fileMapper.toListEntityFromDtos(dto.getFiles()));
         }
         return qr;
     }

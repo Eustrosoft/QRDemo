@@ -1,12 +1,10 @@
 package org.eustrosoft.repositories.projections;
 
-public interface QRSimpleProjection extends SimpleProjection {
+public interface QRSimpleProjection extends QRSimplestProjection {
 
     String getName();
 
     String getDescription();
-
-    Long getCode();
 
     FormSimpleProjection getForm();
 }

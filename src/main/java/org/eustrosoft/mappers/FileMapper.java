@@ -72,6 +72,29 @@ public class FileMapper extends EntityMapper {
         return fileProjections.stream().map(this::toEntity).collect(Collectors.toList());
     }
 
+    public File toEntityFromDto(FileDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        File file = super.toEntity(dto, File.class);
+        file.setLastAccessed(dto.getLastAccessed());
+        file.setStoragePath(dto.getStoragePath());
+        file.setChecksum(dto.getChecksum());
+        file.setFileType(dto.getFileType());
+        file.setIsPublic(dto.getIsPublic());
+        file.setIsActive(dto.getIsActive());
+        file.setFileSize(dto.getFileSize());
+        file.setFileName(dto.getFileName());
+        return file;
+    }
+
+    public List<File> toListEntityFromDtos(List<FileDto> dtos) {
+        if (dtos == null) {
+            return Collections.emptyList();
+        }
+        return dtos.stream().map(this::toEntityFromDto).collect(Collectors.toList());
+    }
+
     public File toEntity(String name, MultipartFile file) throws IOException {
         return toEntity(
                 FileUploadRequest.builder()

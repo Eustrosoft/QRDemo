@@ -1,11 +1,12 @@
-import {fieldToHtmlItems, setQueryParamsAndRefresh, toLoginIfNotAuthorized} from "./utils.js";
-import {dictionaryApi, qrApi} from "./api.js";
+import { fieldToHtmlItems, formatBytes, setQueryParamsAndRefresh, toLoginIfNotAuthorized } from "./utils.js";
+import { dictionaryApi, qrApi } from "./api.js";
 import { notEmptyOrUndefined } from "../commons/common.js";
 import { getTextLabel } from "./components/labels.js";
 import { getInput } from "./components/inputs.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getFileScrollComponent } from "./components/fileScroll.js";
-import { getTable, TableHead } from "./components/tables.js";
+import { getTable, getTr, TableHead } from "./components/tables.js";
+import { downloadFile, showUploadFileModal } from "./files.js";
 
 var formFields = []
 var fieldTypes = []
@@ -45,39 +46,22 @@ function init(formId) {
         let formDiv = document.createElement('div')
         mainBlock.appendChild(formDiv)
 
-        let addElementButton = document.createElement('button')
-        addElementButton.className = 'custom_button'
-        addElementButton.innerText = '+'
-
-        addElementButton.addEventListener('click', () => {
-            formFields = Field.htmlToFields(formDiv)
-            lastElementIndex = Field.getLastFieldsIndex(formFields) + 1
-            const defField = Field.getDefault(lastElementIndex)
-            formFields.push(defField)
-            renderForm(formDiv, formFields)
-        })
-
-        mainBlock.appendChild(addElementButton)
-
         let formName = document.getElementById('formName')
         let formDescription = document.getElementById('formDescription')
 
-        let saveFormBtm = document.createElement('button')
-        saveFormBtm.className = 'custom_button'
-        saveFormBtm.innerText = 'Сохранить'
-        saveFormBtm.addEventListener('click', () => {
+        let saveFormBtn = document.createElement('button')
+        saveFormBtn.className = 'custom_button'
+        saveFormBtn.innerText = 'Сохранить'
+        saveFormBtn.addEventListener('click', () => {
             if (formName.value === null || formName.value === undefined || formName.value === '') {
                 alert("Название шаблона не может быть пустое")
                 return
             }
             const collectedFields = Field.htmlToFields(formDiv);
-            if (collectedFields === null || collectedFields.length === 0) {
-                alert("В шаблоне не могут отсутствовать поля")
-                return
-            }
+            const collectedFiles = Field.htmlToFiles(formDiv);
 
             if (create) {
-                qrApi().saveForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields))
+                qrApi().saveForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles))
                     .then(resp => {
                         if (resp.ok) {
                             return resp.json()
@@ -85,13 +69,13 @@ function init(formId) {
                         throw new Error('Ошибка при сохранении')
                     })
                     .then(json => {
-                        setQueryParamsAndRefresh([{name: 'form', value: true}, {name: 'id', value: json.id}])
+                    setQueryParamsAndRefresh([{ name: 'form', value: true }, { name: 'id', value: json.id }])
                     })
                     .then(() => alert('Шаблон был создан!'))
                     .catch(() => alert('Ошибка при создании шаблона'))
             }
             if (id !== null) {
-                qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, formId))
+                qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles, formId))
                     .then((resp) => {
                     if (resp.ok) {
                         alert('Шаблон был обновлен!')
@@ -106,9 +90,8 @@ function init(formId) {
                 })
             }
         })
-        mainBlock.appendChild(saveFormBtm)
-        let scrollableFiles = getTable()
-        mainBlock.appendChild(scrollableFiles)
+        mainBlock.appendChild(saveFormBtn)
+
         if (id) {
             qrApi().getFormById(id)
                 .then(resp => resp.json())
@@ -124,8 +107,10 @@ function init(formId) {
                         }
                     }
                 formFields = Field.sortFields(formFields)
-                    renderForm(formDiv, formFields)
+                renderForm(formDiv, formFields, json)
                 })
+
+
         }
     } else {
         qrApi().getAllForms().then(resp => resp.json())
@@ -178,14 +163,14 @@ export function deleteForm(id) {
     }
 }
 
-function renderForm(parentDiv, objects) {
+function renderForm(parentDiv, objects, json) {
     parentDiv.innerHTML = ''
 
     let headers = [
         new TableHead('Тип данных', '10%'), new TableHead('Название поля', '20%'),
-        new TableHead('Плейсхолдер', '20%'), new TableHead('Публичное', '8%'),
-        new TableHead('Статическое', '9%'), new TableHead('Поз.', '6%'),
-        new TableHead('Действия', '8%')
+        new TableHead('Значение', '20%'), new TableHead('Статическое', '9%'),
+        new TableHead('Публичное', '8%'), new TableHead('Поз.', '6%'),
+        new TableHead('Удалить', '8%')
     ]
     let items = []
     for (let index in objects) {
@@ -194,20 +179,106 @@ function renderForm(parentDiv, objects) {
         items.push(item)
     }
 
+    parentDiv.appendChild(getTextLabel('Поля:'))
     let table = getTable(
         headers,
         items,
         'formFieldRow',
         'fields_table'
     )
+    let addElementButton = document.createElement('button')
+    addElementButton.className = 'custom_button'
+    addElementButton.innerText = '+'
+
+    addElementButton.addEventListener('click', () => {
+        formFields = Field.htmlToFields(parentDiv)
+        lastElementIndex = Field.getLastFieldsIndex(formFields) + 1
+        const defField = Field.getDefault(lastElementIndex)
+        formFields.push(defField)
+        renderForm(parentDiv, formFields, json)
+    })
+
+    let tr = getTr(addElementButton, headers.length)
+    table.appendChild(tr)
+
     parentDiv.appendChild(table)
-    addDeleteRowActions(table)
+
+    parentDiv.appendChild(getTextLabel('Файлы:'))
+    let filesHeaders = [
+        new TableHead('Название', '10%'), new TableHead('Оригинальное название', '10%'),
+        new TableHead('Описание', '20%'), new TableHead('Размер', '9%'),
+        new TableHead('Публичный', '9%'), new TableHead('Создан', '8%'),
+        new TableHead('Удалить', '8%')
+    ]
+
+    let files = json?.files
+
+    let fileItems = []
+    for (let index in files) {
+        const file = files[index];
+        fileItems.push({
+            name: `<input name="id" type="hidden" value="${file?.id}"/>` + file?.name,
+            fileName: file?.fileName,
+            description: file?.description,
+            fileSize: formatBytes(file?.fileSize),
+            isPublic: file?.isPublic,
+            created: file?.created,
+            actions: `<button class="big_button" id="delete_file_btn_${index}">X</button>`
+        })
+    }
+    let tableFiles = getTable(
+        filesHeaders,
+        fileItems,
+        'formFileRow',
+        'files_table'
+    )
+
+    let addFileButton = document.createElement('button')
+    addFileButton.className = 'custom_button'
+    addFileButton.innerText = '+'
+
+    addFileButton.addEventListener('click', () => {
+        showUploadFileModal(() => {
+            let name = document.getElementById('file_name')
+            let description = document.getElementById('file_description')
+            let file = document.getElementById('file_content')
+            let isPublic = document.getElementById('file_public')
+
+            try {
+                qrApi().uploadFormFile(json?.id, { name: name.value, description: description.value, file: file, public: isPublic.checked })
+                alert('Файл успешно загружен!')
+                window.location.reload()
+            } catch (e) {
+                alert(e)
+            }
+        })
+    })
+
+    let fileTr = getTr(addFileButton, filesHeaders.length)
+    tableFiles.appendChild(fileTr)
+
+    parentDiv.appendChild(tableFiles)
+
+    addDeleteRowActions()
+    addDeleteFileRowActions()
 }
 
-function addDeleteRowActions(table) {
+function addDeleteRowActions() {
     let rows = document.getElementsByClassName('formFieldRow')
     for (let i = 0; i < rows.length; i++) {
         let elem = document.getElementById(`delete_btn_${i}`)
+        if (elem) {
+            elem.addEventListener('click', () => {
+                elem.parentElement.parentElement.remove()
+            })
+        }
+    }
+}
+
+export function addDeleteFileRowActions() {
+    let rows = document.getElementsByClassName('formFileRow')
+    for (let i = 0; i < rows.length; i++) {
+        let elem = document.getElementById(`delete_file_btn_${i}`)
         if (elem) {
             elem.addEventListener('click', () => {
                 elem.parentElement.parentElement.remove()
@@ -242,7 +313,7 @@ function setStartActions() {
         })
 }
 
-class Field {
+export class Field {
 
     constructor(id, name, placeholder, fieldType, isPublic, isStatic, fieldOrder = 0) {
         this.id = Number(id)
@@ -275,15 +346,30 @@ class Field {
         let fields = []
         for (let i = 0; i < formFields.length; i++) {
             // TODO: not depend on element index
-            const fieldType = formFields[i].children[0].firstElementChild.value;
+            const fieldId = formFields[i].children[0].firstElementChild.value;
+            const fieldType = formFields[i].children[0].children[1].value;
             const name = formFields[i].children[1].firstElementChild.value;
             const placeholder = formFields[i].children[2].firstElementChild.value;
             const isStatic = formFields[i].children[3].firstElementChild.checked;
             const isPublic = formFields[i].children[4].firstElementChild.checked;
             const order = formFields[i].children[5].firstElementChild.value;
-            fields.push(new Field(i, name, placeholder, fieldType, isPublic, isStatic, order))
+            fields.push(new Field(fieldId, name, placeholder, fieldType, isPublic, isStatic, order))
         }
         return fields
+    }
+
+    static htmlToFiles(div) {
+        const formFiles = div.getElementsByClassName('formFileRow');
+        if (formFiles.length === 0) {
+            return []
+        }
+
+        let files = []
+        for (let i = 0; i < formFiles.length; i++) {
+            const fileId = formFiles[i].children[0].firstElementChild.value;
+            files.push({ id: fileId })
+        }
+        return files
     }
 
     static getLastFieldsIndex(fields) {
@@ -291,8 +377,7 @@ class Field {
             return 0
         }
         let orders = fields.map(field => field.fieldOrder);
-        return orders.reduce((accumulator, currentValue) =>
-        {return Math.max(accumulator, currentValue);},
+        return orders.reduce((accumulator, currentValue) => { return Math.max(accumulator, currentValue); },
             orders[0]
         );
     }
@@ -301,14 +386,15 @@ class Field {
         if (fields === null || fields === undefined || fields == []) {
             return []
         }
-        return fields.sort(function(a, b){ return a.fieldOrder - b.fieldOrder })
+        return fields.sort(function (a, b) { return a.fieldOrder - b.fieldOrder })
     }
 
-    static fieldsToSaveForm(formName, formDescription, fields, formId, blockId) {
+    static fieldsToSaveForm(formName, formDescription, fields, files, formId) {
         return {
             name: formName,
             description: formDescription,
             id: Number(formId),
+            files: files,
             fields: fields
         }
     }

@@ -7,6 +7,7 @@ import org.eustrosoft.dtos.FormFieldDto;
 import org.eustrosoft.entitites.FormField;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,9 @@ public class FormFieldMapper extends EntityMapper {
         if (formField == null) {
             return null;
         }
-        return formField.stream().map(this::toDto).collect(Collectors.toList());
+        return formField.stream().map(this::toDto)
+                .sorted(Comparator.nullsFirst(Comparator.comparingInt(FormFieldDto::getFieldOrder)))
+                .collect(Collectors.toList());
     }
 
     public FormField fromCreationDto(FormFieldCreationDto dto) {

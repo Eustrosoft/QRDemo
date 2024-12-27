@@ -66,6 +66,9 @@ public class FileService {
 
     @SneakyThrows
     private FileProjection save(File entity) {
+        if (entity.getFileData() == null || entity.getFileData().length == 0) {
+            throw new IllegalArgumentException("File is empty");
+        }
         Participant current = participantService.getCurrentSimpleOrThrow();
         entity.setParticipantId(current.getId());
         return repository.save(entity);
@@ -80,8 +83,11 @@ public class FileService {
 
     public ResponseEntity<byte[]> downloadFile(Long id) {
         try {
-            FileProjection file = findById(id);
-            if (file.getIsPublic()) {
+            FileProjection file = repository.findById(id, FileProjection.class).get();
+            if (file.getIsPublic() == null || file.getIsActive() == null) {
+                throw new IllegalArgumentException("File is not public or inactive");
+            }
+            if (file.getIsPublic() && file.getIsActive()) {
                 return getFileResponse(id, file);
             }
             securityComponent.checkUserRightById(file::getParticipantId);

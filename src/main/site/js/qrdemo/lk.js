@@ -1,5 +1,5 @@
 import { emptyOrUndefined, getQRImage, hasAdminRole, longToHex, notNullOrUndefined, toLoginIfNotAuthorized } from "./utils.js";
-import { adminApi, dictionaryApi, qrApi, userApi } from "./api.js";
+import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
 import { getModalWindow } from "./components/modals.js";
@@ -368,7 +368,10 @@ function getQRRow(data, settings) {
     }
 
     let td = document.createElement('td')
-    td.innerHTML = `<div class="custom_button fs-08rem"><a href="?q=${q}&edit=true">Редактировать</a></div>`
+    td.innerHTML = `
+        <div class="custom_button fs-08rem"><a href="?q=${q}&edit=true">Редактировать</a></div>
+        <div class="custom_button fs-08rem"><a href="${QR_PRINTER_URL}?q=${q}" target="_">Форма для печати</a></div>
+    `
     qrLine.appendChild(td)
 
     return qrLine

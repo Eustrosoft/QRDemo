@@ -10,14 +10,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.dtos.FormDto;
+import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QR;
 import org.eustrosoft.entitites.QRRange;
+import org.eustrosoft.mappers.FileMapper;
+import org.eustrosoft.mappers.FormMapper;
+import org.eustrosoft.mappers.QrMapper;
 import org.eustrosoft.repositories.QRRepository;
 import org.eustrosoft.repositories.projections.FileProjection;
+import org.eustrosoft.repositories.projections.FormComplexProjection;
+import org.eustrosoft.repositories.projections.QRProjection;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.utils.CommonUtils;
@@ -33,6 +40,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +63,9 @@ public class QRService {
     private final ParticipantService participantService;
     private final SecurityComponent securityComponent;
     private final MinioService minioService;
+    private final QrMapper qrMapper;
+    private final FormMapper formMapper;
+    private final FileMapper fileMapper;
     private final FileService fileService;
 
     public Optional<QR> get(Long id) throws IllegalAccessException {
@@ -69,17 +80,15 @@ public class QRService {
         return qrRepository.findByCode(code);
     }
 
-    public QR getByCodePublic(Long code) throws JsonProcessingException {
+    public QRDto getByCodePublic(Long code) throws JsonProcessingException {
         if (code == null) {
             throw new IllegalArgumentException("Illegal code");
         }
-        Optional<QR> qr = qrRepository.findByCode(code);
+        Optional<QRProjection> qr = qrRepository.findByCode(code, QRProjection.class);
         if (!qr.isPresent()) {
             throw new IllegalArgumentException("QR code not found");
         }
-        QR gotQr = qr.get();
-        gotQr.setName(null);
-        gotQr.setDescription(null);
+        QRProjection gotQr = qr.get();
         return prepareDataBasedOnForm(gotQr);
     }
 
@@ -249,25 +258,26 @@ public class QRService {
         }
     }
 
-    private QR prepareDataBasedOnForm(QR qr) throws JsonProcessingException {
+    private QRDto prepareDataBasedOnForm(QRProjection qr) throws JsonProcessingException {
         if (qr == null) {
             throw new IllegalArgumentException("QR is null");
         }
-        Form form = qr.getForm();
+        QRDto dto = qrMapper.toDto(qr);
+        FormComplexProjection form = qr.getForm();
         if (form == null) {
-            qr.setData(EMPTY_JSON);
-            return qr;
+            dto.setData(EMPTY_JSON);
+            return dto;
         }
         if (StringUtils.isEmpty(qr.getData())) {
-            form = new Form();
-            return qr;
+            dto.setForm(new FormDto());
+            return dto;
         }
         Form publicForm = new Form();
 
         List<FormField> formFields = form.getFields();
 
         if (formFields == null) {
-            return qr;
+            return dto;
         }
 
         // Map<Integer, List<FormField>> fieldsToRemove = new HashMap<>();
@@ -283,12 +293,35 @@ public class QRService {
             }
         }
 
-        qr.setForm(publicForm);
-        qr.setData(getDataBasedOnForm(qr));
-        return qr;
+        List<FileProjection> formFiles = form.getFiles();
+        if (formFiles != null) {
+            if (publicForm.getFiles() == null) {
+                publicForm.setFiles(new ArrayList<>());
+            }
+            for (FileProjection fp : formFiles) {
+                Boolean isPublic = fp.getIsPublic();
+                if (isPublic != null && isPublic) {
+                    publicForm.getFiles().add(fileMapper.toEntity(fp));
+                }
+            }
+        }
+
+        dto.setForm(formMapper.toDto(publicForm));
+        dto.setData(getDataBasedOnForm(qr));
+        dto.setFiles(fileMapper.toListDto(getPublicFiles(qr.getFiles())));
+        return dto;
     }
 
-    private String getDataBasedOnForm(QR qr) throws JsonProcessingException {
+    private List<FileProjection> getPublicFiles(List<FileProjection> files) {
+        if (files == null) {
+            return Collections.emptyList();
+        }
+        return files.stream()
+                .filter(file -> Boolean.TRUE.equals(file.getIsPublic()))
+                .collect(Collectors.toList());
+    }
+
+    private String getDataBasedOnForm(QRProjection qr) throws JsonProcessingException {
         if (qr == null || qr.getForm() == null || qr.getData() == null) {
             return EMPTY_JSON;
         }
@@ -296,7 +329,7 @@ public class QRService {
         Map<String, Object> data = mapper.readValue(qr.getData(), new TypeReference<Map<String, Object>>() {
         });
 
-        Form form = qr.getForm();
+        FormComplexProjection form = qr.getForm();
 
         List<FormField> formFields = form.getFields();
 
@@ -306,7 +339,9 @@ public class QRService {
 
         Set<String> dataToStand = new HashSet<>();
         for (FormField field : formFields) {
-            dataToStand.add(field.getName());
+            if (field.getIsPublic() != null && field.getIsPublic()) {
+                dataToStand.add(field.getName());
+            }
         }
         Map<Object, Object> processedData =
                 data.entrySet()
