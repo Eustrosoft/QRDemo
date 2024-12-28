@@ -5,9 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
-import org.eustrosoft.dtos.FormDto;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Form;
@@ -239,10 +237,6 @@ public class QRService {
             dto.setData(EMPTY_JSON);
             return dto;
         }
-        if (StringUtils.isEmpty(qr.getData())) {
-            dto.setForm(new FormDto());
-            return dto;
-        }
         Form publicForm = new Form();
 
         List<FormField> formFields = form.getFields();
@@ -293,11 +287,12 @@ public class QRService {
     }
 
     private String getDataBasedOnForm(QRProjection qr) throws JsonProcessingException {
-        if (qr == null || qr.getForm() == null || qr.getData() == null) {
+        if (qr == null || qr.getForm() == null) {
             return EMPTY_JSON;
         }
+        String qrData = qr.getData() == null ? EMPTY_JSON : qr.getData();
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> data = mapper.readValue(qr.getData(), new TypeReference<Map<String, Object>>() {
+        Map<String, Object> data = mapper.readValue(qrData, new TypeReference<Map<String, Object>>() {
         });
 
         FormComplexProjection form = qr.getForm();
