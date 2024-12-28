@@ -1,11 +1,11 @@
-import { emptyOrUndefined, getQRImage, hasAdminRole, longToHex, notNullOrUndefined, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, getQRImage, hasAdminRole, longToHex, toLoginIfNotAuthorized } from "./utils.js";
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
 import { getModalWindow } from "./components/modals.js";
 import { getInput, getSelect } from "./components/inputs.js";
 import { LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
-import { notEmptyOrUndefined } from "../commons/common.js";
+import { notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 
@@ -477,7 +477,7 @@ function setupAdminPanel(div) {
             .then(resp => resp.json())
             .then(json => {
                 roles = json
-            swtch = getSelect('Роль', 'role', roles.map((role => role.name)))
+            swtch = getSelect('Роль', 'role', roles.map((role => role.name)), USER_ROLES.USER)
                 innerDiv.append(username, passw1, passw2, email, swtch, saveBtn)
                 const modal = getModalWindow('Создание нового пользователя', innerDiv);
                 modal.style.display = 'block'

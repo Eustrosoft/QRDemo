@@ -87,5 +87,6 @@ export function getMeFromLS() {
 // Structures
 export const USER_ROLES = {
     ADMIN: "ROLE_ADMIN",
-    USER: "ROLE_USER"
+    USER: "ROLE_USER",
+    SALESMAN: "ROLE_SALESMAN"
 }

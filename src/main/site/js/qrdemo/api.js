@@ -1,4 +1,3 @@
-import { openFile } from "./files";
 import { emptyOrUndefined } from "./utils.js";
 
 export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
