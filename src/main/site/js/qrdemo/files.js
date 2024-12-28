@@ -124,6 +124,7 @@ export function showUploadFileModal(uploadFileCallback) {
     let fileNameInput = getInput('Имя файла', 'text', true, 'file_name')
     let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_description')
     let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_public')
+    isPublicInput.checked = true
     let fileInput = getInput('Файл', 'file', true, 'file_content')
     let uploadFileBtn = getBigButton('Загрузить')
 
