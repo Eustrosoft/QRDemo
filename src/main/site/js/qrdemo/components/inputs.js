@@ -1,4 +1,4 @@
-import { notEmptyOrUndefined } from "../../commons/common";
+import { notEmptyOrUndefined } from "../../commons/common.js";
 
 export function getInput(labelText, type, required = false, id = '', placeholder = '', readonly = false) {
     let htmlInputDiv = document.createElement('div');

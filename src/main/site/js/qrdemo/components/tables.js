@@ -1,4 +1,4 @@
-import { notNullOrUndefined } from "../../commons/common"
+import { notNullOrUndefined } from "../../commons/common.js"
 
 export function getTable(headItems, items, itemRowClass = null, id = '') {
     let table = document.createElement('table')
