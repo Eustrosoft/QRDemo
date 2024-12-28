@@ -1,4 +1,3 @@
-
 --- Types:
 --   - settings
 --   - dictionary
@@ -9,6 +8,8 @@
 --   - FORM (FM)
 --   - FORM_FIELD (FF)
 --   - FILE (FILE)
+
+set schema 'qrdemo';
 
 CREATE TABLE if NOT EXISTS settings
 (
