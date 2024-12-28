@@ -39,7 +39,6 @@
         <jjwt.version>0.9.1</jjwt.version>
 
         <postgres.version>42.5.1</postgres.version>
-        <minio.version>8.5.2</minio.version>
 
         <lombok.version>1.18.30</lombok.version>
         <apache.commons.version>3.16.0</apache.commons.version>
@@ -57,13 +56,6 @@
             <version>${spring.version}</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>${minio.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -94,6 +86,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgres.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.26.1</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

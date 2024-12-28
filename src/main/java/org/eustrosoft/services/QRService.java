@@ -3,9 +3,6 @@ package org.eustrosoft.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.minio.Result;
-import io.minio.StatObjectResponse;
-import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +47,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.eustrosoft.Constants.EMPTY_JSON;
-import static org.eustrosoft.Constants.MINIO_FILE_DIR_PATTERN;
 import static org.eustrosoft.Constants.RANGE_END;
 import static org.eustrosoft.Constants.RANGE_START;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
@@ -62,7 +58,6 @@ public class QRService {
     private final QRRepository qrRepository;
     private final ParticipantService participantService;
     private final SecurityComponent securityComponent;
-    private final MinioService minioService;
     private final QrMapper qrMapper;
     private final FormMapper formMapper;
     private final FileMapper fileMapper;
@@ -170,30 +165,6 @@ public class QRService {
         int index = getFileIndex(fileId, files);
         files.remove(index);
         update(qr);
-    }
-
-    @Transactional
-    public ResponseEntity<byte[]> getFileBytesResponse(Long id, String name) throws Exception {
-        List<Result<Item>> files = minioService.listObjects(String.format(MINIO_FILE_DIR_PATTERN, id, name));
-        if (files.isEmpty()) {
-            throw new IllegalArgumentException("File not found");
-        }
-        String fileKey = files.stream().findFirst().get().get().objectName();
-        StatObjectResponse metadata = minioService.getObjectMetadata(fileKey);
-        byte[] objectBytes = minioService.getObjectBytes(fileKey);
-        String fileLengthInBytes = String.valueOf(objectBytes.length);
-        return ResponseEntity.status(HttpStatus.OK)
-                .header(HttpHeaders.CONTENT_TYPE, metadata.contentType())
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        String.format(
-                                "attachment; filename*=UTF-8''%s",
-                                URLEncoder.encode(name, StandardCharsets.UTF_8.name())
-                        )
-                )
-                .header(HttpHeaders.ACCEPT_RANGES, "Bytes")
-                .header(HttpHeaders.CONTENT_RANGE, "Bytes" + " " + 0 + "-" + fileLengthInBytes + "/" + fileLengthInBytes)
-                .header(HttpHeaders.CONTENT_LENGTH, fileLengthInBytes)
-                .body(objectBytes);
     }
 
     @Transactional
