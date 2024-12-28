@@ -113,7 +113,9 @@ CREATE TABLE if NOT EXISTS file
 
 CREATE TABLE IF NOT EXISTS role
 (
-    active         BOOLEAN      NOT NULL DEFAULT TRUE -- way to block role by 'single-click'
+    active         BOOLEAN      NOT NULL DEFAULT TRUE, -- way to block role by 'single-click'
+
+    PRIMARY KEY (id)
 ) INHERITS (entity);
 
 CREATE TABLE IF NOT EXISTS form_file
