@@ -50,24 +50,24 @@ function setQRInfo(q, div) {
             qrCode = json?.code
 
             let divCardInfo = document.createElement('div')
-        let cardInfoHtml = edit
-        ? getEditCardInfoHtml(json)
-        : getViewCardInfoHtml(json)
+            let cardInfoHtml = edit
+                ? getEditCardInfoHtml(json)
+                : getViewCardInfoHtml(json)
             divCardInfo.className = 'code_info'
 
             // const qrImageDiv = getQRImageDiv(longToHex(json?.code));
             // divCardInfo.append(qrImageDiv)
-        if (cardInfoHtml.innerHTML === null || cardInfoHtml.innerHTML === undefined || cardInfoHtml.innerHTML === '') {
-            cardInfoHtml.innerHTML = '<h1>Нет информации для этой карточки</h1>'
-        }
+            if (cardInfoHtml.innerHTML === null || cardInfoHtml.innerHTML === undefined || cardInfoHtml.innerHTML === '') {
+                cardInfoHtml.innerHTML = '<h1>Нет информации для этой карточки</h1>'
+            }
             divCardInfo.append(cardInfoHtml)
             div.appendChild(divCardInfo)
-        if (edit) {
-            addCodeBtnListeners()
-            addDeleteFileRowActions()
-        } else {
-            addDownloadPublicFileRowActions()
-        }
+            if (edit) {
+                addCodeBtnListeners()
+                addDeleteFileRowActions()
+            } else {
+                addDownloadPublicFileRowActions()
+            }
         })
         .catch(ex => alert(ex))
 }
@@ -113,17 +113,17 @@ function getEditCardInfoHtml(qr) {
 
     qrApi().getAllForms().then(resp => resp.json())
         .then(json => {
-        for (let i = 0; i < json.length; i++) {
-            const opt = document.createElement('option')
-            opt.value = json[i].name
-            opt.id = json[i].id
-            opt.innerHTML = json[i].name
-            if (qrForm !== null && qrForm?.id === json[i].id) {
-                opt.selected = true
+            for (let i = 0; i < json.length; i++) {
+                const opt = document.createElement('option')
+                opt.value = json[i].name
+                opt.id = json[i].id
+                opt.innerHTML = json[i].name
+                if (qrForm !== null && qrForm?.id === json[i].id) {
+                    opt.selected = true
+                }
+                formChooseElement.append(opt)
             }
-            formChooseElement.append(opt)
-        }
-    })
+        })
         .catch(ex => alert(ex))
 
     codeDiv.append(formLabel)
@@ -238,8 +238,8 @@ function getViewCardInfoHtml(qr) {
         const field = fields[index];
         let key = field?.name
         let value = (data === null || data[field?.name] === '' || data[field?.name] === undefined)
-        ? field?.placeholder
-        : data[field?.name]
+            ? field?.placeholder
+            : data[field?.name]
         fieldsItems.push({
             key: key,
             value: value
