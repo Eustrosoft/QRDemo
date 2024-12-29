@@ -257,10 +257,8 @@ function getViewCardInfoHtml(qr) {
     }
 
     let filesHeaders = [
-        new TableHead('Название', '8%'),
-        new TableHead('Описание', '15%'),
-        new TableHead('Размер', '10%'),
-        new TableHead('Скачать', '15%')
+        new TableHead('Название', '50%'),
+        new TableHead('Скачать', '50%')
     ]
     let files = qr?.files
 
@@ -273,8 +271,6 @@ function getViewCardInfoHtml(qr) {
         const file = files[index];
         fileItems.push({
             name: `<input name="id" type="hidden" value="${file?.id}"/>` + file?.name,
-            description: file?.description,
-            fileSize: formatBytes(file?.fileSize),
             actions: `<button class="big_button" id="download_file_btn_${index}">Скачать</button>`
         })
     }

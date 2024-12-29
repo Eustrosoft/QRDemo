@@ -54,11 +54,10 @@ ROOT:
 	install -m 644 src/main/site/js/qrdemo/files.js work/webapps/ROOT/js/qrdemo/files.js
 #	install -m 644 src/main/site/package-lock.json work/webapps/ROOT/package-lock.json
 	install -m 644 src/main/site/package.json work/webapps/ROOT/package.json
-	install -m 644 src/main/site/public/logo.svg work/webapps/ROOT/logo.svg
-	install -m 644 src/main/site/public/logos/dominatorco.svg work/webapps/ROOT/logos/dominatorco.svg
-	install -m 644 src/main/site/public/logos/file-upload-duotone.svg work/webapps/ROOT/logos/file-upload-duotone.svg
-	install -m 644 src/main/site/public/logos/icons8-file.svg work/webapps/ROOT/logos/icons8-file.svg
-	install -m 644 src/main/site/public/placeholder.svg work/webapps/ROOT/placeholder.svg
+	install -m 644 src/main/site/public/logos/logo.svg work/webapps/ROOT/logos/logo.svg
+	install -m 644 src/main/site/public/icons/file-upload-duotone.svg work/webapps/ROOT/icons/file-upload-duotone.svg
+	install -m 644 src/main/site/public/icons/icons8-file.svg work/webapps/ROOT/icons/icons8-file.svg
+	install -m 644 src/main/site/public/icons/placeholder.svg work/webapps/ROOT/icons/placeholder.svg
 	install -m 644 src/main/site/site.webmanifest work/webapps/ROOT/site.webmanifest
 	install -m 644 src/main/site/styles/animations.css work/webapps/ROOT/styles/animations.css
 	install -m 644 src/main/site/styles/dop.css work/webapps/ROOT/styles/dop.css

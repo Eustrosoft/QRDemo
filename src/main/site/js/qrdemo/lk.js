@@ -370,7 +370,7 @@ function getQRRow(data, settings) {
     let td = document.createElement('td')
     td.innerHTML = `
         <div class="custom_button fs-08rem"><a href="?q=${q}&edit=true">Редактировать</a></div>
-        <div class="custom_button fs-08rem"><a href="${QR_PRINTER_URL}?q=${q}" target="_">Форма для печати</a></div>
+        <div class="custom_button fs-08rem"><a href="${QR_PRINTER_URL}?q=${q}" target="_">Распечатать QR-код</a></div>
     `
     qrLine.appendChild(td)
 
