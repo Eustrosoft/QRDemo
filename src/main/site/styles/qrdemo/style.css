@@ -175,7 +175,7 @@ video {
         }
 
         .modal-content-inner {
-            padding: 12px;
+            padding: 6px;
         }
     }
 }
@@ -311,15 +311,18 @@ table, td, th {
     text-align: center;
     text-overflow: ellipsis;
     overflow: hidden;
-    word-break: break-all;
+
+    word-break: break-word;
+    overflow-wrap: break-word;
+
+    width: 100%;
     font-size: 1.4em;
 
-td > input, select, button {
-    font-size: 0.8em !important;
-    width: 94%;
-    height: 98%;
-}
-
+    td > input, select, button {
+        font-size: 0.8em !important;
+        width: 94%;
+        height: 98%;
+    }
 }
 
 .toolbar {

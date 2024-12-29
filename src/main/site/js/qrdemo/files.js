@@ -4,6 +4,7 @@ import { getInput } from "./components/inputs.js";
 import { getTable, TableHead } from "./components/tables.js";
 import { getModalWindow } from "./components/modals.js";
 import { getBigButton } from "./components/buttons.js";
+import { notEmptyOrUndefined } from "../commons/common.js";
 
 export function setFiles(formId) {
     toLoginIfNotAuthorized()
@@ -123,17 +124,33 @@ export function showUploadFileModal(uploadFileCallback) {
 
     let fileNameInput = getInput('Имя файла', 'text', true, 'file_name')
     let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_description')
-    let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_public')
-    let fileInput = getInput('Файл', 'file', true, 'file_content')
+    let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_public', '', true)
+    let fileInput = getInput('Файл', 'file', true, 'file_content', '', true)
     let uploadFileBtn = getBigButton('Загрузить')
+
+    let nameInput = fileNameInput.getElementsByTagName('input')[0];
+    nameInput.maxLength = '127'
+
+    let descriptionInput = fileDescriptionInput.getElementsByTagName('input')[0];
+    descriptionInput.maxLength = '511'
+
+    let publicInput = isPublicInput.getElementsByTagName('input')[0];
+    publicInput.checked = true
+    publicInput.style.width = '11px'
+    publicInput.style.height = '11px'
 
     fileUploadForm.append(fileNameInput, fileDescriptionInput, isPublicInput, fileInput, uploadFileBtn)
 
     let modal = getModalWindow('Загрузка файла', fileUploadForm)
     modal.style.display = 'block'
 
-    uploadFileBtn.addEventListener('click', uploadFileCallback)
-
-    let checks = document.getElementById('file_public')
-    checks.checked = true
+    uploadFileBtn.addEventListener('click', () => {
+        let fileName = document.getElementById('file_name')
+        let file = document.getElementById('file_content')
+        if (fileName && notEmptyOrUndefined(fileName.value) && file && file.files[0] != null) {
+            uploadFileCallback()
+        } else {
+            alert('Необходимо ввести имя файла и выбрать файл')
+        }
+    })
 }

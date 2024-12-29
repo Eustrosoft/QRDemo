@@ -1,13 +1,18 @@
 import { notEmptyOrUndefined } from "../../commons/common.js";
 
-export function getInput(labelText, type, required = false, id = '', placeholder = '', readonly = false) {
+export function getInput(labelText, type, required = false, id = '', placeholder = '', inline = false) {
     let htmlInputDiv = document.createElement('div');
+    if (inline) {
+        htmlInputDiv.style.display = 'flex'
+    }
 
     if (notEmptyOrUndefined(labelText)) {
         let htmlLabel = document.createElement('label');
         htmlLabel.innerHTML = labelText
         htmlInputDiv.appendChild(htmlLabel)
-        htmlInputDiv.appendChild(document.createElement('br'))
+        if (!inline) {
+            htmlInputDiv.appendChild(document.createElement('br'))
+        }
     }
     let htmlInput = document.createElement('input')
     htmlInput.type = type
