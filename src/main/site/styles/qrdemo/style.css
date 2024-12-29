@@ -282,7 +282,7 @@ select {
 .code_info {
     display: flex;
     flex-direction: column;
-    padding: 46px;
+    padding: 14px;
     justify-items: center;
     justify-content: space-between;
 }

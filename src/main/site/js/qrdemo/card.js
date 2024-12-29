@@ -237,7 +237,7 @@ function getViewCardInfoHtml(qr) {
     for (let index in fields) {
         const field = fields[index];
         let key = field?.name
-        let value = data[field?.name] === ''
+        let value = (data === null || data[field?.name] === '' || data[field?.name] === undefined)
         ? field?.placeholder
         : data[field?.name]
         fieldsItems.push({
@@ -257,12 +257,16 @@ function getViewCardInfoHtml(qr) {
     }
 
     let filesHeaders = [
-        new TableHead('Название', '10%'),
-        new TableHead('Описание', '20%'),
-        new TableHead('Размер', '5%'),
-        new TableHead('Скачать', '5%')
+        new TableHead('Название', '8%'),
+        new TableHead('Описание', '15%'),
+        new TableHead('Размер', '10%'),
+        new TableHead('Скачать', '15%')
     ]
-    let files = qr?.files.concat(qr?.form?.files)
+    let files = qr?.files
+
+    if (qr?.form?.files != null) {
+        files?.push(...qr?.form?.files)
+    }
 
     let fileItems = []
     for (let index in files) {
