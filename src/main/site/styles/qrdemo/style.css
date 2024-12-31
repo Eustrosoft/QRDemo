@@ -300,11 +300,11 @@ select {
 
 table {
     table-layout: fixed;
-    width: 99%;
+    padding: 2px !important;
+    margin: 1px;
 }
 
 table, td, th {
-    margin: 8px;
     border: 1px solid black;
     padding: 1px;
 
