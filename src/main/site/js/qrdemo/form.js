@@ -16,12 +16,12 @@ var lastElementIndex = 0
 export function setForm(formId) {
     toLoginIfNotAuthorized()
         .then(x => {
-        dictionaryApi().getDictionariesByCode(DICTIONARIES.INPUT_TYPES)
-            .then(resp => resp.json())
-            .then(json => fieldTypes = json)
-            .then(x => init(formId))
-            .catch(ex => alert(ex))
-    })
+            dictionaryApi().getDictionariesByCode(DICTIONARIES.INPUT_TYPES)
+                .then(resp => resp.json())
+                .then(json => fieldTypes = json)
+                .then(x => init(formId))
+                .catch(ex => alert(ex))
+        })
 }
 
 function init(formId) {
@@ -69,7 +69,7 @@ function init(formId) {
                         throw new Error('Ошибка при сохранении')
                     })
                     .then(json => {
-                    setQueryParamsAndRefresh([{ name: 'form', value: true }, { name: 'id', value: json.id }])
+                        setQueryParamsAndRefresh([{ name: 'form', value: true }, { name: 'id', value: json.id }])
                     })
                     .then(() => alert('Шаблон был создан!'))
                     .catch(() => alert('Ошибка при создании шаблона'))
@@ -77,17 +77,17 @@ function init(formId) {
             if (id !== null) {
                 qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles, formId))
                     .then((resp) => {
-                    if (resp.ok) {
-                        alert('Шаблон был обновлен!')
-                        window.location.reload()
-                    } else {
-                        throw Error('unexpected error')
-                    }
-                })
+                        if (resp.ok) {
+                            alert('Шаблон был обновлен!')
+                            window.location.reload()
+                        } else {
+                            throw Error('unexpected error')
+                        }
+                    })
                     .catch(() => {
-                    alert('Ошибка при обновлении шаблона')
-                    window.location.reload()
-                })
+                        alert('Ошибка при обновлении шаблона')
+                        window.location.reload()
+                    })
             }
         })
         mainBlock.appendChild(saveFormBtn)
@@ -100,14 +100,14 @@ function init(formId) {
                     formName.value = json.name
                     formDescription.value = json.description
 
-                const fields = json?.fields;
-                if (notEmptyOrUndefined(fields)) {
+                    const fields = json?.fields;
+                    if (notEmptyOrUndefined(fields)) {
                         for (let j = 0; j < fields.length; j++) {
                             formFields.push(fields[j])
                         }
                     }
-                formFields = Field.sortFields(formFields)
-                renderForm(formDiv, formFields, json)
+                    formFields = Field.sortFields(formFields)
+                    renderForm(formDiv, formFields, json)
                 })
 
 
@@ -245,9 +245,23 @@ function renderForm(parentDiv, objects, json) {
             let isPublic = document.getElementById('file_public')
 
             try {
-                qrApi().uploadFormFile(json?.id, { name: name.value, description: description.value, file: file, public: isPublic.checked })
+                qrApi().uploadFormFile(json?.id,
+                    {
+                        name: name.value,
+                        description: description.value,
+                        file: file,
+                        public: isPublic.checked
+                    }
+                )
                 alert('Файл успешно загружен!')
-                window.location.reload()
+
+                formFields = Field.htmlToFields(parentDiv)
+                qrApi().getFormById(json?.id)
+                    .then(resp => {
+                        return resp.json()
+                    }).then(json => {
+                        renderForm(parentDiv, formFields, json)
+                    })
             } catch (e) {
                 alert(e)
             }

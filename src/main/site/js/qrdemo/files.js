@@ -119,7 +119,7 @@ function setStartActions() {
     })
 }
 
-export function showUploadFileModal(uploadFileCallback) {
+export function showUploadFileModal(uploadFileCallback, closeOnComplete = true, closeOnError = false) {
     let fileUploadForm = document.createElement('div')
 
     let fileNameInput = getInput('Имя файла', 'text', true, 'file_name')
@@ -148,7 +148,16 @@ export function showUploadFileModal(uploadFileCallback) {
         let fileName = document.getElementById('file_name')
         let file = document.getElementById('file_content')
         if (fileName && notEmptyOrUndefined(fileName.value) && file && file.files[0] != null) {
-            uploadFileCallback()
+            try {
+                uploadFileCallback()
+                if (closeOnComplete) {
+                    modal.remove()
+                }
+            } catch(e) {
+                if (closeOnComplete) {
+                    modal.remove()
+                }
+            }
         } else {
             alert('Необходимо ввести имя файла и выбрать файл')
         }
