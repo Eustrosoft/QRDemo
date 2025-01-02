@@ -35,21 +35,20 @@ ROOT:
 	install -m 644 src/main/site/js/commons/dateUtils.js work/webapps/ROOT/js/commons/dateUtils.js
 #	install -m 644 src/main/site/js/commons/package.json work/webapps/ROOT/js/commons/package.json
 	install -m 644 src/main/site/js/package.json work/webapps/ROOT/js/package.json
-	install -m 644 src/main/site/js/qrdemo/admin.js work/webapps/ROOT/js/qrdemo/admin.js
-	install -m 644 src/main/site/js/qrdemo/api.js work/webapps/ROOT/js/qrdemo/api.js
-	install -m 644 src/main/site/js/qrdemo/card.js work/webapps/ROOT/js/qrdemo/card.js
 	install -m 644 src/main/site/js/qrdemo/components/buttons.js work/webapps/ROOT/js/qrdemo/components/buttons.js
 	install -m 644 src/main/site/js/qrdemo/components/inputs.js work/webapps/ROOT/js/qrdemo/components/inputs.js
 	install -m 644 src/main/site/js/qrdemo/components/labels.js work/webapps/ROOT/js/qrdemo/components/labels.js
 	install -m 644 src/main/site/js/qrdemo/components/modals.js work/webapps/ROOT/js/qrdemo/components/modals.js
 	install -m 644 src/main/site/js/qrdemo/components/fileScroll.js work/webapps/ROOT/js/qrdemo/components/fileScroll.js
 	install -m 644 src/main/site/js/qrdemo/components/tables.js work/webapps/ROOT/js/qrdemo/components/tables.js
+	install -m 644 src/main/site/js/qrdemo/components/versions.js work/webapps/ROOT/js/qrdemo/components/versions.js
 	install -m 644 src/main/site/js/qrdemo/domain/participantSettings.js work/webapps/ROOT/js/qrdemo/domain/participantSettings.js
 	install -m 644 src/main/site/js/qrdemo/domain/dictionaries.js work/webapps/ROOT/js/qrdemo/domain/dictionaries.js
 	install -m 644 src/main/site/js/qrdemo/form.js work/webapps/ROOT/js/qrdemo/form.js
 	install -m 644 src/main/site/js/qrdemo/lk.js work/webapps/ROOT/js/qrdemo/lk.js
 	install -m 644 src/main/site/js/qrdemo/localStorage.js work/webapps/ROOT/js/qrdemo/localStorage.js
 	install -m 644 src/main/site/js/qrdemo/main.js work/webapps/ROOT/js/qrdemo/main.js
+	install -m 644 src/main/site/js/qrdemo/version.js work/webapps/ROOT/js/qrdemo/version.js
 	install -m 644 src/main/site/js/qrdemo/mocks.js work/webapps/ROOT/js/qrdemo/mocks.js
 	install -m 644 src/main/site/js/qrdemo/package.json work/webapps/ROOT/js/qrdemo/package.json
 	install -m 644 src/main/site/js/qrdemo/utils.js work/webapps/ROOT/js/qrdemo/utils.js
