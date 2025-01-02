@@ -1,5 +1,5 @@
-import { qrApi } from "../api"
-import { APP_VERSION } from "../version"
+import { qrApi } from "../api.js"
+import { APP_VERSION } from "../version.js"
 
 export function getAppVersionSpan() {
     let appVersionSpan = document.createElement('span')
