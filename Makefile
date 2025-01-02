@@ -2,6 +2,7 @@ usage:
 	@echo "make build|ROOT|qrCodeDemo|clean|all"
 clean:
 	rm -rf  work/
+	mvn clean
 all: qrCodeDemo ROOT pkg
 build:
 	time mvn clean package -P prod
