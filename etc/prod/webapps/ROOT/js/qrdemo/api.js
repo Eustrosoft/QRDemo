@@ -11,6 +11,19 @@ export function qrApi() {
     }
 
     return {
+        getAppVersion: () => {
+            let url = `${QR_DEMO_API}unsecured/alive/version`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return fetch(req)
+        },
         saveForm: (form) => {
             let url = `${QR_DEMO_API}secured/forms`;
 

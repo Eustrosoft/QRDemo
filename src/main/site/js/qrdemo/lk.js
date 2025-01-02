@@ -8,6 +8,8 @@ import { LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./do
 import { notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
+import { APP_VERSION } from "./version.js";
+import { getAppVersionSpan } from "./components/versions.js";
 
 const mainBlock = document.getElementById('main_block')
 let divLk = document.createElement('div')
@@ -55,7 +57,7 @@ function setUserAccount(username, div) {
                 .catch(ex => setSettings(div))
         } else {
             if (!admin) {
-                setupQrs(div)          
+                setupQrs(div)
             } else {
                 setupAdminPanel(div)
             }
@@ -85,16 +87,15 @@ function setAccountCard(username, div) {
             <div class="ranges" id="user_ranges"> \
             <h4>Выделенные диапазоны: </h4> \
             </div>\
-        '
-        }
+            '}
                    </div>
                         <button class="big_button" id="user_logout_btn">Выйти</button>
                         <button class="big_button" id="user_settings_btn">Настройки</button>
                    </div>
     `
-
     divAccountPart.appendChild(divAccountCard)
     div.appendChild(divAccountPart)
+    divAccountCard.appendChild(getAppVersionSpan())
     document.getElementById("user_logout_btn")
         .addEventListener('click', () => {
             userApi().logout()
@@ -103,9 +104,9 @@ function setAccountCard(username, div) {
         })
 
     document.getElementById('user_settings_btn')
-            .addEventListener('click', () => {
-                window.location = '?lk=true&settings=true'
-            })
+        .addEventListener('click', () => {
+            window.location = '?lk=true&settings=true'
+        })
 
     if (!admin) {
         const rangeDiv = document.getElementById('user_ranges')
@@ -170,7 +171,7 @@ function setSettings(div, settingsJson) {
 
             qrTableSettingsDiv.appendChild(columnName)
             qrTableSettingsDiv.appendChild(columnEnable)
-            columnEnable.addEventListener('change', function() {
+            columnEnable.addEventListener('change', function () {
                 if (this.checked) {
                     if (notEmptyOrUndefined(existedQrTableSettings)) {
                         existedQrTableSettings[col].enable = true
@@ -189,7 +190,7 @@ function setSettings(div, settingsJson) {
             qrTableSettingsDiv.appendChild(document.createElement('br'))
         }
     }
-    
+
 
     divSettings.appendChild(languageLabel)
     divSettings.appendChild(languageSelect)
@@ -204,7 +205,7 @@ function setSettings(div, settingsJson) {
 
         let stgs = new ParticipantSettings(
             new Settings(
-                languageSelect.value, 
+                languageSelect.value,
                 admin ? null : existedQrTableSettings == null ? QR_TABLE_COLUMNS : existedQrTableSettings
             )
         )
@@ -258,9 +259,9 @@ function setSettings(div, settingsJson) {
 
 function setupQrs(div) {
     userApi().getSettings()
-        .then(resp => {return resp.ok ? resp.json() : null})
-        .then(settings => {setupQrsPart(div, settings)})
-    .catch(ex => setupQrsPart(div))
+        .then(resp => { return resp.ok ? resp.json() : null })
+        .then(settings => { setupQrsPart(div, settings) })
+        .catch(ex => setupQrsPart(div))
 }
 
 function setupQrsPart(div, settings) {
@@ -344,7 +345,7 @@ function getQRRow(data, settings) {
             let fieldType = settings[cs].type
 
             console.log(fieldName)
-            
+
             switch (fieldType) {
                 case "text": {
                     td.innerHTML = data[fieldName]
@@ -384,23 +385,23 @@ function getTableHeader(tableSettings) {
         let qrTd = document.createElement('th')
         qrTd.innerHTML = 'QR'
         tableHeader.append(qrTd)
-    
+
         let qrCode = document.createElement('th')
         qrCode.innerHTML = 'Код'
         tableHeader.append(qrCode)
-    
+
         let qrName = document.createElement('th')
         qrName.innerHTML = 'Название'
         tableHeader.append(qrName)
-    
+
         let qrDescription = document.createElement('th')
         qrDescription.innerHTML = 'Описание'
         tableHeader.append(qrDescription)
-    
+
         let actions = document.createElement('th')
         actions.innerHTML = 'Действия'
         tableHeader.append(actions)
-    
+
         return tableHeader
     }
 
@@ -453,7 +454,7 @@ function setupAdminPanel(div) {
         saveBtn.style = 'margin-top: 8px;'
 
         let roles = null
-        
+
         saveBtn.addEventListener('click', () => {
             adminApi()
                 .createParticipant(
@@ -462,7 +463,7 @@ function setupAdminPanel(div) {
                         password: document.getElementById('create_participant_password_1').value,
                         confirmPassword: document.getElementById('create_participant_password_2').value,
                         email: document.getElementById('create_participant_email').value,
-                        roles: [ roles.find(x => x.name === document.getElementById('role').value) ]
+                        roles: [roles.find(x => x.name === document.getElementById('role').value)]
                     }
                 ).then(resp => {
                     if (!resp.ok)
@@ -477,7 +478,7 @@ function setupAdminPanel(div) {
             .then(resp => resp.json())
             .then(json => {
                 roles = json
-            swtch = getSelect('Роль', 'role', roles.map((role => role.name)), USER_ROLES.USER)
+                swtch = getSelect('Роль', 'role', roles.map((role => role.name)), USER_ROLES.USER)
                 innerDiv.append(username, passw1, passw2, email, swtch, saveBtn)
                 const modal = getModalWindow('Создание нового пользователя', innerDiv);
                 modal.style.display = 'block'
