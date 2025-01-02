@@ -451,7 +451,7 @@ function uploadSingleFile(url, fileRequest) {
     let fileSize = file.size
 
     if (fileSize > MAX_FILE_UPLOAD_SIZE) {
-        throw new Error('Файл большой!')
+        throw new Error('Выберите файл менее 10 МБ!')
     }
 
     data.append('file', file, file.name)
