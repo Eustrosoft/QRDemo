@@ -3,7 +3,7 @@ usage:
 clean:
 	rm -rf  work/
 	mvn clean
-all: qrCodeDemo ROOT pkg
+all: build qrCodeDemo ROOT pkg
 build:
 	time mvn clean package -P prod
 pkg:
