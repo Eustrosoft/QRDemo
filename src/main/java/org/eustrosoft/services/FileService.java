@@ -102,7 +102,7 @@ public class FileService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", file.getFileType());
         headers.add("Content-Length", file.getFileSize().toString());
-        headers.add("Content-Disposition", String.format("attachment; filename*=UTF-8''%s", file.getFileName()));
+        headers.add("Content-Disposition", String.format("inline; filename*=UTF-8''%s", file.getFileName()));
         return new ResponseEntity<>(
                 fileData, headers, HttpStatus.OK
         );

@@ -154,7 +154,7 @@ export function showUploadFileModal(uploadFileCallback, closeOnComplete = true, 
                     modal.remove()
                 }
             } catch(e) {
-                if (closeOnComplete) {
+                if (closeOnError) {
                     modal.remove()
                 }
             }

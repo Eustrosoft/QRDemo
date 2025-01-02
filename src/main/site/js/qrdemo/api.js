@@ -133,35 +133,11 @@ export function qrApi() {
         },
         uploadFormFile: (id, fileRequest) => {
             const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`;
-
-            let data = new FormData()
-            let file = fileRequest.file.files[0];
-
-            data.append('file', file, file.name)
-            data.append('name', fileRequest.name)
-            data.append('description', fileRequest.description)
-            data.append('public', fileRequest.public)
-
-            const request = new XMLHttpRequest();
-            request.open('POST', url, false)
-            request.withCredentials = true
-            request.send(data)
+            uploadSingleFile(url, fileRequest)
         },
         uploadQRFile: (id, fileRequest) => {
             const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`;
-
-            let data = new FormData()
-            let file = fileRequest.file.files[0];
-
-            data.append('file', file, file.name)
-            data.append('name', fileRequest.name)
-            data.append('description', fileRequest.description)
-            data.append('public', fileRequest.public)
-
-            const request = new XMLHttpRequest();
-            request.open('POST', url, false)
-            request.withCredentials = true
-            request.send(data)
+            uploadSingleFile(url, fileRequest)
         },
         getFileLink: (id, name) => {
             return QR_DEMO_API + `unsecured/qrs/${id}/files/${name}`
@@ -269,19 +245,7 @@ export function qrApi() {
         },
         uploadFile: (fileRequest) => {
             let url = `${QR_DEMO_API}secured/files/upload`;
-
-            let data = new FormData()
-            let file = fileRequest.file.files[0];
-
-            data.append('file', file, file.name)
-            data.append('name', fileRequest.name)
-            data.append('description', fileRequest.description)
-            data.append('public', fileRequest.public)
-
-            const request = new XMLHttpRequest();
-            request.open('POST', url, false)
-            request.withCredentials = true
-            request.send(data)
+            uploadSingleFile(url, fileRequest)
         }
     }
 }
@@ -464,4 +428,27 @@ export function dictionaryApi() {
             return fetch(req)
         }
     }
+}
+
+const MAX_FILE_UPLOAD_SIZE = 10_485_760
+
+function uploadSingleFile(url, fileRequest) {
+    let data = new FormData()
+    let file = fileRequest.file.files[0]
+    let fileSize = file.size
+
+    if (fileSize > MAX_FILE_UPLOAD_SIZE) {
+        alert('Файл большой!');
+        throw new Error('Файл большой!')
+    }
+
+    data.append('file', file, file.name)
+    data.append('name', fileRequest.name)
+    data.append('description', fileRequest.description)
+    data.append('public', fileRequest.public)
+
+    const request = new XMLHttpRequest()
+    request.open('POST', url, false)
+    request.withCredentials = true
+    request.send(data)
 }

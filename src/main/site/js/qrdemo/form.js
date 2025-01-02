@@ -244,27 +244,23 @@ function renderForm(parentDiv, objects, json) {
             let file = document.getElementById('file_content')
             let isPublic = document.getElementById('file_public')
 
-            try {
-                qrApi().uploadFormFile(json?.id,
-                    {
-                        name: name.value,
-                        description: description.value,
-                        file: file,
-                        public: isPublic.checked
-                    }
-                )
-                alert('Файл успешно загружен!')
+            qrApi().uploadFormFile(json?.id,
+                {
+                    name: name.value,
+                    description: description.value,
+                    file: file,
+                    public: isPublic.checked
+                }
+            )
+            alert('Файл успешно загружен!')
 
-                formFields = Field.htmlToFields(parentDiv)
-                qrApi().getFormById(json?.id)
-                    .then(resp => {
-                        return resp.json()
-                    }).then(json => {
-                        renderForm(parentDiv, formFields, json)
-                    })
-            } catch (e) {
-                alert(e)
-            }
+            formFields = Field.htmlToFields(parentDiv)
+            qrApi().getFormById(json?.id)
+                .then(resp => {
+                    return resp.json()
+                }).then(json => {
+                    renderForm(parentDiv, formFields, json)
+                })
         })
     })
 
