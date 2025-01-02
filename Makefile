@@ -46,6 +46,7 @@ ROOT:
 	install -m 644 src/main/site/js/qrdemo/domain/dictionaries.js work/webapps/ROOT/js/qrdemo/domain/dictionaries.js
 	install -m 644 src/main/site/js/qrdemo/form.js work/webapps/ROOT/js/qrdemo/form.js
 	install -m 644 src/main/site/js/qrdemo/lk.js work/webapps/ROOT/js/qrdemo/lk.js
+	install -m 644 src/main/site/js/qrdemo/card.js work/webapps/ROOT/js/qrdemo/card.js
 	install -m 644 src/main/site/js/qrdemo/localStorage.js work/webapps/ROOT/js/qrdemo/localStorage.js
 	install -m 644 src/main/site/js/qrdemo/main.js work/webapps/ROOT/js/qrdemo/main.js
 	install -m 644 src/main/site/js/qrdemo/version.js work/webapps/ROOT/js/qrdemo/version.js
