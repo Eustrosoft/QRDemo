@@ -2,9 +2,9 @@ package org.eustrosoft.exceptions;
 
 import lombok.Getter;
 
+@Getter
 public class CommonException extends RuntimeException {
 
-    @Getter
     public Code code;
 
     public CommonException(Code code) {

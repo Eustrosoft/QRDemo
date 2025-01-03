@@ -154,9 +154,9 @@ export function fieldToHtmlItems(field, index, fieldTypes = []) {
     let fieldTypesStr = fieldTypesToOptions(fieldTypes, type)
 
     let items = [
-        `<input name="id" type="hidden" value="${id}">
+        `<input name="id" type="hidden" value="${id}" id="field_id_${id}">
          <select name="type">${fieldTypesStr}</select>`,
-        `<input name="name" type="text" value="${name}">`,
+        `<input name="name" class="field_name" type="text" value="${name}">`,
         `<input name="placeholder" type="text" value="${placeholder}">`,
         `<input name="isStatic" type="checkbox" ${isStatic ? 'checked' : ''}></input>`,
         `<input name="isPublic" type="checkbox" ${isPublic ? 'checked' : ''}></input>`,

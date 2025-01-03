@@ -305,7 +305,7 @@ table {
 }
 
 table, td, th {
-    border: 1px solid black;
+    border: 1px black solid;
     padding: 1px;
 
     text-align: center;
@@ -340,7 +340,6 @@ table, td, th {
 @media only screen and (max-width: 1000px) {
     table, td, th {
         margin: 2px;
-        border: 1px solid black;
         padding: 1px;
 
         text-align: center;
@@ -373,10 +372,10 @@ table, td, th {
     border: solid 1px #dbdbdb;
     border-radius: 10px;
 
-.upper_menu {
-    height: 30px;
-    border-bottom: solid 1px #dbdbdb;
-}
+    .upper_menu {
+        height: 30px;
+        border-bottom: solid 1px #dbdbdb;
+    }
 }
 
 .upload-file-button {
@@ -431,4 +430,8 @@ table, td, th {
     height: 875px;
     border: 2px solid #888;
     border-radius: 1%;
+}
+
+.red_border {
+    background-color: rgba(255,0,0,0.9);
 }

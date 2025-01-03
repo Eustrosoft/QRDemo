@@ -18,7 +18,9 @@ export function getTable(headItems, items, itemRowClass = null, id = '') {
     for (let item in items) {
         let tr = document.createElement('tr')
         if (notNullOrUndefined(itemRowClass)) {
-            tr.className = itemRowClass
+            tr.className = itemRowClass + ' black_border'
+        } else {
+            tr.className = 'black_border'
         }
         for (let rowItem in items[item]) {
             let td = document.createElement('td')

@@ -1,4 +1,4 @@
-import { fieldToHtmlItems, formatBytes, setQueryParamsAndRefresh, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, fieldToHtmlItems, formatBytes, setQueryParamsAndRefresh, toLoginIfNotAuthorized } from "./utils.js";
 import { dictionaryApi, qrApi } from "./api.js";
 import { notEmptyOrUndefined } from "../commons/common.js";
 import { getTextLabel } from "./components/labels.js";
@@ -85,8 +85,7 @@ function init(formId) {
                         }
                     })
                     .catch(() => {
-                        alert('Ошибка при обновлении шаблона')
-                        window.location.reload()
+                        alert('Ошибка при обновлении шаблона, проверьте одинаковые поля')
                     })
             }
         })
@@ -203,6 +202,21 @@ function renderForm(parentDiv, objects, json) {
 
     parentDiv.appendChild(table)
 
+    // processing same field names
+    let fieldNames = document.getElementsByClassName('field_name')
+    let incorrectFields = Field.getIncorrectFields(formFields)
+    Field.printRedBorderOnIncorrectFields(incorrectFields)
+    for (let fieldName in fieldNames) {
+        if (fieldNames[fieldName] instanceof HTMLElement) {
+            fieldNames[fieldName].addEventListener('input', (e) => {
+                formFields[fieldName].name = e.target.value
+                let incorrectFields = Field.getIncorrectFields(formFields)
+                Field.printRedBorderOnIncorrectFields(incorrectFields)
+            })
+        }
+    }
+    // end processing same field names
+
     parentDiv.appendChild(getTextLabel('Файлы:'))
     let filesHeaders = [
         new TableHead('Название', '10%'), new TableHead('Оригинальное название', '10%'),
@@ -269,17 +283,19 @@ function renderForm(parentDiv, objects, json) {
 
     parentDiv.appendChild(tableFiles)
 
-    addDeleteRowActions()
+    addDeleteRowActions(parentDiv, objects, json)
     addDeleteFileRowActions()
 }
 
-function addDeleteRowActions() {
+function addDeleteRowActions(parentDiv, objects, json) {
     let rows = document.getElementsByClassName('formFieldRow')
     for (let i = 0; i < rows.length; i++) {
         let elem = document.getElementById(`delete_btn_${i}`)
         if (elem) {
             elem.addEventListener('click', () => {
                 elem.parentElement.parentElement.remove()
+                formFields.splice(i, 1)
+                renderForm(parentDiv, Field.htmlToFields(parentDiv), json)
             })
         }
     }
@@ -406,6 +422,46 @@ export class Field {
             id: Number(formId),
             files: files,
             fields: fields
+        }
+    }
+
+    static getIncorrectFields(formFields) {
+        if (formFields === null) {
+            return []
+        }
+        const incorrectFields = new Set()
+        const fieldsSet = new Set()
+        for (let i = 0; i < formFields.length; i++) {
+            const name = formFields[i].name;
+            if (emptyOrUndefined(name)) {
+                incorrectFields.add(formFields[i])
+            }
+            if (fieldsSet.has(name)) {
+                incorrectFields.add(formFields[i])
+            }
+            fieldsSet.add(name)
+        }
+        return incorrectFields
+    }
+
+    static printRedBorderOnIncorrectFields(formFields) {
+        if (formFields === null) {
+            return
+        }
+        let fieldNames = document.getElementsByClassName('field_name')
+        let formFieldNames = []
+        for (let ff of formFields.keys()) {
+            formFieldNames.push(ff.name)
+        }
+        for (let fn in fieldNames) {
+            try {
+                let parentTr = fieldNames[fn].parentElement.parentElement
+                if (formFieldNames.includes(fieldNames[fn].value)) {
+                    parentTr.classList = 'formFieldRow red_border'
+                } else {
+                    parentTr.classList = 'formFieldRow'
+                }
+            } catch (e) { }
         }
     }
 }
