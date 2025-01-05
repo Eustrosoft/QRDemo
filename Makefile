@@ -42,6 +42,9 @@ ROOT:
 	install -m 644 src/main/site/js/qrdemo/components/fileScroll.js work/webapps/ROOT/js/qrdemo/components/fileScroll.js
 	install -m 644 src/main/site/js/qrdemo/components/tables.js work/webapps/ROOT/js/qrdemo/components/tables.js
 	install -m 644 src/main/site/js/qrdemo/components/versions.js work/webapps/ROOT/js/qrdemo/components/versions.js
+	install -m 644 src/main/site/js/qrdemo/components/texts.js work/webapps/ROOT/js/qrdemo/components/texts.js
+	install -m 644 src/main/site/js/qrdemo/components/hrs.js work/webapps/ROOT/js/qrdemo/components/hrs.js
+	install -m 644 src/main/site/js/qrdemo/components/link.js work/webapps/ROOT/js/qrdemo/components/link.js
 	install -m 644 src/main/site/js/qrdemo/domain/participantSettings.js work/webapps/ROOT/js/qrdemo/domain/participantSettings.js
 	install -m 644 src/main/site/js/qrdemo/domain/dictionaries.js work/webapps/ROOT/js/qrdemo/domain/dictionaries.js
 	install -m 644 src/main/site/js/qrdemo/form.js work/webapps/ROOT/js/qrdemo/form.js
@@ -60,6 +63,9 @@ ROOT:
 	install -m 644 src/main/site/public/icons/file-upload-duotone.svg work/webapps/ROOT/icons/file-upload-duotone.svg
 	install -m 644 src/main/site/public/icons/icons8-file.svg work/webapps/ROOT/icons/icons8-file.svg
 	install -m 644 src/main/site/public/icons/placeholder.svg work/webapps/ROOT/icons/placeholder.svg
+	install -m 644 src/main/site/public/icons/lk-icon.svg work/webapps/ROOT/icons/lk-icon.svg
+	install -m 644 src/main/site/public/icons/lk-icon-black.svg work/webapps/ROOT/icons/lk-icon-black.svg
+	install -m 644 src/main/site/public/icons/y-icon.svg work/webapps/ROOT/icons/y-icon.svg
 	install -m 644 src/main/site/site.webmanifest work/webapps/ROOT/site.webmanifest
 	install -m 644 src/main/site/styles/animations.css work/webapps/ROOT/styles/animations.css
 	install -m 644 src/main/site/styles/dop.css work/webapps/ROOT/styles/dop.css
