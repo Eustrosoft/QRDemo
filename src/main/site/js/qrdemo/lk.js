@@ -10,6 +10,8 @@ import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { APP_VERSION } from "./version.js";
 import { getAppVersionSpan } from "./components/versions.js";
+import { getSpan } from "./components/texts.js";
+import { getHr } from "./components/hrs.js";
 
 const mainBlock = document.getElementById('main_block')
 let divLk = document.createElement('div')
@@ -42,18 +44,17 @@ export function setLk() {
             admin = hasAdminRole(roles)
 
             mainBlock.appendChild(divLk)
-            setUserAccount(userDetails.username, divLk)
+            setUserAccount(userDetails, divLk)
         })
 }
 
-function setUserAccount(username, div) {
-    if (username && div) {
-        setAccountCard(username, div)
+function setUserAccount(userDetails, div) {
+    if (userDetails && div) {
         if (settings) {
             userApi()
                 .getSettings()
                 .then(resp => resp.json())
-                .then(json => setSettings(div, json))
+                .then(json => setSettings(div, json, userDetails))
                 .catch(ex => setSettings(div))
         } else {
             if (!admin) {
@@ -65,66 +66,7 @@ function setUserAccount(username, div) {
     }
 }
 
-function setAccountCard(username, div) {
-    let divAccountPart = document.createElement('div')
-    divAccountPart.id = 'account_part'
-
-    let divAccountCard = document.createElement('div')
-    divAccountCard.className = 'account_card'
-    divAccountCard.innerHTML = `
-                    <img class="account_image" 
-                        src="https://images.unsplash.com/photo-1621075160523-b936ad96132a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" 
-                        alt="accountImage" 
-                    />
-                    <div class="margin-10 p-5 align-items-center">
-                        <h2>${username}</h2>
-                        <p class="description">
-                            ${admin ? 'QXYZ - SUPER ADMIN' : 'QXYZ - Демо пользователь'}
-                        </p>
-                        <div class="account_info">
-                            ${admin ? '' :
-            '\
-            <div class="ranges" id="user_ranges"> \
-            <h4>Выделенные диапазоны: </h4> \
-            </div>\
-            '}
-                   </div>
-                        <button class="big_button" id="user_logout_btn">Выйти</button>
-                        <button class="big_button" id="user_settings_btn">Настройки</button>
-                   </div>
-    `
-    divAccountPart.appendChild(divAccountCard)
-    div.appendChild(divAccountPart)
-    divAccountCard.appendChild(getAppVersionSpan())
-    document.getElementById("user_logout_btn")
-        .addEventListener('click', () => {
-            userApi().logout()
-                .finally(resp => location.reload())
-                .catch(ex => console.log(ex))
-        })
-
-    document.getElementById('user_settings_btn')
-        .addEventListener('click', () => {
-            window.location = '?lk=true&settings=true'
-        })
-
-    if (!admin) {
-        const rangeDiv = document.getElementById('user_ranges')
-
-        qrApi().getRanges()
-            .then(resp => resp.json())
-            .then(json => {
-                for (let i in json) {
-                    const rEl = document.createElement('p');
-                    rEl.innerHTML = `От: ${longToHex(json[i]?.from)} До: ${longToHex(json[i]?.to)}`
-                    rangeDiv.appendChild(rEl)
-                }
-            })
-            .catch(ex => alert(ex))
-    }
-}
-
-function setSettings(div, settingsJson) {
+function setSettings(div, settingsJson, userDetails) {
     let divSettings = document.createElement('div')
     divSettings.className = 'basic_card'
 
@@ -191,12 +133,24 @@ function setSettings(div, settingsJson) {
         }
     }
 
-
     divSettings.appendChild(languageLabel)
     divSettings.appendChild(languageSelect)
     divSettings.appendChild(document.createElement('br'))
 
     if (!admin) {
+        let ranges = userDetails?.ranges
+        if (ranges) {
+            divSettings.appendChild(getHr())
+            let rangesSpan = getTextLabel('Выделенные диапазоны:')
+            divSettings.appendChild(rangesSpan)
+            for (let index in ranges) {
+                let range = ranges[index]
+                let rangeSpan = getTextLabel(` - ${range?.from}-${range?.to}`)
+                divSettings.appendChild(rangeSpan)
+            }
+            divSettings.appendChild(getHr())
+        }
+
         divSettings.appendChild(qrTableSettingsDiv)
     }
 
@@ -292,22 +246,13 @@ function setupQrsPart(div, settings) {
     let divFormCreatePart = document.createElement('button')
     divFormCreatePart.id = 'forms_create_part'
     divFormCreatePart.className = 'big_button'
-    divFormCreatePart.innerHTML = `Менеджер шаблонов`
+    divFormCreatePart.innerHTML = `Шаблоны`
     divFormCreatePart.addEventListener('click', () => {
         window.location = '?form=true'
     })
 
-    let divFileCreatePart = document.createElement('button')
-    divFileCreatePart.id = 'files_create_part'
-    divFileCreatePart.className = 'big_button'
-    divFileCreatePart.innerHTML = `Менеджер файлов`
-    divFileCreatePart.addEventListener('click', () => {
-        window.location = '?files=true'
-    })
-
     buttonsDiv.appendChild(divQrCreatePart)
     buttonsDiv.appendChild(divFormCreatePart)
-    buttonsDiv.appendChild(divFileCreatePart)
     divQrsPart.appendChild(buttonsDiv)
 
     let qrsTable = document.createElement('table')
@@ -343,8 +288,6 @@ function getQRRow(data, settings) {
             let td = document.createElement('td')
             let fieldName = settings[cs].fieldName
             let fieldType = settings[cs].type
-
-            console.log(fieldName)
 
             switch (fieldType) {
                 case "text": {
@@ -522,10 +465,8 @@ function setUserPanel(parenDiv, participantId) {
 
 function setUsersPanel(parenDiv) {
     parenDiv.innerHTML = ''
-    parenDiv.style = 'overflow-x: auto'
 
     let participantsTable = document.createElement('table')
-    participantsTable.style = 'width: 98%'
 
     let tableHeader = document.createElement('tr')
     let td1 = document.createElement('th')

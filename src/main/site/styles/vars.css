@@ -2,19 +2,31 @@
     --gap-5px: 5px;
     --gap-10px: 10px;
     --gap-50px: 50px;
-    /* Радиус бордера */
+
     --br-8px: 8px;
     --br-10px: 10px;
     --br-40px: 40px;
     --br-50per: 50%;
-    /* Размер шрифта */
+
     --fs-08rem: 0.8rem;
     --fs-1rem: 1rem;
     --fs-14rem: 1.4rem;
     --fs-16rem: 1.6rem;
     --fs-30px: 30px;
-    /* Размер элемента */
+
     --height-74px: 74px;
     --height-12px: 12px;
     --height-40px: 40px;
+}
+
+
+.light {
+    --border-color: #dedede;
+    --font-color: #111;
+    --bg-color: #fff;
+}
+
+.dark {
+    --font-color: #eee;
+    --bg-color: #111;
 }

@@ -29,7 +29,7 @@ export function describeRole(roleRaw) {
 
 export const processFetchErrorToLogin = (error) => {
     if (error !== undefined) {
-        console.log(error)
+        // todo
     }
     window.location.href = 'login.html'
 }

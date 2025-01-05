@@ -27,11 +27,8 @@
 <body>
 <div class="up"></div>
 <div class="content">
-    <span>Сканируйте для <br>дополнительной информации<br></span>
+    <span>Сканируйте для <br>дополнительной информации:<br></span>
     <div id="mainBlock"><a class="qr_link" target="_"><img id="qr_image"></a></div>
-    <div>
-        <span><center>или перейдите по ссылке:<br/><a id="qr_text_link" target="_"></a></center></span>
-    </div>
 </div>
 </body>
 <script>
@@ -46,13 +43,8 @@
         const queryQ = '/?q='
 
         let qr_links = document.getElementsByClassName('qr_link')
-        let qr_text_link = document.getElementById('qr_text_link')
         for (let i in qr_links) {
             qr_links[i].href = schema + baseQrHref + queryQ + q
-        }
-        if (qr_text_link) {
-            qr_text_link.innerHTML = baseQrHref + queryQ + q
-            qr_text_link.href = schema + baseQrHref + queryQ + q
         }
 
         const baseGenerateHref = 'https://qrgen.qxyz.ru/generate?q='

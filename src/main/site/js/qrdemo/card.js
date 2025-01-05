@@ -29,6 +29,10 @@ export function setCard(q, creating = false) {
         create = true
         toLoginIfNotAuthorized()
     }
+    if (!edit) {
+        let header = document.getElementById('qrdemo_header')
+        if (header) header.remove()
+    }
 
     mainBlock.appendChild(divCard)
     setQRCard(q, divCard)
@@ -145,7 +149,7 @@ function getEditCardInfoHtml(qr) {
     codeDiv.appendChild(descriptionElem)
 
     for (let field in fields) {
-        const formFieldDiv = document.createElement('div');
+        const formFieldDiv = document.createElement('div')
         formFieldDiv.className = 'form_field_div'
         formFieldDiv.innerHTML = fieldToHtml(
             fields[field],
@@ -163,9 +167,25 @@ function getEditCardInfoHtml(qr) {
         new TableHead('Создан', '8%'), new TableHead('Публичный', '8%'),
         new TableHead('Удалить', '8%')
     ]
-    let files = qr?.files
-
     let fileItems = []
+
+    let formFiles = qr?.form?.files
+    if (formFiles) {
+        for (let index in formFiles) {
+            const file = formFiles[index];
+            fileItems.push({
+                name: file?.name,
+                fileName: file?.fileName,
+                description: file?.description,
+                fileSize: formatBytes(file?.fileSize),
+                created: file?.created,
+                isPublic: file?.isPublic,
+                actions: ''
+            })
+        }
+    }
+
+    let files = qr?.files
     for (let index in files) {
         const file = files[index];
         fileItems.push({
@@ -212,7 +232,7 @@ function getEditCardInfoHtml(qr) {
     showOnPhoneBtn.innerHTML = 'Просмотр карточки'
     showOnPhoneBtn.className = 'big_button'
     showOnPhoneBtn.id = 'show_public_code_phone_btn'
-    showOnPhoneBtn.style = 'width: 97%'
+    showOnPhoneBtn.style = 'width: 100%'
     codeDiv.append(showOnPhoneBtn)
 
     const saveBtn = document.createElement('input');
@@ -292,15 +312,15 @@ function getViewCardInfoHtml(qr) {
 let filesInputArray = []
 
 function addCodeBtnListeners() {
-    const saveCodeBtn = document.getElementById('save_code_btn');
+    const saveCodeBtn = document.getElementById('save_code_btn')
     if (saveCodeBtn) {
         saveCodeBtn.addEventListener('click', () => {
             let nameElem = document.getElementById('name_input')
             let descriptionElem = document.getElementById('description_input')
             let formElement = document.getElementById('form_select')
 
-            const collectedFiles = Field.htmlToFiles(document.getElementById('files_table'));
-            const data = collectFormData();
+            const collectedFiles = Field.htmlToFiles(document.getElementById('files_table'))
+            const data = collectFormData()
             qrApi().saveQr({
                 id: qrId,
                 code: qrCode,

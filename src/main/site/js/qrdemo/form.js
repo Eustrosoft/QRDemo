@@ -364,7 +364,7 @@ export class Field {
     }
 
     static htmlToFields(div) {
-        const formFields = div.getElementsByClassName('formFieldRow');
+        const formFields = div.getElementsByClassName('formFieldRow')
         if (formFields.length === 0) {
             return []
         }
@@ -372,28 +372,31 @@ export class Field {
         let fields = []
         for (let i = 0; i < formFields.length; i++) {
             // TODO: not depend on element index
-            const fieldId = formFields[i].children[0].firstElementChild.value;
-            const fieldType = formFields[i].children[0].children[1].value;
-            const name = formFields[i].children[1].firstElementChild.value;
-            const placeholder = formFields[i].children[2].firstElementChild.value;
-            const isStatic = formFields[i].children[3].firstElementChild.checked;
-            const isPublic = formFields[i].children[4].firstElementChild.checked;
-            const order = formFields[i].children[5].firstElementChild.value;
+            const fieldId = formFields[i].children[0].firstElementChild.value
+            const fieldType = formFields[i].children[0].children[1].value
+            const name = formFields[i].children[1].firstElementChild.value
+            const placeholder = formFields[i].children[2].firstElementChild.value
+            const isStatic = formFields[i].children[3].firstElementChild.checked
+            const isPublic = formFields[i].children[4].firstElementChild.checked
+            const order = formFields[i].children[5].firstElementChild.value
             fields.push(new Field(fieldId, name, placeholder, fieldType, isPublic, isStatic, order))
         }
         return fields
     }
 
     static htmlToFiles(div) {
-        const formFiles = div.getElementsByClassName('formFileRow');
+        const formFiles = div.getElementsByClassName('formFileRow')
         if (formFiles.length === 0) {
             return []
         }
 
         let files = []
         for (let i = 0; i < formFiles.length; i++) {
-            const fileId = formFiles[i].children[0].firstElementChild.value;
-            files.push({ id: fileId })
+            let formFileIdElement = formFiles[i].children[0].firstElementChild
+            if (formFileIdElement) {
+                const fileId = formFileIdElement.value
+                files.push({ id: fileId })
+            }
         }
         return files
     }

@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <title>QRDemo</title>
-    <link href="styles/qrdemo/style.css" type="text/css" rel="stylesheet"/>
-    <link href="styles/vars.css" type="text/css" rel="stylesheet"/>
-    <link href="styles/dop.css" type="text/css" rel="stylesheet"/>
-    <link href="styles/global.css" type="text/css" rel="stylesheet"/>
-    <meta name="viewport" content="width=device-width, initial-scale=0.6"/>
-    <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-    />
+    <link href="styles/qrdemo/style.css" type="text/css" rel="stylesheet" />
+    <link href="styles/vars.css" type="text/css" rel="stylesheet" />
+    <link href="styles/dop.css" type="text/css" rel="stylesheet" />
+    <link href="styles/global.css" type="text/css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.6" />
     <script type="module" src="js/qrdemo/main.js"></script>
-    <link rel="icon"
-          href="logos/logo.svg"
-          type="image/x-icon"/>
+    <link rel="icon" href="logos/logo.svg" type="image/x-icon" />
 </head>
-<body class="flex m-0 gap-05rem flex-direction-column" style="height: 100%">
+<header class="light header">
+    <div class="container">
+        <div class="header__body">
+            <div class="header__logo">
+                <a href="index.html">
+                    <span class="fs-8rem">QXYZ</span>
+                </a>
+            </div>
 
-<header id="qrdemo_header"
-        class="flex flex-wrap-nowrap justify-content-space-around flex-direction-row box-shadow-silver bg-white top-0 width-100 z-index-30 p-5">
-
-    <div class="flex flex-direction-row justify-content-center">
-        <a href="index.html">
-            <h1 class=fs-8rem><span class="color-red">QXYZ</span> - Стенд для демонстрации работы системы</h1>
-        </a>
+            <nav class="header__nav">
+                <ul class="header__ul">
+                    <li class="header__ul__item">
+                        <a href="?lk=true">
+                            Карточки
+                        </a>
+                    </li>
+                    <li class="header__ul__item">
+                        <a>
+                            <div id="avatar__dropdown" class="dropdown">
+                                <img class="header__ul__item__avatar" alt="Avatar image" src="icons/lk-icon.svg"/>
+                                <div id="avatar__dropdown__content" class="dropdown__content">
+                                </div>
+                            </div>    
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
-
-    <div id="lk_div" class="flex gap-10px margin-10">
-        <button class="custom_button" id="lk_button" type="button">
-            <a href="?lk=true">Кабинет</a>
-        </button>
-    </div>
-
 </header>
 
-<main class="flex flex-auto">
-    <div class="flex flex-auto flex-direction-column" id="main_block">
+<body class="flex m-0 gap-05rem flex-direction-column light">
 
-    </div>
-</main>
+    <main>
+        <div class="flex flex-auto flex-direction-column" id="main_block">
+
+        </div>
+    </main>
 </body>
+
 </html>
