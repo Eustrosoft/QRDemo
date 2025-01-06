@@ -8,9 +8,10 @@ export class ParticipantSettings {
 
 export class Settings {
 
-    constructor(language, qrTableColumns) {
+    constructor(language, qrTableColumns, defaultQrPrintText) {
         this.language = language
         this.qrTableColumns = qrTableColumns
+        this.defaultQrPrintText = defaultQrPrintText
     }
 }
 

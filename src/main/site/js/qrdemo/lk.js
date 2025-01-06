@@ -3,14 +3,11 @@ import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.j
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
 import { getModalWindow } from "./components/modals.js";
-import { getInput, getSelect } from "./components/inputs.js";
+import { getInput, getSelect, getSingleInput } from "./components/inputs.js";
 import { LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
 import { notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
-import { APP_VERSION } from "./version.js";
-import { getAppVersionSpan } from "./components/versions.js";
-import { getSpan } from "./components/texts.js";
 import { getHr } from "./components/hrs.js";
 
 const mainBlock = document.getElementById('main_block')
@@ -88,10 +85,24 @@ function setSettings(div, settingsJson, userDetails) {
 
     let qrTableSettingsDiv
     let existedQrTableSettings
+
+    let qrPrintTextDiv
+    let defaultQrPrintTextInput
+    let existedDefaultQrPrintText = settingsJson?.settings?.defaultQrPrintText
     if (!admin) {
+        qrPrintTextDiv = document.createElement('div')
+        let defaultQrPrintTextLabel = getTextLabel('Текст для печатной формы QR по умолчанию:')
+        defaultQrPrintTextInput = getSingleInput('text', false, 'qr_print_form_input', '')
+        defaultQrPrintTextInput.style.width = '100%'
+        defaultQrPrintTextInput.maxLength = 128
+        if (existedDefaultQrPrintText) {
+            defaultQrPrintTextInput.value = existedDefaultQrPrintText
+        }
+        qrPrintTextDiv.appendChild(defaultQrPrintTextLabel)
+        qrPrintTextDiv.appendChild(defaultQrPrintTextInput)
+
         qrTableSettingsDiv = document.createElement('div')
-        let qrTableSettingsHeader = document.createElement('label')
-        qrTableSettingsHeader.innerHTML = 'Настройки таблицы QR'
+        let qrTableSettingsHeader = getTextLabel('Настройки таблицы QR')
         qrTableSettingsDiv.appendChild(qrTableSettingsHeader)
         qrTableSettingsDiv.appendChild(document.createElement('br'))
 
@@ -138,6 +149,7 @@ function setSettings(div, settingsJson, userDetails) {
     divSettings.appendChild(document.createElement('br'))
 
     if (!admin) {
+        divSettings.appendChild(qrPrintTextDiv)
         let ranges = userDetails?.ranges
         if (ranges) {
             divSettings.appendChild(getHr())
@@ -156,11 +168,11 @@ function setSettings(div, settingsJson, userDetails) {
 
     let saveSettingsButton = getBigButton('Сохранить')
     saveSettingsButton.addEventListener('click', () => {
-
         let stgs = new ParticipantSettings(
             new Settings(
                 languageSelect.value,
-                admin ? null : existedQrTableSettings == null ? QR_TABLE_COLUMNS : existedQrTableSettings
+                admin ? null : existedQrTableSettings == null ? QR_TABLE_COLUMNS : existedQrTableSettings,
+                defaultQrPrintTextInput?.value
             )
         )
 
@@ -271,7 +283,7 @@ function setupQrsPart(div, settings) {
                 let description = json[i]?.description
                 let created = json[i]?.created
                 let updated = json[i]?.updated
-                const qrLine = getQRRow({ code: code, name: name, description: description, created: created, updated: updated }, colSettings)
+                const qrLine = getQRRow({ code: code, name: name, description: description, created: created, updated: updated }, settings?.settings)
                 qrsTable.appendChild(qrLine)
             }
         }).catch(ex => alert(ex))
@@ -283,11 +295,12 @@ function getQRRow(data, settings) {
     let qrLine = document.createElement('tr')
     const q = Number(data?.code).toString(16);
 
-    for (let cs in settings) {
-        if (settings[cs].enable) {
+    let colSettings = settings?.qrTableColumns
+    for (let cs in colSettings) {
+        if (colSettings[cs].enable) {
             let td = document.createElement('td')
-            let fieldName = settings[cs].fieldName
-            let fieldType = settings[cs].type
+            let fieldName = colSettings[cs].fieldName
+            let fieldType = colSettings[cs].type
 
             switch (fieldType) {
                 case "text": {
@@ -299,7 +312,7 @@ function getQRRow(data, settings) {
                     break
                 }
                 case "qr_image": {
-                    td.innerHTML = getQRImage(q, 150)
+                    td.innerHTML = getQRImage(q, 125)
                     break
                 }
                 case "date": {
@@ -311,10 +324,14 @@ function getQRRow(data, settings) {
         }
     }
 
+    let printFormText = settings?.defaultQrPrintText == undefined
+        ? ''
+        : settings?.defaultQrPrintText
+
     let td = document.createElement('td')
     td.innerHTML = `
         <div class="custom_button fs-08rem"><a href="?q=${q}&edit=true">Редактировать</a></div>
-        <div class="custom_button fs-08rem"><a href="${QR_PRINTER_URL}?q=${q}" target="_">Распечатать QR-код</a></div>
+        <div class="custom_button fs-08rem"><a href="${QR_PRINTER_URL}?q=${q}&text=${printFormText}" target="_">Распечатать QR-код</a></div>
     `
     qrLine.appendChild(td)
 

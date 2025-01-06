@@ -9,6 +9,10 @@
             justify-content:center;
             align-items: center;
         }
+        .content-box {
+            max-width: 300px;
+            text-align: center;
+        }
         a {
             text-decoration: none;
             text-align: center;
@@ -27,13 +31,19 @@
 <body>
 <div class="up"></div>
 <div class="content">
-    <span>Сканируйте для <br>дополнительной информации:<br></span>
-    <div id="mainBlock"><a class="qr_link" target="_"><img id="qr_image"></a></div>
+    <div class="content-box">
+        <span id="content-text"></span>
+        <div id="mainBlock"><a class="qr_link" target="_"><img id="qr_image"></a></div>
+    </div>
 </div>
 </body>
 <script>
+    const defaultText = 'Сканируйте для дополнительной информации:'
     const urlParams = new URLSearchParams(window.location.search)
     const q = urlParams.get('q')
+    const text = urlParams.get('text')
+
+    const contentText = document.getElementById('content-text')
 
     if (!q) {
         alert('Не предоставлен параметр q')
@@ -51,6 +61,11 @@
         let qr_image = document.getElementById('qr_image')
         if (qr_image) {
             qr_image.src = baseGenerateHref + q + '&color=%23000000&background=%23ffffff&x=165&fileType=SVG&correctionLevel=L&site=' + schema + baseQrHref
+        }
+        if (text != null && text != '') {
+            contentText.innerHTML = text
+        } else {
+            contentText.innerHTML = defaultText
         }
     }
 </script>

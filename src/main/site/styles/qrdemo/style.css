@@ -525,7 +525,7 @@ th {
 .dropdown__content {
     display: none;
     position: absolute;
-    background-color: var(--bg-color);
+    background-color: var(--bg-dropdown-color);
     border-radius: .7rem;
     min-width: 220px;
     max-width: 400px;
@@ -533,7 +533,7 @@ th {
     padding: 8px 0;
     right: -4px;
     z-index: 10000;
-    overflow: hidden;
+    top: 55px;
 
     align-items: start;
     text-align: left;
@@ -562,6 +562,21 @@ th {
     word-wrap: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.dropdown__content:before {
+    left: 182px;
+    top: -12px;
+    content: "";
+    position: absolute;
+
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid var(--bg-dropdown-color);
+    
+    z-index: 10001;
 }
 
 .contact_address {

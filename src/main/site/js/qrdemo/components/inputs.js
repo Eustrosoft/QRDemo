@@ -1,5 +1,14 @@
 import { notEmptyOrUndefined } from "../../commons/common.js";
 
+export function getSingleInput(type, required = false, id = '', placeholder = '') {
+    let htmlInput = document.createElement('input')
+    htmlInput.type = type
+    htmlInput.placeholder = placeholder
+    htmlInput.required = required
+    htmlInput.id = id
+    return htmlInput
+}
+
 export function getInput(labelText, type, required = false, id = '', placeholder = '', inline = false) {
     let htmlInputDiv = document.createElement('div');
     if (inline) {

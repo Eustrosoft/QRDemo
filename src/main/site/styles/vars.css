@@ -21,12 +21,17 @@
 
 
 .light {
+    --bg-dropdown-color: #f8f8f8;
+
     --border-color: #dedede;
     --font-color: #111;
     --bg-color: #fff;
 }
 
 .dark {
+    --bg-dropdown-color: #9091f6;
+
+    --border-color: #dedede;
     --font-color: #eee;
     --bg-color: #111;
 }
