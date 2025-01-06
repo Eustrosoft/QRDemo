@@ -565,7 +565,7 @@ th {
 }
 
 .dropdown__content:before {
-    left: 182px;
+    right: 18px;
     top: -12px;
     content: "";
     position: absolute;
