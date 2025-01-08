@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -97,12 +99,19 @@ public class FileService {
         }
     }
 
+    @SneakyThrows
     private ResponseEntity<byte[]> getFileResponse(Long id, FileProjection file) {
         byte[] fileData = repository.findById(id, FileBytesProjection.class).get().getFileData();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", file.getFileType());
         headers.add("Content-Length", file.getFileSize().toString());
-        headers.add("Content-Disposition", String.format("inline; filename*=UTF-8''%s", file.getFileName()));
+        headers.add(
+                "Content-Disposition",
+                String.format(
+                        "inline; filename*=UTF-8''%s",
+                        URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
+                )
+        );
         return new ResponseEntity<>(
                 fileData, headers, HttpStatus.OK
         );

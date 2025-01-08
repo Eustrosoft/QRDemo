@@ -6,6 +6,8 @@ import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.FormChangeDto;
 import org.eustrosoft.dtos.FormCreationDto;
 import org.eustrosoft.dtos.FormDto;
+import org.eustrosoft.dtos.FormFieldDto;
+import org.eustrosoft.mappers.FormFieldMapper;
 import org.eustrosoft.mappers.FormMapper;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.services.FormService;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class FormsController {
     private final FormService formService;
     private final FormMapper formMapper;
+    private final FormFieldMapper formFieldMapper;
 
     @GetMapping
     public List<FormDto> getAllForms() throws Exception {
@@ -72,5 +75,10 @@ public class FormsController {
     @DeleteMapping("/{id}")
     public void deleteForm(@PathVariable Long id) throws IllegalAccessException {
         formService.delete(id);
+    }
+
+    @GetMapping("/fields")
+    public List<FormFieldDto> getAllFormFields() {
+        return formFieldMapper.toListDto(formService.findAllFields());
     }
 }

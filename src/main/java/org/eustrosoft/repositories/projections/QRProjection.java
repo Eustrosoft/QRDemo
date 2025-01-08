@@ -6,8 +6,6 @@ public interface QRProjection extends QRSimplestProjection {
 
     String getData();
 
-    Long getParticipantId();
-
     List<FileProjection> getFiles();
 
     FormComplexProjection getForm();

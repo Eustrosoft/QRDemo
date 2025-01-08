@@ -18,17 +18,14 @@ export function addParamToHeader(name, value) {
 }
 
 export function toLoginIfNotAuthorized() {
-    return userApi().me()
+    return userApi().authMe()
         .then(resp => {
-            if (resp.status === 401)
-                throw new Error('Login to system')
             return resp.json()
         })
         .then(json => {
             localStorage.setItem(LOCAL_STORAGE_USER, JSON.stringify(json))
             return json
         })
-        .catch(processFetchErrorToLogin);
 }
 
 export const processFetchErrorToLogin = (error) => {

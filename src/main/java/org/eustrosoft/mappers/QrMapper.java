@@ -22,10 +22,7 @@ public class QrMapper extends EntityMapper {
     private final FileMapper fileMapper;
 
     public QRDto toDto(QRSimplestProjection qr) {
-        QRDto dto = new QRDto();
-        dto.setId(qr.getId());
-        dto.setCreated(qr.getCreated());
-        dto.setUpdated(qr.getUpdated());
+        QRDto dto = super.toDtoFromProjection(qr, QRDto.class);
         dto.setCode(qr.getCode());
         return dto;
     }
@@ -41,6 +38,7 @@ public class QrMapper extends EntityMapper {
     public QRDto toDto(QRProjection qr) {
         QRDto dto = toDto((QRSimplestProjection) qr);
         dto.setCode(qr.getCode());
+        dto.setData(qr.getData());
         dto.setForm(formMapper.toDto(qr.getForm()));
         dto.setFiles(fileMapper.toListDto(qr.getFiles()));
         return dto;

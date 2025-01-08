@@ -27,13 +27,6 @@ export function describeRole(roleRaw) {
     }
 }
 
-export const processFetchErrorToLogin = (error) => {
-    if (error !== undefined) {
-        // todo
-    }
-    window.location.href = 'login.html'
-}
-
 export function getCurrentHeaders() {
     let headers = null
     const req = new XMLHttpRequest();

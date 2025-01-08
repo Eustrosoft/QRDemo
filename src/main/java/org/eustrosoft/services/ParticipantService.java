@@ -14,6 +14,7 @@ import org.eustrosoft.entitites.Role;
 import org.eustrosoft.entitites.enums.Roles;
 import org.eustrosoft.repositories.ParticipantRepository;
 import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
+import org.eustrosoft.repositories.projections.ParticipantSettingsProjection;
 import org.eustrosoft.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -87,11 +88,10 @@ public class ParticipantService {
 
     @SneakyThrows
     public String getSettings() {
-        Optional<Participant> byToken = userService.getByToken();
-        if (!byToken.isPresent()) {
-            throw new IllegalAccessException("Can not find current user");
-        }
-        return byToken.get().getSettings();
+        return repository.findByUsername(
+                userService.getUsername(),
+                ParticipantSettingsProjection.class
+        ).get().getSettings();
     }
 
     @SneakyThrows

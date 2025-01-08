@@ -13,7 +13,10 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import java.util.List;
 
@@ -22,13 +25,16 @@ import java.util.List;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "form", schema = "qrdemo")
+@NamedEntityGraph(name="fieldsEntityGraph", attributeNodes={
+        @NamedAttributeNode("fields")
+})
 public class Form extends DbEntity implements FormSimpleProjection {
     public static final String TYPE = "FM";
 
     @Column(name = "data")
     private String data;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "form_id", updatable = false)
     private List<FormField> fields;
 
@@ -39,4 +45,7 @@ public class Form extends DbEntity implements FormSimpleProjection {
             inverseJoinColumns = {@JoinColumn(name = "file_id")}
     )
     private List<File> files;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "form", orphanRemoval = false)
+    private List<QR> qrs;
 }

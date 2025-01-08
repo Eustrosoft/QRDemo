@@ -7,6 +7,7 @@ import org.eustrosoft.dtos.FormDto;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.repositories.projections.FormComplexProjection;
 import org.eustrosoft.repositories.projections.FormSimpleProjection;
+import org.eustrosoft.repositories.projections.FormWithFieldsProjection;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
@@ -48,6 +49,17 @@ public class FormMapper extends EntityMapper {
             return null;
         }
         return super.toDtoFromProjection(form, FormDto.class);
+    }
+
+    public FormDto toDto(FormWithFieldsProjection form) {
+        if (form == null) {
+            return null;
+        }
+        FormDto dto = super.toDtoFromProjection(form, FormDto.class);
+        if (form.getFields() != null) {
+            dto.setFields(ffMapper.toListDto(form.getFields()));
+        }
+        return dto;
     }
 
     public FormDto toDto(FormComplexProjection form) {

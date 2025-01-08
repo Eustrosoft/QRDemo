@@ -1,18 +1,16 @@
-import { fieldToHtmlItems, formatBytes, toLoginIfNotAuthorized } from "./utils.js";
+import { formatBytes } from "./utils.js";
 import { qrApi } from "./api.js";
 import { getInput } from "./components/inputs.js";
-import { getTable, TableHead } from "./components/tables.js";
 import { getModalWindow } from "./components/modals.js";
 import { getBigButton } from "./components/buttons.js";
 import { notEmptyOrUndefined } from "../commons/common.js";
 
-export function setFiles(formId) {
-    toLoginIfNotAuthorized()
-        .then(x => init())
-        .catch(ex => alert(ex))
+export function setFiles(filesParam) {
+    init()
 }
 
 function init() {
+    let files = qrApi().getAllFiles()
     document.title = `QRDemo - My Files`
 
     const mainBlock = document.getElementById('main_block')
@@ -20,9 +18,8 @@ function init() {
     mainBlock.innerHTML = getStartPage()
     setStartActions()
 
-    qrApi().getAllFiles().then(resp => resp.json())
+    files.then(resp => resp.json())
         .then(json => printFilesList(mainBlock, json))
-        .catch(ex => alert(ex))
 }
 
 function printFilesList(parent, json) {

@@ -36,11 +36,13 @@ public class QRController {
 
     @GetMapping
     public List<QRDto> findAll() throws IllegalAccessException {
-        return service.findAllMine().stream().map(mapper::toDto).collect(Collectors.toList());
+        return service.findAllMine()
+                .stream().map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/code")
-    public QRDto findById(@RequestParam("q") String q) throws IllegalAccessException {
+    public QRDto findByCode(@RequestParam("q") String q) throws IllegalAccessException {
         if (StringUtils.isEmpty(q)) {
             return null;
         }
@@ -66,19 +68,19 @@ public class QRController {
     }
 
     @PostMapping("/{id}/files/upload")
-    public FileDto uploadFile(
+    public QRDto uploadFile(
             @PathVariable Long id,
             FileUploadRequest fur
     ) throws IllegalAccessException, IOException {
-        return fileMapper.toDto(service.uploadFile(id, fur));
+        return mapper.toDto(service.uploadFile(id, fur));
     }
 
     @PostMapping("/{id}/files/{fileId}/delete")
-    public void deleteFile(
+    public QRDto deleteFile(
             @PathVariable Long id,
             @PathVariable Long fileId
     ) throws IllegalAccessException {
-        service.deleteFile(id, fileId);
+        return mapper.toDto(service.deleteFile(id, fileId));
     }
 
     @DeleteMapping("/{id}")

@@ -3,6 +3,8 @@ package org.eustrosoft.entitites;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eustrosoft.repositories.projections.ParticipantSettingsProjection;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -59,11 +61,11 @@ public class Participant extends DbEntity implements ParticipantSettingsProjecti
     @Column(name = "banned_reason")
     private String bannedReason;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "participant_id")
     private List<File> files;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "participant_id")
     private List<Role> roles;
 

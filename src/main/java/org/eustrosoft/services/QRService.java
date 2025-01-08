@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.QRDto;
-import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
 import org.eustrosoft.entitites.Participant;
@@ -17,22 +16,21 @@ import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.mappers.FormMapper;
 import org.eustrosoft.mappers.QrMapper;
 import org.eustrosoft.repositories.QRRepository;
+import org.eustrosoft.repositories.projections.EntityProjection;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.repositories.projections.FormComplexProjection;
 import org.eustrosoft.repositories.projections.QRProjection;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
+import org.eustrosoft.repositories.projections.QRSimplestProjection;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.utils.CommonUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,8 +45,8 @@ import java.util.stream.Collectors;
 import static org.eustrosoft.Constants.EMPTY_JSON;
 import static org.eustrosoft.Constants.RANGE_END;
 import static org.eustrosoft.Constants.RANGE_START;
+import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
-import static org.eustrosoft.utils.FileUtils.getFileIndex;
 
 @Service
 @RequiredArgsConstructor
@@ -67,12 +65,19 @@ public class QRService {
         return byId;
     }
 
-    public Optional<QR> getByCode(Long code) throws IllegalAccessException {
-        Optional<QR> byId = qrRepository.findByCode(code);
+    public <T extends EntityProjection> Optional<T> get(Long id, Class<T> clazz) throws IllegalAccessException {
+        Optional<T> byId = qrRepository.findById(id, clazz);
         securityComponent.checkUserRightById(byId.get()::getParticipantId);
-        return qrRepository.findByCode(code);
+        return byId;
     }
 
+    public Optional<QRProjection> getByCode(Long code) throws IllegalAccessException {
+        Optional<QRProjection> byId = qrRepository.findByCode(code, QRProjection.class);
+        securityComponent.checkUserRightById(byId.get()::getParticipantId);
+        return byId;
+    }
+
+    @Cacheable(value = QR_CACHE_NAME)
     public QRDto getByCodePublic(Long code) throws JsonProcessingException {
         if (code == null) {
             throw new IllegalArgumentException("Illegal code");
@@ -87,8 +92,35 @@ public class QRService {
 
     public List<QRSimpleProjection> findAllMine() throws IllegalAccessException {
         return CommonUtils.iterableToList(
-                qrRepository.findAllByParticipantIdOrderByUpdatedDesc(
+                qrRepository.findAllByParticipantIdOrderByCodeDesc(
                         participantService.getCurrentSimpleOrThrow().getId()
+                )
+        );
+    }
+
+    public <T extends EntityProjection> List<T> findAllByFormId(
+            Long formId,
+            Class<T> clazz
+    ) throws IllegalAccessException {
+        return CommonUtils.iterableToList(
+                qrRepository.findAllByParticipantIdAndFormId(
+                        participantService.getCurrentSimpleOrThrow().getId(),
+                        formId,
+                        clazz
+                )
+        );
+    }
+
+    public <T extends EntityProjection> List<T> findAllByFormIdAndParticipantId(
+            Long participantId,
+            Long formId,
+            Class<T> clazz
+    ) {
+        return CommonUtils.iterableToList(
+                qrRepository.findAllByParticipantIdAndFormId(
+                        participantId,
+                        formId,
+                        clazz
                 )
         );
     }
@@ -110,6 +142,7 @@ public class QRService {
     }
 
     @Transactional
+    @CacheEvict(key = "#result.code",value = QR_CACHE_NAME)
     public QR setFormForQR(Long id, Long formId) throws IllegalAccessException, JsonProcessingException {
         Optional<QR> qr = get(id);
         if (qr.isPresent()) {
@@ -124,6 +157,7 @@ public class QRService {
     }
 
     @Transactional
+    @CacheEvict(key = "#result.code", value = QR_CACHE_NAME)
     public QR update(QR qr) throws IllegalAccessException, JsonProcessingException {
         Optional<QR> gotQr = get(qr.getId());
         qr.setParticipantId(participantService.getCurrentSimpleOrThrow().getId());
@@ -140,46 +174,30 @@ public class QRService {
     }
 
     @Transactional
-    public FileProjection uploadFile(Long id, FileUploadRequest fur) throws IllegalAccessException, IOException {
-        QR qr = get(id).get();
+    @CacheEvict(key = "#result.code", value = QR_CACHE_NAME)
+    public QRProjection uploadFile(Long id, FileUploadRequest fur) throws IllegalAccessException, IOException {
+        QRSimplestProjection qr = get(id, QRSimplestProjection.class).get();
         FileProjection file = fileService.uploadFile(fur);
-        List<File> files = qr.getFiles();
-        if (files == null) {
-            qr.setFiles(new ArrayList<>());
-        }
-        qr.getFiles().add(new File(file.getId()));
-        update(qr);
-        return file;
+        qrRepository.insertFile(qr.getId(), file.getId());
+        return get(id, QRProjection.class).get();
     }
 
     @Transactional
     @SneakyThrows
-    public void deleteFile(Long id, Long fileId) {
-        QR qr = get(id).get();
-        List<File> files = qr.getFiles();
-        if (files == null) {
-            throw new IllegalArgumentException("There are no files in this qr");
-        }
-        int index = getFileIndex(fileId, files);
-        files.remove(index);
-        update(qr);
+    @CacheEvict(key = "#result.code", value = QR_CACHE_NAME)
+    public QRProjection deleteFile(Long id, Long fileId) {
+        QRSimplestProjection qr = get(id, QRSimplestProjection.class).get();
+        qrRepository.deleteFile(qr.getId(), fileId);
+        return get(id, QRProjection.class).get();
     }
 
     @Transactional
-    public ResponseEntity<byte[]> getFileBytesResponseV2(Long id) throws Exception {
-        FileProjection file = fileService.findById(id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .header(HttpHeaders.CONTENT_TYPE, file.getFileType())
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        String.format(
-                                "attachment; filename*=UTF-8''%s",
-                                URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
-                        )
-                )
-                .header(HttpHeaders.ACCEPT_RANGES, "Bytes")
-                .header(HttpHeaders.CONTENT_RANGE, "Bytes" + " " + 0 + "-" + file.getFileSize() + "/" + file.getFileSize())
-                .header(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString())
-                .body(fileService.getFileBytes(id));
+    public void annulForm(List<Long> ids) {
+        if (ids == null) {
+            return;
+        }
+
+        qrRepository.annulForm(ids);
     }
 
     private void checkUsedQr(Collection<QRRange> ranges, Collection<QR> used, Long qr) throws IllegalArgumentException {

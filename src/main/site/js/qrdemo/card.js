@@ -1,6 +1,5 @@
-import { fieldToHtml, formatBytes, getQRImageDiv, longToHex, toLoginIfNotAuthorized } from "./utils.js";
+import { fieldToHtml, formatBytes } from "./utils.js";
 import { qrApi } from "./api.js";
-import { getInput } from "./components/inputs.js";
 import { getModalWindow } from "./components/modals.js";
 import { getTable, getTr, TableHead } from "./components/tables.js";
 import { getBigButton } from "./components/buttons.js";
@@ -23,11 +22,9 @@ export function setCard(q, creating = false) {
     const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.get('edit')) {
         edit = urlParams.get('edit')
-        toLoginIfNotAuthorized()
     }
     if (urlParams.get('create') || creating) {
         create = true
-        toLoginIfNotAuthorized()
     }
     if (!edit) {
         let header = document.getElementById('qrdemo_header')
@@ -73,7 +70,6 @@ function setQRInfo(q, div) {
                 addDownloadPublicFileRowActions()
             }
         })
-        .catch(ex => alert(ex))
 }
 
 function getEditCardInfoHtml(qr) {
@@ -128,7 +124,6 @@ function getEditCardInfoHtml(qr) {
                 formChooseElement.append(opt)
             }
         })
-        .catch(ex => alert(ex))
 
     codeDiv.append(formLabel)
     formSelectDiv.append(formChooseElement)
@@ -336,7 +331,7 @@ function addCodeBtnListeners() {
                 } else {
                     alert(resp.json())
                 }
-            }).catch(ex => alert(ex))
+            })
         })
     }
 

@@ -1,4 +1,4 @@
-import { emptyOrUndefined, getQRImage, hasAdminRole, longToHex, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, getQRImage, hasAdminRole, longToHex, processFetchErrorToLogin, toLoginIfNotAuthorized } from "./utils.js";
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
@@ -26,7 +26,7 @@ let settings;
 
 export function setLk() {
     toLoginIfNotAuthorized()
-        .then(x => {
+        .then(resp => {
             document.title = 'QRDemo - Личный кабинет'
 
             const urlParams = new URLSearchParams(window.location.search)
@@ -52,7 +52,10 @@ function setUserAccount(userDetails, div) {
                 .getSettings()
                 .then(resp => resp.json())
                 .then(json => setSettings(div, json, userDetails))
-                .catch(ex => setSettings(div))
+                .catch(ex => {
+                    console.log(ex)
+                    setSettings(div, null, userDetails)
+                })
         } else {
             if (!admin) {
                 setupQrs(div)
@@ -225,9 +228,12 @@ function setSettings(div, settingsJson, userDetails) {
 
 function setupQrs(div) {
     userApi().getSettings()
-        .then(resp => { return resp.ok ? resp.json() : null })
-        .then(settings => { setupQrsPart(div, settings) })
-        .catch(ex => setupQrsPart(div))
+        .then(resp => resp.json())
+        .then(settings => setupQrsPart(div, settings))
+        .catch(ex => {
+            console.log(ex)
+            setupQrsPart(div, null)
+        })
 }
 
 function setupQrsPart(div, settings) {
@@ -250,7 +256,9 @@ function setupQrsPart(div, settings) {
                 if (resp.ok) {
                     alert('Карточка была создана!')
                     location.reload()
-                } else alert("Карточка не была создана")
+                } else {
+                    alert("Карточка не была создана")
+                }
             })
             .catch(ex => alert(ex))
     })

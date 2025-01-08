@@ -1,12 +1,11 @@
-import { emptyOrUndefined, fieldToHtmlItems, formatBytes, setQueryParamsAndRefresh, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, fieldToHtmlItems, formatBytes, setQueryParamsAndRefresh } from "./utils.js";
 import { dictionaryApi, qrApi } from "./api.js";
 import { notEmptyOrUndefined } from "../commons/common.js";
 import { getTextLabel } from "./components/labels.js";
 import { getInput } from "./components/inputs.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
-import { getFileScrollComponent } from "./components/fileScroll.js";
 import { getTable, getTr, TableHead } from "./components/tables.js";
-import { downloadFile, showUploadFileModal } from "./files.js";
+import { showUploadFileModal } from "./files.js";
 
 var formFields = []
 var fieldTypes = []
@@ -14,14 +13,10 @@ var formId = ''
 var lastElementIndex = 0
 
 export function setForm(formId) {
-    toLoginIfNotAuthorized()
-        .then(x => {
-            dictionaryApi().getDictionariesByCode(DICTIONARIES.INPUT_TYPES)
-                .then(resp => resp.json())
-                .then(json => fieldTypes = json)
-                .then(x => init(formId))
-                .catch(ex => alert(ex))
-        })
+    dictionaryApi().getDictionariesByCode(DICTIONARIES.INPUT_TYPES)
+        .then(resp => resp.json())
+        .then(json => fieldTypes = json)
+        .then(x => init(formId))
 }
 
 function init(formId) {
