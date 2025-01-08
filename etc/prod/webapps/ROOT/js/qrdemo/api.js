@@ -1,4 +1,4 @@
-import { emptyOrUndefined } from "./utils.js";
+import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
 export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
 export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
@@ -9,7 +9,7 @@ export function qrApi() {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     }
-
+    const authFetch = RequestDecorators.withAuth(fetch)
     return {
         getAppVersion: () => {
             let url = `${QR_DEMO_API}unsecured/alive/version`;
@@ -36,7 +36,7 @@ export function qrApi() {
                     body: JSON.stringify(form)
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         updateForm: (form) => {
             let url = `${QR_DEMO_API}secured/forms/${form.id}`;
@@ -50,7 +50,7 @@ export function qrApi() {
                     body: JSON.stringify(form)
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         getAllForms: () => {
             let url = `${QR_DEMO_API}secured/forms`;
@@ -63,7 +63,20 @@ export function qrApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
+        },
+        getAllFormFields: () => {
+            let url = `${QR_DEMO_API}secured/forms/fields`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
         },
         getFormById: (id) => {
             let url = `${QR_DEMO_API}secured/forms/${id}`;
@@ -76,7 +89,7 @@ export function qrApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         deleteForm: (id) => {
             let url = `${QR_DEMO_API}secured/forms/${id}`;
@@ -89,7 +102,7 @@ export function qrApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         getQrs: () => {
             let url = `${QR_DEMO_API}secured/qrs`;
@@ -102,7 +115,7 @@ export function qrApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         getQr: (q) => {
             let url = `${QR_DEMO_API}secured/qrs/code?q=${q}`;
@@ -115,7 +128,7 @@ export function qrApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         getQrPublic: (q) => {
             let url = `${QR_DEMO_API}unsecured/qrs?q=${q}`;
@@ -142,7 +155,7 @@ export function qrApi() {
                     body: JSON.stringify(data)
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         uploadFormFile: (id, fileRequest) => {
             const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`;
@@ -169,7 +182,7 @@ export function qrApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         createQR: (name, description) => {
             let url = `${QR_DEMO_API}secured/qrs`;
@@ -183,7 +196,7 @@ export function qrApi() {
                     body: JSON.stringify({name: name, description: description})
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         getAllFiles: () => {
             let url = `${QR_DEMO_API}secured/files`;
@@ -196,7 +209,7 @@ export function qrApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         deleteFile: (id) => {
             let url = `${QR_DEMO_API}secured/files/${id}`;
@@ -209,7 +222,7 @@ export function qrApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         openFile: (id) => {
             let url = `${QR_DEMO_API}secured/files/${id}/download`;
@@ -268,6 +281,7 @@ export function adminApi() {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     }
+    const authFetch = RequestDecorators.withAuth(fetch)
 
     return {
         getParticipants: () => {
@@ -281,7 +295,7 @@ export function adminApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         getParticipant: (id) => {
             let url = `${QR_DEMO_API}admin/panel/participants/${id}`;
@@ -294,7 +308,7 @@ export function adminApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         createParticipant: (form) => {
             let url = `${QR_DEMO_API}admin/panel/participants`;
@@ -308,7 +322,7 @@ export function adminApi() {
                     body: JSON.stringify(form)
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         getRoles: () => {
             const req = new Request(
@@ -319,7 +333,7 @@ export function adminApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         }
     }
 }
@@ -330,6 +344,7 @@ export function userApi() {
         'Content-Type': 'application/json'
     }
 
+    const authFetch = RequestDecorators.withAuth(fetch)
     return {
         register: (login, password, password_2) => {
             const req = new Request(
@@ -366,7 +381,7 @@ export function userApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         me: () => {
             const req = new Request(
@@ -379,6 +394,17 @@ export function userApi() {
             )
             return fetch(req)
         },
+        authMe: () => {
+            const req = new Request(
+                `${QR_DEMO_API}secured/participants/me`,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include',
+                }
+            )
+            return authFetch(req)
+        },
         getSettings: () => {
             const req = new Request(
                 `${QR_DEMO_API}secured/participants/settings`,
@@ -388,7 +414,7 @@ export function userApi() {
                     credentials: 'include',
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         updateSettings: (settings) => {
             const req = new Request(
@@ -400,7 +426,7 @@ export function userApi() {
                     body: JSON.stringify(settings)
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         },
         changePassword: (changePassw) => {
             const req = new Request(
@@ -412,7 +438,7 @@ export function userApi() {
                     body: JSON.stringify(changePassw)
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         }
     }
 }
@@ -422,6 +448,7 @@ export function dictionaryApi() {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     }
+    const authFetch = RequestDecorators.withAuth(fetch)
 
     return {
         getDictionariesByCode: (code) => {
@@ -438,7 +465,7 @@ export function dictionaryApi() {
                     credentials: 'include'
                 }
             )
-            return fetch(req)
+            return authFetch(req)
         }
     }
 }
@@ -451,8 +478,8 @@ function uploadSingleFile(url, fileRequest) {
     let fileSize = file.size
 
     if (fileSize > MAX_FILE_UPLOAD_SIZE) {
-        alert('Файл большой!');
-        throw new Error('Файл большой!')
+        alert('Файл слишком большой, выберите файл менее 10 МБ!')
+        throw new Error('Выберите файл менее 10 МБ!')
     }
 
     data.append('file', file, file.name)
@@ -464,4 +491,19 @@ function uploadSingleFile(url, fileRequest) {
     request.open('POST', url, false)
     request.withCredentials = true
     request.send(data)
+}
+
+class RequestDecorators {
+    static withAuth(fetch) {
+        return function(req) {
+            const response = fetch(req);
+            return response.then(resp => {
+                if (resp.status === 401) {
+                    throw new Error('Unauthorized')
+                }
+                return resp
+            })
+                .catch(processFetchErrorToLogin)
+        }
+    }
 }
