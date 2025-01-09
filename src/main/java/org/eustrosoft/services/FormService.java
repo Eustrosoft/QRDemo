@@ -177,7 +177,7 @@ public class FormService {
     }
 
     private List<QRSimplestProjection> evictFromQrsCache(Long participantId, Long formId) {
-        if (formId == null) {
+        if (formId == null || participantId == null) {
             return Collections.emptyList();
         }
         List<QRSimplestProjection> qrs = qrService.findAllByFormIdAndParticipantId(

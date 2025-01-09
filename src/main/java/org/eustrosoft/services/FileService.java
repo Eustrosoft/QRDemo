@@ -10,6 +10,7 @@ import org.eustrosoft.repositories.FileRepository;
 import org.eustrosoft.repositories.projections.FileBytesProjection;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.security.SecurityComponent;
+import org.eustrosoft.utils.CommonUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +30,11 @@ public class FileService {
     private final SecurityComponent securityComponent;
 
     @SneakyThrows
-    public List<File> findAllMyFiles() {
-        // TODO: not optimized!
-        return participantService.getCurrentOrThrow().getFiles();
+    public List<FileProjection> findAllMyFiles() {
+        Participant participant = participantService.getCurrentOrThrow();
+        return CommonUtils.iterableToList(
+                repository.findAllByParticipantId(participant.getId(), FileProjection.class)
+        );
     }
 
     @SneakyThrows
@@ -40,16 +43,6 @@ public class FileService {
         FileProjection file = repository.findById(id, FileProjection.class).get();
         if (file.getIsPublic() || file.getParticipantId().equals(current.getId())) {
             return file;
-        }
-        throw new IllegalAccessException("File is not public or yours");
-    }
-
-    @SneakyThrows
-    public byte[] getFileBytes(Long id) {
-        Participant current = participantService.getCurrentSimpleOrThrow();
-        FileBytesProjection file = repository.findById(id, FileBytesProjection.class).get();
-        if (file.getIsPublic() || file.getParticipantId().equals(current.getId())) {
-            return file.getFileData();
         }
         throw new IllegalAccessException("File is not public or yours");
     }
@@ -113,7 +106,8 @@ public class FileService {
                 )
         );
         return new ResponseEntity<>(
-                fileData, headers, HttpStatus.OK
+                fileData, headers,
+                HttpStatus.OK
         );
     }
 }

@@ -137,7 +137,7 @@ public class ParticipantService {
                 role.setActive(true);
             });
         }
-        if (!containsRoleAdmin(participant.getRoles())) {
+        if (!isAdmin(participant.getRoles())) {
             QRRange qrRange = qrRangeService.generateNextRange();
             List<QRRange> range = new ArrayList<>();
             range.add(qrRange);
@@ -215,22 +215,7 @@ public class ParticipantService {
         return getById(participant.getId());
     }
 
-    private boolean containsRoleAdmin(Collection<Role> roles) {
-        if (CollectionUtils.isEmpty(roles)) {
-            return false;
-        }
-        for (Role r : roles) {
-            if (StringUtils.isEmpty(r.getName())) {
-                throw new IllegalArgumentException("Role name is not present");
-            } else {
-                if (Roles.ADMIN.getName().equalsIgnoreCase(r.getName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
+    @Transactional
     public void changePassword(PasswordChangeDto dto) throws IllegalAccessException {
         if (StringUtils.isEmpty(dto.getOldPassword())) {
             throw new IllegalArgumentException("Old password can not be null or empty!");
@@ -251,5 +236,21 @@ public class ParticipantService {
         }
         participant.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         repository.save(participant);
+    }
+
+    private boolean isAdmin(Collection<Role> roles) {
+        if (CollectionUtils.isEmpty(roles)) {
+            return false;
+        }
+        for (Role r : roles) {
+            if (StringUtils.isEmpty(r.getName())) {
+                throw new IllegalArgumentException("Role name is not present");
+            } else {
+                if (Roles.ADMIN.getName().equalsIgnoreCase(r.getName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

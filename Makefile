@@ -45,6 +45,7 @@ ROOT:
 	install -m 644 src/main/site/js/qrdemo/components/texts.js work/webapps/ROOT/js/qrdemo/components/texts.js
 	install -m 644 src/main/site/js/qrdemo/components/hrs.js work/webapps/ROOT/js/qrdemo/components/hrs.js
 	install -m 644 src/main/site/js/qrdemo/components/link.js work/webapps/ROOT/js/qrdemo/components/link.js
+	install -m 644 src/main/site/js/qrdemo/components/loader.js work/webapps/ROOT/js/qrdemo/components/loader.js
 	install -m 644 src/main/site/js/qrdemo/domain/participantSettings.js work/webapps/ROOT/js/qrdemo/domain/participantSettings.js
 	install -m 644 src/main/site/js/qrdemo/domain/dictionaries.js work/webapps/ROOT/js/qrdemo/domain/dictionaries.js
 	install -m 644 src/main/site/js/qrdemo/form.js work/webapps/ROOT/js/qrdemo/form.js

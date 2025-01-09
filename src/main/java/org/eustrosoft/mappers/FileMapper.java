@@ -1,5 +1,6 @@
 package org.eustrosoft.mappers;
 
+import lombok.SneakyThrows;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.FileDto;
@@ -9,6 +10,7 @@ import org.eustrosoft.utils.ChecksumUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -104,6 +106,7 @@ public class FileMapper extends EntityMapper {
         );
     }
 
+    @SneakyThrows
     public File toEntity(FileUploadRequest fur) throws IOException {
         if (fur == null) {
             return null;

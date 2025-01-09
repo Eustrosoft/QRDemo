@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface FileRepository extends CrudRepository<File, Long> {
 
     <T> Optional<T> findById(Long id, Class<T> type);
+
+    <T> Iterable<T> findAllByParticipantId(Long participantId, Class<T> type);
 }

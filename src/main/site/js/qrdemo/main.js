@@ -9,6 +9,7 @@ import { getLink } from "./components/link.js";
 import { getTextLabel } from "./components/labels.js";
 import { getHr } from "./components/hrs.js";
 import { showAboutModal, showContactModal } from "./components/modals.js";
+import { Loader } from "./components/loader.js";
 
 (function (window, document, undefined) {
     window.onload = init
@@ -94,9 +95,15 @@ function initBasicListeners() {
 function showAvatarDropdownContentListener() {
     const avatarDropdownContent = document.getElementById('avatar__dropdown__content')
     avatarDropdownContent.innerHTML = ''
+
+    let loader = new Loader()
+    avatarDropdownContent.style.display = 'block'
+    avatarDropdownContent.appendChild(loader.get())
+    loader.showLoader()
+
     userApi().me()
         .then(resp => {
-            avatarDropdownContent.style.display = 'block'
+            loader.destroy()
             if (resp.ok) {
                 return resp.json()
             }
@@ -152,6 +159,7 @@ function showAvatarDropdownContentListener() {
             avatarDropdownContent.appendChild(exitSection)
         })
         .catch(ex => {
+            loader.destroy()
             let enterSection = document.createElement('div')
             enterSection.className = 'dropdown__content__section'
             let enterLink = getLink('Войти', 'index.html?login=true', '')

@@ -196,7 +196,6 @@ public class QRService {
         if (ids == null) {
             return;
         }
-
         qrRepository.annulForm(ids);
     }
 
