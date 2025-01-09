@@ -3,7 +3,6 @@ import { APP_VERSION } from "../version.js"
 import { getHr } from "./hrs.js"
 import { getTextLabel } from "./labels.js"
 import { getParagraph, getSpan } from "./texts.js"
-import { getAppVersionSpan } from "./versions.js"
 
 export function getModalWindow(modalName, modalInner) {
     let modalWindow = document.createElement('div')

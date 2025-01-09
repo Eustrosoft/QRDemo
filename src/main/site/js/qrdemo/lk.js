@@ -1,14 +1,15 @@
-import { emptyOrUndefined, getQRImage, hasAdminRole, longToHex, processFetchErrorToLogin, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, getQRImage, hasAdminRole, isUpperCase, longToHex, processFetchErrorToLogin, toLoginIfNotAuthorized } from "./utils.js";
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
 import { getModalWindow } from "./components/modals.js";
 import { getInput, getSelect, getSingleInput } from "./components/inputs.js";
-import { LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
+import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
 import { notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getHr } from "./components/hrs.js";
+import { Loader } from "./components/loader.js";
 
 const mainBlock = document.getElementById('main_block')
 let divLk = document.createElement('div')
@@ -87,11 +88,11 @@ function setSettings(div, settingsJson, userDetails) {
     }
 
     let qrTableSettingsDiv
-    let existedQrTableSettings
-
     let qrPrintTextDiv
     let defaultQrPrintTextInput
+
     let existedDefaultQrPrintText = settingsJson?.settings?.defaultQrPrintText
+    let existedQrTableSettings = settingsJson?.settings?.qrTableColumns
     if (!admin) {
         qrPrintTextDiv = document.createElement('div')
         let defaultQrPrintTextLabel = getTextLabel('Текст для печатной формы QR по умолчанию:')
@@ -105,46 +106,7 @@ function setSettings(div, settingsJson, userDetails) {
         qrPrintTextDiv.appendChild(defaultQrPrintTextInput)
 
         qrTableSettingsDiv = document.createElement('div')
-        let qrTableSettingsHeader = getTextLabel('Настройки таблицы QR')
-        qrTableSettingsDiv.appendChild(qrTableSettingsHeader)
-        qrTableSettingsDiv.appendChild(document.createElement('br'))
-
-        existedQrTableSettings = settingsJson?.settings?.qrTableColumns
-        for (let col in QR_TABLE_COLUMNS) {
-            let currentCol = QR_TABLE_COLUMNS[col]
-            let columnName = document.createElement('label');
-            columnName.innerHTML = " - " + currentCol.name
-            let columnEnable = document.createElement('input')
-            columnEnable.type = 'checkbox'
-
-            if (notEmptyOrUndefined(existedQrTableSettings)) {
-                if (existedQrTableSettings[col].enable) {
-                    columnEnable.checked = true
-                }
-            } else if (currentCol.enable) {
-                columnEnable.checked = true
-            }
-
-            qrTableSettingsDiv.appendChild(columnName)
-            qrTableSettingsDiv.appendChild(columnEnable)
-            columnEnable.addEventListener('change', function () {
-                if (this.checked) {
-                    if (notEmptyOrUndefined(existedQrTableSettings)) {
-                        existedQrTableSettings[col].enable = true
-                    } else {
-                        QR_TABLE_COLUMNS[col].enable = true
-                    }
-                } else {
-                    if (notEmptyOrUndefined(existedQrTableSettings)) {
-                        existedQrTableSettings[col].enable = false
-                    } else {
-                        QR_TABLE_COLUMNS[col].enable = false
-                    }
-                }
-            })
-
-            qrTableSettingsDiv.appendChild(document.createElement('br'))
-        }
+        printSettingsTableAttribute(qrTableSettingsDiv, existedQrTableSettings, settingsJson)
     }
 
     divSettings.appendChild(languageLabel)
@@ -226,6 +188,118 @@ function setSettings(div, settingsJson, userDetails) {
     div.appendChild(divSettings)
 }
 
+function printSettingsTableAttribute(parent, existedQrTableSettings, settingsJson) {
+    parent.innerHTML = ''
+    let qrTableSettingsHeader = getTextLabel('Настройки таблицы QR')
+    parent.appendChild(qrTableSettingsHeader)
+    parent.appendChild(document.createElement('br'))
+
+    let attributesList = notEmptyOrUndefined(existedQrTableSettings)
+        ? existedQrTableSettings
+        : QR_TABLE_COLUMNS
+    for (let col in attributesList) {
+        let currentCol = attributesList[col]
+        let columnName = document.createElement('label');
+        columnName.innerHTML = " - " + currentCol.name
+        let columnEnable = document.createElement('input')
+        columnEnable.type = 'checkbox'
+        let removeAttrBtn = getBigButton('-')
+
+        if (notEmptyOrUndefined(existedQrTableSettings) && notEmptyOrUndefined(existedQrTableSettings[col])) {
+            if (existedQrTableSettings[col].enable) {
+                columnEnable.checked = true
+            }
+        } else if (currentCol.enable) {
+            columnEnable.checked = true
+        }
+
+        parent.appendChild(columnName)
+        parent.appendChild(columnEnable)
+        parent.appendChild(removeAttrBtn)
+        columnEnable.addEventListener('change', function () {
+            if (this.checked) {
+                if (notEmptyOrUndefined(existedQrTableSettings)
+                    && notEmptyOrUndefined(existedQrTableSettings[col])) {
+                    existedQrTableSettings[col].enable = true
+                } else {
+                    QR_TABLE_COLUMNS[col].enable = true
+                }
+            } else {
+                if (notEmptyOrUndefined(existedQrTableSettings)
+                    && notEmptyOrUndefined(existedQrTableSettings[col])) {
+                    existedQrTableSettings[col].enable = false
+                } else {
+                    QR_TABLE_COLUMNS[col].enable = false
+                }
+            }
+        })
+        removeAttrBtn.addEventListener('click', () => {
+            if (notEmptyOrUndefined(existedQrTableSettings)
+                && notEmptyOrUndefined(existedQrTableSettings[col])) {
+                existedQrTableSettings.splice(col, 1)
+            } else {
+                QR_TABLE_COLUMNS.splice(col, 1)
+            }
+            printSettingsTableAttribute(parent, existedQrTableSettings, settingsJson)
+        })
+        parent.appendChild(document.createElement('br'))
+    }
+
+    let addSelfAttributeBtn = getBigButton('Добавить атрибут из созданных')
+    parent.appendChild(addSelfAttributeBtn)
+
+    addSelfAttributeBtn.addEventListener('click', () => {
+        let attributeChooseDiv = document.createElement('div')
+        let chooseAttributeModal = getModalWindow('Выбор атрибута', attributeChooseDiv)
+        let attributesLoader = new Loader()
+        attributeChooseDiv.appendChild(attributesLoader.get())
+
+        chooseAttributeModal.style.display = 'block'
+        attributesLoader.showLoader()
+        qrApi().getAllFormFields()
+            .then(resp => {
+                attributesLoader.hideLoader()
+                return resp.json()
+            })
+            .then(json => {
+                attributeChooseDiv.appendChild(getTextLabel('Базовые поля:'))
+                attributeChooseDiv.appendChild(document.createElement('br'))
+                attributeChooseDiv.appendChild(document.createElement('hr'))
+                for (let i = 0; i < QR_TABLE_COLUMNS.length; i++) {
+                    let col = QR_TABLE_COLUMNS[i]
+                    let addAttributeBtn = getBigButton('+')
+                    attributeChooseDiv.appendChild(getTextLabel(col.name))
+                    attributeChooseDiv.appendChild(addAttributeBtn)
+                    attributeChooseDiv.appendChild(document.createElement('br'))
+                    addAttributeBtn.addEventListener('click', () => {
+                        attributesList.push(new Column(col.type, col.fieldName, col.name, col.enable))
+                        chooseAttributeModal.remove()
+                        printSettingsTableAttribute(parent, existedQrTableSettings, settingsJson)
+                    })
+                }
+                attributeChooseDiv.appendChild(getTextLabel('Созданные поля:'))
+                attributeChooseDiv.appendChild(document.createElement('br'))
+                attributeChooseDiv.appendChild(document.createElement('hr'))
+                for (let i = 0; i < json.length; i++) {
+                    let name = json[i]?.name
+                    let type = json[i]?.fieldType
+                    let addAttributeBtn = getBigButton('+')
+                    attributeChooseDiv.appendChild(getTextLabel(name))
+                    attributeChooseDiv.appendChild(addAttributeBtn)
+                    attributeChooseDiv.appendChild(document.createElement('br'))
+                    addAttributeBtn.addEventListener('click', () => {
+                        attributesList.push(new Column(type, name, name, false))
+                        chooseAttributeModal.remove()
+                        printSettingsTableAttribute(parent, existedQrTableSettings, settingsJson)
+                    })
+                }
+            }).catch(e => {
+                attributesLoader.hideLoader()
+                alert(e)
+            })
+    })
+}
+
 function setupQrs(div) {
     userApi().getSettings()
         .then(resp => resp.json())
@@ -286,12 +360,7 @@ function setupQrsPart(div, settings) {
                 qrsTable.append(getTableHeader(colSettings))
             }
             for (let i = 0; i < json.length; i++) {
-                let code = json[i]?.code
-                let name = json[i]?.name
-                let description = json[i]?.description
-                let created = json[i]?.created
-                let updated = json[i]?.updated
-                const qrLine = getQRRow({ code: code, name: name, description: description, created: created, updated: updated }, settings?.settings)
+                const qrLine = getQRRow(json[i], settings?.settings)
                 qrsTable.appendChild(qrLine)
             }
         }).catch(ex => alert(ex))
@@ -308,24 +377,40 @@ function getQRRow(data, settings) {
         if (colSettings[cs].enable) {
             let td = document.createElement('td')
             let fieldName = colSettings[cs].fieldName
-            let fieldType = colSettings[cs].type
+            let fieldType = colSettings[cs]?.type
 
-            switch (fieldType) {
-                case "text": {
-                    td.innerHTML = data[fieldName]
-                    break
+            if (isUpperCase(fieldType)) {
+                let dataAttr = data['data']?.[fieldName]
+                let fieldAttr = data['form']?.fields?.filter(field => fieldName === field['name']).map(field => field['placeholder'])
+                if (notEmptyOrUndefined(dataAttr)) {
+                    td.innerHTML = dataAttr
+                } else if (notEmptyOrUndefined(fieldAttr)) {
+                    td.innerHTML = fieldAttr
+                } else {
+                    td.innerHTML = ''
                 }
-                case "qr_code": {
-                    td.innerHTML = q;
-                    break
-                }
-                case "qr_image": {
-                    td.innerHTML = getQRImage(q, 125)
-                    break
-                }
-                case "date": {
-                    td.innerHTML = new Date(data[fieldName]).toLocaleString()
-                    break
+            } else {
+                switch (fieldType) {
+                    case "text": {
+                        td.innerHTML = data[fieldName]
+                        break
+                    }
+                    case "number": {
+                        td.innerHTML = data[fieldName]
+                        break
+                    }
+                    case "qr_code": {
+                        td.innerHTML = q;
+                        break
+                    }
+                    case "qr_image": {
+                        td.innerHTML = getQRImage(q, 125)
+                        break
+                    }
+                    case "date": {
+                        td.innerHTML = new Date(data[fieldName]).toLocaleString()
+                        break
+                    }
                 }
             }
             qrLine.appendChild(td)

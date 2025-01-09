@@ -31,6 +31,7 @@ public class QrMapper extends EntityMapper {
         QRDto dto = toDto((QRSimplestProjection) qr);
         dto.setName(qr.getName());
         dto.setDescription(qr.getDescription());
+        dto.setData(qr.getData());
         dto.setForm(formMapper.toDto(qr.getForm()));
         return dto;
     }

@@ -14,7 +14,6 @@ import org.eustrosoft.repositories.FormRepository;
 import org.eustrosoft.repositories.projections.EntityProjection;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.repositories.projections.FormComplexProjection;
-import org.eustrosoft.repositories.projections.FormQrsProjection;
 import org.eustrosoft.repositories.projections.FormSimpleProjection;
 import org.eustrosoft.repositories.projections.FormWithFieldsProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
@@ -36,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
+import static org.eustrosoft.utils.CommonUtils.distinctByKey;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
 import static org.eustrosoft.utils.FileUtils.getFileIndex;
 
@@ -147,6 +147,8 @@ public class FormService {
         return forms.stream()
                 .filter(form -> form != null && form.getFields() != null)
                 .flatMap(form -> form.getFields().stream())
+                .filter(ff -> StringUtils.isNotBlank(ff.getName()))
+                .filter(distinctByKey(FormField::getName))
                 .collect(Collectors.toList());
     }
 
