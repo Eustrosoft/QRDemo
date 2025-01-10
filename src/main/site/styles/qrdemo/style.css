@@ -700,8 +700,8 @@ th {
 }
 
 .compact_table th {
-    background-color: var(--table-header-color);
-    color: var(--bg-color);
+    background-color: var(--table-header-background-color);
+    color: var(--table-header-color);
     text-align: left;
 }
 
@@ -713,7 +713,6 @@ th {
 
 .compact_table tr td {
     border-bottom: thin solid var(--table-body-bottom-border-color);
-    /* color: var(--font-color); */
     color: var(--table-body-color);
 }
 

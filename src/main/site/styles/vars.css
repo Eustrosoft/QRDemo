@@ -46,7 +46,8 @@
     --bg-secondary-color: #f8f8f8;
     --a-visited: var(--font-color);
 
-    --table-header-color: #1E88E5;
+    --table-header-color: #fff;
+    --table-header-background-color: #1E88E5;
     --table-body-bottom-border-color: #E0E0E0;
     --table-body-border-color: #E0E0E0;
     --table-body-color: #616161;
@@ -65,7 +66,8 @@
     --bg-secondary-color: #272727;
     --a-visited: var(--font-color);
 
-    --table-header-color: #1E88E5;
+    --table-header-color: #fff;
+    --table-header-background-color: #1E88E5;
     --table-body-bottom-border-color: #E0E0E0;
     --table-body-border-color: #E0E0E0;
     --table-body-color: #acacac;
