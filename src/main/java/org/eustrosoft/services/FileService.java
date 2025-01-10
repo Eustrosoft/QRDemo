@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URLEncoder;
@@ -22,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class FileService {
     private final FileRepository repository;
@@ -30,6 +32,7 @@ public class FileService {
     private final SecurityComponent securityComponent;
 
     @SneakyThrows
+    @Transactional(readOnly = true)
     public List<FileProjection> findAllMyFiles() {
         Participant participant = participantService.getCurrentOrThrow();
         return CommonUtils.iterableToList(
@@ -38,6 +41,7 @@ public class FileService {
     }
 
     @SneakyThrows
+    @Transactional(readOnly = true)
     public FileProjection findById(Long id) {
         Participant current = participantService.getCurrentSimpleOrThrow();
         FileProjection file = repository.findById(id, FileProjection.class).get();
@@ -93,6 +97,7 @@ public class FileService {
     }
 
     @SneakyThrows
+    @Transactional(readOnly = true)
     private ResponseEntity<byte[]> getFileResponse(Long id, FileProjection file) {
         byte[] fileData = repository.findById(id, FileBytesProjection.class).get().getFileData();
         HttpHeaders headers = new HttpHeaders();

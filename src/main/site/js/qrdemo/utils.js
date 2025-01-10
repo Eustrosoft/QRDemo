@@ -1,4 +1,6 @@
 import {qrApi, userApi} from "./api.js";
+import { getInput, getSingleInput } from "./components/inputs.js";
+import { getTextLabel } from "./components/labels.js";
 import {LOCAL_STORAGE_USER} from "./localStorage.js";
 
 export function setLkHeader() {
@@ -94,49 +96,11 @@ export function fieldToHtml(field, fieldValue, edit = false, id = null, qrId = n
     const name = field?.name
 
     const editable = edit ? '' : 'readonly'
-    const idField = notNullOrUndefined(id) ? `id="${id}"` : '';
+    const idField = notNullOrUndefined(id) ? `${id}` : '';
 
-    return `
-        <label>${name}</label><br/>
-        <input ${idField} name="${name}" value="${fieldValue}" ${editable} placeholder="${placeholder}" type="${type}"/>
-    `
-}
-
-export function fieldToEditFormRow(field, index, fieldTypes = []) {
-    const name = field.name
-    const placeholder = field.placeholder
-    const isStatic = field.isStatic
-    const isPublic = field.isPublic
-    const type = field.fieldType
-    const id = field.id
-
-    let formField = document.createElement('div')
-    let fieldTypesStr = fieldTypesToOptions(fieldTypes, type)
-
-    formField.className = 'form_field'
-    formField.innerHTML = `
-            <label>Тип данных</label> 
-            <select name="type">
-                  ${fieldTypesStr}
-            </select>
-            
-            <label>Имя поля</label> 
-            <input name="name" type="text" value="${name}">
-            
-            <label>Плейсхолдер</label> 
-            <input name="placeholder" type="text" value="${placeholder}">
-            
-            <label>Статическое</label> 
-            <input name="isStatic" type="checkbox" ${isStatic ? 'checked' : ''}>
-            
-            <label>Публичное</label> 
-            <input name="isPublic" type="checkbox" ${isPublic ? 'checked' : ''}>
-            
-            <input name="id" type="hidden" value="${id}">
-            
-            <button class="big_button" id="delete_btn_${index}"> X </button>
-    `
-    return formField
+    let label = getTextLabel(name)
+    let input = getSingleInput(type, false, idField, placeholder, fieldValue, editable)
+    return label.outerHTML + input.outerHTML
 }
 
 export function fieldToHtmlItems(field, index, fieldTypes = []) {
@@ -153,13 +117,14 @@ export function fieldToHtmlItems(field, index, fieldTypes = []) {
     let items = [
         `<input name="id" type="hidden" value="${id}" id="field_id_${id}">
          <select name="type">${fieldTypesStr}</select>`,
-        `<input name="name" class="field_name" type="text" value="${name}">`,
-        `<input name="placeholder" type="text" value="${placeholder}">`,
+        `<input name="name" class="field_name" type="text" value="${escapeDQuotes(name)}">`,
+        `<input name="placeholder" type="text" value="${escapeDQuotes(placeholder)}">`,
         `<input name="isStatic" type="checkbox" ${isStatic ? 'checked' : ''}></input>`,
         `<input name="isPublic" type="checkbox" ${isPublic ? 'checked' : ''}></input>`,
         `<input name="fieldOrder" type="number" value="${order}">`,
         `<button class="big_button" id="delete_btn_${index}">X</button>`
     ]
+
     return items
 }
 
@@ -229,3 +194,10 @@ export function isUpperCase(word) {
         return false;
     }
 }
+
+export function escapeDQuotes(text){
+    if (notNullOrUndefined(text)) {
+        return text.replaceAll('"', '&quot;')
+    }
+    return ''
+  }

@@ -12,28 +12,28 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FormFieldService {
     private final FormFieldRepository formFieldRepository;
 
+    @Transactional(readOnly = true)
     public List<FormField> findAll() {
         return CommonUtils.iterableToList(formFieldRepository.findAll());
     }
 
+    @Transactional(readOnly = true)
     public Optional<FormField> get(Long id) {
         return formFieldRepository.findById(id);
     }
 
-    @Transactional
     public FormField create(FormField formField) {
         return formFieldRepository.save(formField);
     }
 
-    @Transactional
     public FormField update(FormField formField) {
         return formFieldRepository.save(formField);
     }
 
-    @Transactional
     public void delete(Long id) {
         formFieldRepository.deleteById(id);
     }

@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import org.eustrosoft.exceptions.Error;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -26,6 +28,7 @@ import static org.eustrosoft.configurations.security.CookieUserToken.JWT_COOKIE_
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthorizationService {
     private final UserManipulationService userService;
     private final JwtTokenUtils tokenUtils;
@@ -33,6 +36,7 @@ public class AuthorizationService {
     private final HttpUtils httpUtils;
     private final ParticipantMapper participantMapper;
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> authorize(UserLoginDto userLoginDto) {
         try {
             ResponseEntity<?> response = validateUserLogin(userLoginDto);
@@ -68,6 +72,7 @@ public class AuthorizationService {
         return ResponseEntity.ok("logged out successfully.");
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ResponseEntity<?> registerUser(RegistrationDto registrationDto, boolean fromAdmin) {
         ResponseEntity<?> response = validateUser(registrationDto);
         if (response != null) return response;
@@ -80,6 +85,7 @@ public class AuthorizationService {
         );
     }
 
+    @Transactional(readOnly = true)
     private ResponseEntity<?> validateUserLogin(final UserLoginDto userLoginDto) {
         Optional<Participant> Participant = userService.getByUsername(userLoginDto.getUsername());
         if (!Participant.isPresent()) {
@@ -98,6 +104,7 @@ public class AuthorizationService {
         return null;
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> validateUser(RegistrationDto registrationDto) {
         if (Strings.isEmpty(registrationDto.getUsername())
                 || Strings.isEmpty(registrationDto.getEmail())

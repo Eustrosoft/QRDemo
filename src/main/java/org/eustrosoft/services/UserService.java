@@ -17,21 +17,24 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService implements UserDetailsService {
     private final ParticipantRepository participantRepository;
     private final JwtTokenUtils jwtTokenUtils;
     private final UserToken userToken;
 
+    @Transactional(readOnly = true)
     public Optional<Participant> getByUsername(final String username) {
         return participantRepository.findByUsername(username);
     }
 
+    @Transactional(readOnly = true)
     public Optional<Participant> getByEmail(final String email) {
         return participantRepository.findByEmail(email);
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Participant user = getByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new org.springframework.security.core.userdetails.User(
@@ -43,13 +46,13 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<Participant> getByToken() {
         String token = userToken.getToken();
         return getByUsername(jwtTokenUtils.getUsername(token));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public String getUsername() {
         return jwtTokenUtils.getUsername(userToken.getToken());
     }

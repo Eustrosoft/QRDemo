@@ -11,14 +11,17 @@ import java.util.Optional;
 @Repository
 public interface FormRepository extends CrudRepository<Form, Long> {
 
-    @EntityGraph(attributePaths = { "fields" })
+    @EntityGraph(value = "fieldsEntityGraph")
     Optional<Form> findById(Long id);
 
-    @EntityGraph(attributePaths = { "fields" })
+    @EntityGraph(value = "fieldsEntityGraph")
     <T> Optional<T> findById(Long id, Class<T> type);
+
+    @EntityGraph(value = "fieldsEntityGraph")
+    <T> Optional<T> findByIdAndParticipantId(Long id, Long participantId, Class<T> type);
 
     Iterable<FormSimpleProjection> findAllByParticipantIdOrderByUpdatedDesc(Long participantId);
 
-    @EntityGraph(attributePaths = { "fields" })
+    @EntityGraph(value = "fieldsEntityGraph")
     <T> Iterable<T> findAllByParticipantId(Long participantId, Class<T> type);
 }

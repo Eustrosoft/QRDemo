@@ -6,6 +6,8 @@ import { getBigButton } from "./components/buttons.js";
 import { downloadFileUnsecured, showUploadFileModal } from "./files.js";
 import { addDeleteFileRowActions, Field } from "./form.js";
 import { getTextLabel } from "./components/labels.js";
+import { getSingleInput } from "./components/inputs.js";
+import { notEmptyOrUndefined } from "../commons/common.js";
 
 const mainBlock = document.getElementById('main_block')
 let divCard = document.createElement('div')
@@ -146,13 +148,15 @@ function getEditCardInfoHtml(qr) {
     for (let field in fields) {
         const formFieldDiv = document.createElement('div')
         formFieldDiv.className = 'form_field_div'
-        formFieldDiv.innerHTML = fieldToHtml(
-            fields[field],
-            getDataFromForm(qr, fields[field]?.name),
-            edit,
-            fields[field]?.id,
-            qrId
-        )
+
+        let f = fields[field]
+        let label = getTextLabel(f?.name)
+        let input = getSingleInput(f?.fieldType, false, f?.id, f?.placeholder)
+        input.name = f?.name
+        input.value = getDataFromForm(qr, f?.name)
+        input.readOnly = edit === 'true' ? false : true
+        formFieldDiv.append(label, input)
+
         codeDiv.append(formFieldDiv)
     }
 

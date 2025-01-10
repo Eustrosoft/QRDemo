@@ -19,24 +19,29 @@ import static org.eustrosoft.Constants.RANGE_END;
 import static org.eustrosoft.Constants.RANGE_START;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class QRRangeService {
     private final QRRangeRepository repository;
     private final ParticipantService participantService;
 
+    @Transactional(readOnly = true)
     public QRRange getQRRange(Long id) {
         return repository.findById(id).get();
     }
 
+    @Transactional(readOnly = true)
     public Collection<QRRange> getMyRanges() throws IllegalAccessException {
-        Participant current = participantService.getCurrentSimpleOrThrow();
-        Participant participant = participantService.getById(current.getId());
+        Participant participant = participantService.getById(
+                participantService.getCurrentSimpleOrThrow().getId()
+        );
         if (participant == null) {
-            return Collections.emptyList();
+            throw new IllegalArgumentException("Participant not found");
         }
         return participant.getRanges();
     }
 
+    @Transactional(readOnly = true)
     public List<QRRange> findAll() {
         return CommonUtils.iterableToList(repository.findAll());
     }
@@ -78,12 +83,10 @@ public class QRRangeService {
         return repository.save(qrRange);
     }
 
-    @Transactional
     public QRRange update(QRRange qrRange) {
         return repository.save(qrRange);
     }
 
-    @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
     }

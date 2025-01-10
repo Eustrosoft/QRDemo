@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -31,6 +32,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ParticipantService {
     private final ParticipantRepository repository;
     private final RoleService roleService;
@@ -48,6 +50,12 @@ public class ParticipantService {
     @Autowired
     private UserService userService;
 
+    @Transactional(readOnly = true)
+    public List<Participant> findAll() {
+        return CommonUtils.iterableToList(repository.findAll());
+    }
+
+    @Transactional(readOnly = true)
     public Participant getCurrentSimpleOrThrow() throws IllegalAccessException {
         Optional<Participant> byToken = userService.getByToken();
         if (!byToken.isPresent()) {
@@ -60,6 +68,7 @@ public class ParticipantService {
         return participant;
     }
 
+    @Transactional(readOnly = true)
     public Participant getCurrentOrThrow() throws IllegalAccessException {
         Optional<Participant> byToken = userService.getByToken();
         if (!byToken.isPresent()) {
@@ -78,15 +87,18 @@ public class ParticipantService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Participant getById(Long id) {
         return repository.findById(id).get();
     }
 
+    @Transactional(readOnly = true)
     public ParticipantAdminProjection getByIdAdminProjection(Long id) {
         return repository.findById(id, ParticipantAdminProjection.class).get();
     }
 
     @SneakyThrows
+    @Transactional(readOnly = true)
     public String getSettings() {
         return repository.findByUsername(
                 userService.getUsername(),
@@ -95,7 +107,6 @@ public class ParticipantService {
     }
 
     @SneakyThrows
-    @Transactional
     public String updateSettings(SettingsChangeDto settings) {
         if (settings == null || settings.getSettings() == null || settings.getSettings().isEmpty()) {
             throw new IllegalArgumentException("Illegal settings parameter");
@@ -108,11 +119,7 @@ public class ParticipantService {
         return getSettings();
     }
 
-    public List<Participant> findAll() {
-        return CommonUtils.iterableToList(repository.findAll());
-    }
-
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Participant create(Participant participant) {
         ResponseEntity<?> resp = authorizationService.validateUser(
                 new RegistrationDto(
@@ -160,17 +167,17 @@ public class ParticipantService {
         }
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Participant update(Participant participant) {
         return repository.save(participant);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(Long id) {
         repository.deleteById(id);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void blockParticipant(Participant participant, String reason) {
         participant.setBanned(true);
         if (StringUtils.isNotBlank(reason)) {
@@ -179,13 +186,13 @@ public class ParticipantService {
         repository.save(participant);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void unblockParticipant(Participant participant) {
         participant.setBanned(false);
         repository.save(participant);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Participant addRangeToParticipant(Participant participant, QRRange range) {
         Optional<Participant> part = repository.findById(participant.getId());
         if (!part.isPresent()) {
@@ -199,7 +206,7 @@ public class ParticipantService {
         return getById(participant.getId());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Participant revokeRangeFromParticipant(Participant participant, QRRange range) {
         Optional<Participant> part = repository.findById(participant.getId());
         if (!part.isPresent()) {
@@ -215,7 +222,7 @@ public class ParticipantService {
         return getById(participant.getId());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void changePassword(PasswordChangeDto dto) throws IllegalAccessException {
         if (StringUtils.isEmpty(dto.getOldPassword())) {
             throw new IllegalArgumentException("Old password can not be null or empty!");

@@ -1,6 +1,6 @@
 import { notNullOrUndefined } from "../../commons/common.js"
 
-export function getTable(headItems, items, itemRowClass = null, id = '') {
+export function getTable(headItems, items, itemRowClass = null, id = '', isItemsDoms = false) {
     let table = document.createElement('table')
     if (id != '') {
         table.id = id
@@ -24,7 +24,11 @@ export function getTable(headItems, items, itemRowClass = null, id = '') {
         }
         for (let rowItem in items[item]) {
             let td = document.createElement('td')
-            td.innerHTML = items[item][rowItem]
+            if (isItemsDoms) {
+                td.appendChild(items[item][rowItem])
+            } else {
+                td.innerHTML = items[item][rowItem]
+            }
             tr.appendChild(td)
         }
         table.appendChild(tr)

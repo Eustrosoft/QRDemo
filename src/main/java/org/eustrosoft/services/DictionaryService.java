@@ -6,15 +6,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.entitites.Dictionary;
 import org.eustrosoft.repositories.DictionaryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DictionaryService {
     private final DictionaryRepository repository;
 
     @SneakyThrows
+    @Transactional(readOnly = true)
     public List<Dictionary> getDictionariesByCode(String code) {
         if (StringUtils.isEmpty(code)) {
             throw new IllegalArgumentException("Could not be empty code value");

@@ -50,6 +50,7 @@ import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class QRService {
     private final QRRepository qrRepository;
     private final ParticipantService participantService;
@@ -59,24 +60,28 @@ public class QRService {
     private final FileMapper fileMapper;
     private final FileService fileService;
 
+    @Transactional(readOnly = true)
     public Optional<QR> get(Long id) throws IllegalAccessException {
         Optional<QR> byId = qrRepository.findById(id);
         securityComponent.checkUserRightById(byId.get()::getParticipantId);
         return byId;
     }
 
+    @Transactional(readOnly = true)
     public <T extends EntityProjection> Optional<T> get(Long id, Class<T> clazz) throws IllegalAccessException {
         Optional<T> byId = qrRepository.findById(id, clazz);
         securityComponent.checkUserRightById(byId.get()::getParticipantId);
         return byId;
     }
 
+    @Transactional(readOnly = true)
     public Optional<QRProjection> getByCode(Long code) throws IllegalAccessException {
         Optional<QRProjection> byId = qrRepository.findByCode(code, QRProjection.class);
         securityComponent.checkUserRightById(byId.get()::getParticipantId);
         return byId;
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = QR_CACHE_NAME)
     public QRDto getByCodePublic(Long code) throws JsonProcessingException {
         if (code == null) {
@@ -90,6 +95,7 @@ public class QRService {
         return prepareDataBasedOnForm(gotQr);
     }
 
+    @Transactional(readOnly = true)
     public List<QRSimpleProjection> findAllMine() throws IllegalAccessException {
         return CommonUtils.iterableToList(
                 qrRepository.findAllByParticipantIdOrderByCodeDesc(
@@ -98,6 +104,7 @@ public class QRService {
         );
     }
 
+    @Transactional(readOnly = true)
     public <T extends EntityProjection> List<T> findAllByFormId(
             Long formId,
             Class<T> clazz
@@ -111,6 +118,7 @@ public class QRService {
         );
     }
 
+    @Transactional(readOnly = true)
     public <T extends EntityProjection> List<T> findAllByFormIdAndParticipantId(
             Long participantId,
             Long formId,
@@ -141,7 +149,7 @@ public class QRService {
         return qrRepository.save(qr);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @CacheEvict(key = "#result.code",value = QR_CACHE_NAME)
     public QR setFormForQR(Long id, Long formId) throws IllegalAccessException, JsonProcessingException {
         Optional<QR> qr = get(id);
@@ -156,7 +164,6 @@ public class QRService {
         throw new IllegalArgumentException("Not found QR with this id");
     }
 
-    @Transactional
     @CacheEvict(key = "#result.code", value = QR_CACHE_NAME)
     public QR update(QR qr) throws IllegalAccessException, JsonProcessingException {
         Optional<QR> gotQr = get(qr.getId());
@@ -167,13 +174,11 @@ public class QRService {
         return qrRepository.save(qr);
     }
 
-    @Transactional
     public void delete(Long id) throws IllegalAccessException {
         get(id);
         qrRepository.deleteById(id);
     }
 
-    @Transactional
     @CacheEvict(key = "#result.code", value = QR_CACHE_NAME)
     public QRProjection uploadFile(Long id, FileUploadRequest fur) throws IllegalAccessException, IOException {
         QRSimplestProjection qr = get(id, QRSimplestProjection.class).get();
@@ -182,7 +187,6 @@ public class QRService {
         return get(id, QRProjection.class).get();
     }
 
-    @Transactional
     @SneakyThrows
     @CacheEvict(key = "#result.code", value = QR_CACHE_NAME)
     public QRProjection deleteFile(Long id, Long fileId) {
@@ -191,7 +195,6 @@ public class QRService {
         return get(id, QRProjection.class).get();
     }
 
-    @Transactional
     public void annulForm(List<Long> ids) {
         if (ids == null) {
             return;

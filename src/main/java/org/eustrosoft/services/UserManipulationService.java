@@ -12,12 +12,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
 @Primary
 @Service
+@Transactional
 public class UserManipulationService extends UserService {
     private final ParticipantRepository userRepository;
     private final RoleService roleService;
@@ -37,12 +39,12 @@ public class UserManipulationService extends UserService {
         this.roleService = roleService;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Participant createUser(RegistrationDto registrationDto) {
         return createUser(registrationDto, true);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Participant createUser(RegistrationDto registrationDto, boolean active) {
         Participant participant = new Participant();
         participant.setCreated(new Date());
@@ -57,7 +59,7 @@ public class UserManipulationService extends UserService {
         return participant;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void setActivationUser(final String username, final boolean active) {
         getByUsername(username).ifPresent(Participant -> {
             Participant.setActive(active);
@@ -65,7 +67,7 @@ public class UserManipulationService extends UserService {
         });
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void banUser(final String username, final String reason) {
         getByUsername(username).ifPresent(Participant -> {
             Participant.setBanned(true);

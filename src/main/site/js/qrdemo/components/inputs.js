@@ -1,11 +1,13 @@
 import { notEmptyOrUndefined } from "../../commons/common.js";
 
-export function getSingleInput(type, required = false, id = '', placeholder = '') {
+export function getSingleInput(type, required = false, id = '', placeholder = '', value = '', editable = true) {
     let htmlInput = document.createElement('input')
     htmlInput.type = type
     htmlInput.placeholder = placeholder
     htmlInput.required = required
     htmlInput.id = id
+    htmlInput.value = value
+    htmlInput.editable = editable
     return htmlInput
 }
 

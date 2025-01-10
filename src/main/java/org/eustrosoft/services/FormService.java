@@ -41,34 +41,38 @@ import static org.eustrosoft.utils.FileUtils.getFileIndex;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FormService {
     private final FormMapper formMapper;
     private final FormRepository formRepository;
     private final ParticipantService participantService;
-    private final SecurityComponent securityComponent;
     private final FileService fileService;
     private final CacheManager cacheManager;
     private final QRService qrService;
 
+    @Transactional(readOnly = true)
     public List<FormSimpleProjection> findAll() throws IllegalAccessException {
         return CommonUtils.iterableToList(
                 formRepository.findAllByParticipantIdOrderByUpdatedDesc(participantService.getCurrentSimpleOrThrow().getId())
         );
     }
 
+    @Transactional(readOnly = true)
     public Optional<FormComplexProjection> get(Long id) throws IllegalAccessException {
-        Optional<FormComplexProjection> form = formRepository.findById(id, FormComplexProjection.class);
-        securityComponent.checkUserRightById(form.get()::getParticipantId);
-        return form;
+        return formRepository.findByIdAndParticipantId(
+                id, participantService.getCurrentOrThrow().getId(),
+                FormComplexProjection.class
+        );
     }
 
+    @Transactional(readOnly = true)
     public <T extends EntityProjection> Optional<T> get(Long id, Class<T> clazz) throws IllegalAccessException {
-        Optional<T> form = formRepository.findById(id, clazz);
-        securityComponent.checkUserRightById(form.get()::getParticipantId);
-        return form;
+        return formRepository.findByIdAndParticipantId(
+                id, participantService.getCurrentOrThrow().getId(),
+                clazz
+        );
     }
 
-    @Transactional
     public Form create(Form form) throws IllegalAccessException {
         Participant current = participantService.getCurrentSimpleOrThrow();
         form.setParticipantId(current.getId());
@@ -83,7 +87,6 @@ public class FormService {
         return formRepository.save(form);
     }
 
-    @Transactional
     public Form update(Form form) throws IllegalAccessException, JsonProcessingException {
         Optional<FormComplexProjection> existedForm = get(form.getId());
         throwIfDuplicateFields(form.getFields());
@@ -97,7 +100,6 @@ public class FormService {
         return formRepository.save(form);
     }
 
-    @Transactional
     public void delete(Long id) throws IllegalAccessException {
         EntityProjection form = get(id, EntityProjection.class).get();
         List<QRSimplestProjection> evicted = evictFromQrsCache(form.getParticipantId(), form.getId());
@@ -107,7 +109,6 @@ public class FormService {
         }
     }
 
-    @Transactional
     @SneakyThrows
     public FileProjection uploadFile(Long id, FileUploadRequest fur) {
         Form form = formMapper.toEntity(get(id).get());
@@ -122,7 +123,6 @@ public class FormService {
         return file;
     }
 
-    @Transactional
     @SneakyThrows
     public void deleteFile(Long id, Long fileId) {
         Form form = formMapper.toEntity(get(id).get());
@@ -137,6 +137,7 @@ public class FormService {
     }
 
     @SneakyThrows
+    @Transactional(readOnly = true)
     public List<FormField> findAllFields() {
         List<FormWithFieldsProjection> forms = CommonUtils.iterableToList(
                 formRepository.findAllByParticipantId(

@@ -603,11 +603,17 @@ th {
     animation: spinning 1s infinite linear;
 } */
 
-/* HTML: <div class="loader"></div> */
-/* HTML: <div class="loader"></div> */
-/* HTML: <div class="loader"></div> */
-/* HTML: <div class="loader"></div> */
-/* HTML: <div class="loader"></div> */
+/* 
+@keyframes spinning {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg)
+    }
+} */
+
+
 .loader {
     width: 5rem;
     height: 3rem;
@@ -629,6 +635,10 @@ th {
     animation:
         l7-1 2s infinite linear,
         l7-2 2s infinite linear;
+}
+
+.loader.show {
+    display: block;
 }
 
 @keyframes l7-1 {
@@ -666,18 +676,4 @@ th {
     100% {
         transform: translate(200%)
     }
-}
-
-/* 
-@keyframes spinning {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg)
-    }
-} */
-
-.loader.show {
-    display: block;
 }
