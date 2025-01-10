@@ -36,6 +36,26 @@ export function getInput(labelText, type, required = false, id = '', placeholder
     return htmlInputDiv
 }
 
+export function getSwitch(checked = false, xSize, ySize) {
+    let label = document.createElement('label')
+    label.className = 'switch'
+    let input = document.createElement('input')
+    input.type = 'checkbox'
+    input.checked = checked
+
+    let span = document.createElement('span')
+    span.className = 'slider round'
+    if (xSize && ySize) {
+        document.documentElement.style.setProperty('--slider-height', ySize / 2 + 'px')
+        document.documentElement.style.setProperty('--slider-width', xSize / 2 + 'px')
+        document.documentElement.style.setProperty('--switch-height', ySize + 'px')
+        document.documentElement.style.setProperty('--switch-width', xSize + 'px')
+    }
+
+    label.append(input, span)
+    return label
+}
+
 export function getSelect(labelText, id = '', values, value = null, required = false) {
     let htmlInputDiv = document.createElement('div');
 

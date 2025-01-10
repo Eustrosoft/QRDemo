@@ -1,6 +1,7 @@
 body {
     margin: 0;
     font-family: 'Attractive Heavy', sans-serif;
+    background-color: var(--bg-color);
 }
 
 :root {
@@ -23,6 +24,7 @@ header {
 main {
     max-width: 100vw;
     display: block;
+    background-color: var(--bg-color);
 }
 
 .page {
@@ -63,7 +65,7 @@ main {
 .fancy {
     @supports (background-clip: text) or (-webkit-background-clip: text) {
         background-image:
-                url("data:image/svg+xml,%3Csvg width='2250' height='900' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Cpath fill='%2300A080' d='M0 0h2255v899H0z'/%3E%3Ccircle cx='366' cy='207' r='366' fill='%2300FDCF'/%3E%3Ccircle cx='1777.5' cy='318.5' r='477.5' fill='%2300FDCF'/%3E%3Ccircle cx='1215' cy='737' r='366' fill='%23008060'/%3E%3C/g%3E%3C/svg%3E%0A");
+            url("data:image/svg+xml,%3Csvg width='2250' height='900' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Cpath fill='%2300A080' d='M0 0h2255v899H0z'/%3E%3Ccircle cx='366' cy='207' r='366' fill='%2300FDCF'/%3E%3Ccircle cx='1777.5' cy='318.5' r='477.5' fill='%2300FDCF'/%3E%3Ccircle cx='1215' cy='737' r='366' fill='%23008060'/%3E%3C/g%3E%3C/svg%3E%0A");
         background-size: 110% auto;
         background-position: center;
         color: transparent;
@@ -125,23 +127,19 @@ main {
     text-align: center;
 }
 
-
-/* The switch - the box around the slider */
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: var(--switch-width);
+    height: var(--switch-height);
 }
 
-/* Hide default HTML checkbox */
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-/* The slider */
 .slider {
     position: absolute;
     cursor: pointer;
@@ -149,40 +147,37 @@ main {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--font-color);
     -webkit-transition: .4s;
     transition: .4s;
 }
 
 .slider:before {
-    position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
+    position: absolute;
+    height: var(--slider-height);
+    width: var(--slider-height);
+    left: calc(var(--switch-padding) / 2);
+    bottom: calc(var(--switch-padding) / 2);
+    background-color: var(--bg-color);
     -webkit-transition: .4s;
     transition: .4s;
 }
 
-input:checked + .slider {
-    background-color: #2196F3;
+input:checked+.slider {
+    background-color: var(--font-color);
 }
 
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--font-color);
 }
 
-input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+input:checked+.slider:before {
+    transform: translateX(var(--slider-on));
 }
 
-/* Rounded sliders */
 .slider.round {
-    border-radius: 34px;
+    border-radius: var(--slider-height);
 }
 
 .slider.round:before {
@@ -200,4 +195,23 @@ pre {
 label {
     color: var(--font-color);
     font-size: 1.6em;
+}
+
+a:visited {
+    color: var(--a-visited);
+}
+
+hr {
+    border-color: var(--border-color);
+    color: var(--border-color);
+    background-color: var(--border-color);
+}
+
+p {
+    color: var(--font-color)
+}
+
+input, select {
+    background-color: var(--bg-color);
+    color: var(--font-color);
 }

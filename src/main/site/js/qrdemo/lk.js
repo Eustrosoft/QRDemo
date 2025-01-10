@@ -3,7 +3,7 @@ import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.j
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
 import { getModalWindow } from "./components/modals.js";
-import { getInput, getSelect, getSingleInput } from "./components/inputs.js";
+import { getInput, getSelect, getSingleInput, getSwitch } from "./components/inputs.js";
 import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
 import { notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
@@ -147,7 +147,8 @@ function setSettings(div, settingsJson, userDetails) {
                     alert('Настройки обновлены')
                     location.reload()
                 }
-            }).catch(ex => alert(ex))
+            })
+            .catch(ex => alert(ex))
     })
 
     let changePasswordButton = getBigButton('Изменить пароль')
@@ -350,7 +351,7 @@ function setupQrsPart(div, settings) {
     divQrsPart.appendChild(buttonsDiv)
 
     let qrsTable = document.createElement('table')
-    qrsTable.className = 'qrs_table'
+    qrsTable.classList = 'qrs_table compact_table'
 
     qrApi().getQrs()
         .then(resp => resp.json())

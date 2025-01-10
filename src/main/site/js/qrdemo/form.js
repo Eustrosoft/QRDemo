@@ -55,20 +55,6 @@ function init(formId) {
             const collectedFields = Field.htmlToFields(formDiv);
             const collectedFiles = Field.htmlToFiles(formDiv);
 
-            if (create) {
-                qrApi().saveForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles))
-                    .then(resp => {
-                        if (resp.ok) {
-                            return resp.json()
-                        }
-                        throw new Error('Ошибка при сохранении')
-                    })
-                    .then(json => {
-                        setQueryParamsAndRefresh([{ name: 'form', value: true }, { name: 'id', value: json.id }])
-                    })
-                    .then(() => alert('Шаблон был создан!'))
-                    .catch(() => alert('Ошибка при создании шаблона'))
-            }
             if (id !== null) {
                 qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles, formId))
                     .then((resp) => {
@@ -82,6 +68,19 @@ function init(formId) {
                     .catch(() => {
                         alert('Ошибка при обновлении шаблона, проверьте одинаковые поля')
                     })
+            } else if (create) {
+                qrApi().saveForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles))
+                    .then(resp => {
+                        if (resp.ok) {
+                            return resp.json()
+                        }
+                        throw new Error('Ошибка при сохранении')
+                    })
+                    .then(json => {
+                        setQueryParamsAndRefresh([{ name: 'form', value: true }, { name: 'id', value: json.id }])
+                    })
+                    .then(() => alert('Шаблон был создан!'))
+                    .catch(() => alert('Ошибка при создании шаблона'))
             }
         })
         mainBlock.appendChild(saveFormBtn)
@@ -115,6 +114,7 @@ function init(formId) {
 
 function printFormsList(parent, json) {
     let tableForms = document.createElement('table')
+    tableForms.className = 'compact_table'
     parent.appendChild(tableForms)
 
     let tableHeaderRow = document.createElement('tr')
@@ -178,7 +178,8 @@ function renderForm(parentDiv, objects, json) {
         headers,
         items,
         'formFieldRow',
-        'fields_table'
+        'fields_table',
+        'compact_table'
     )
     let addElementButton = document.createElement('button')
     addElementButton.className = 'custom_button'
@@ -239,7 +240,8 @@ function renderForm(parentDiv, objects, json) {
         filesHeaders,
         fileItems,
         'formFileRow',
-        'files_table'
+        'files_table',
+        'compact_table'
     )
 
     let addFileButton = document.createElement('button')

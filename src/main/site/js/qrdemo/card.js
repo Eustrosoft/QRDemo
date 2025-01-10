@@ -2,7 +2,7 @@ import { fieldToHtml, formatBytes } from "./utils.js";
 import { qrApi } from "./api.js";
 import { getModalWindow } from "./components/modals.js";
 import { getTable, getTr, TableHead } from "./components/tables.js";
-import { getBigButton } from "./components/buttons.js";
+import { getBigButton, getCustomButton } from "./components/buttons.js";
 import { downloadFileUnsecured, showUploadFileModal } from "./files.js";
 import { addDeleteFileRowActions, Field } from "./form.js";
 import { getTextLabel } from "./components/labels.js";
@@ -105,7 +105,7 @@ function getEditCardInfoHtml(qr) {
     formSelectDiv.className = 'flex'
     let formChooseElement = document.createElement('select')
     formChooseElement.id = 'form_select'
-    let formViewBtn = getBigButton('Открыть шаблон')
+    let formViewBtn = getCustomButton('Открыть шаблон')
 
     const opt = document.createElement('option')
     opt.value = ''
@@ -150,7 +150,12 @@ function getEditCardInfoHtml(qr) {
         formFieldDiv.className = 'form_field_div'
 
         let f = fields[field]
-        let label = getTextLabel(f?.name)
+        let labelText = f?.name
+        let isPublic = notEmptyOrUndefined(f?.isPublic) ? f?.isPublic : true
+        if (notEmptyOrUndefined(isPublic) && !isPublic) {
+            labelText = labelText.concat(' *')
+        }
+        let label = getTextLabel(labelText)
         let input = getSingleInput(f?.fieldType, false, f?.id, f?.placeholder)
         input.name = f?.name
         input.value = getDataFromForm(qr, f?.name)
@@ -201,7 +206,8 @@ function getEditCardInfoHtml(qr) {
         filesHeaders,
         fileItems,
         'formFileRow',
-        'files_table'
+        'files_table',
+        'compact_table'
     )
 
     let addFileButton = document.createElement('button')
@@ -268,7 +274,8 @@ function getViewCardInfoHtml(qr) {
         fieldsHeaders,
         fieldsItems,
         'qrRows',
-        'qrTable'
+        'qrTable',
+        'compact_table'
     )
 
     if (fieldsItems.length > 0) {
@@ -297,7 +304,8 @@ function getViewCardInfoHtml(qr) {
         filesHeaders,
         fileItems,
         'formFileRow',
-        'files_table'
+        'files_table',
+        'compact_table'
     )
 
     if (fileItems.length > 0) {

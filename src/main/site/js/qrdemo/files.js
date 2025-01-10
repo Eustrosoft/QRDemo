@@ -24,6 +24,7 @@ function init() {
 
 function printFilesList(parent, json) {
     let tableForms = document.createElement('table')
+    tableForms.className = 'compact_table'
     parent.appendChild(tableForms)
 
     let tableHeaderRow = document.createElement('tr')

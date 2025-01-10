@@ -1,9 +1,12 @@
 import { notNullOrUndefined } from "../../commons/common.js"
 
-export function getTable(headItems, items, itemRowClass = null, id = '', isItemsDoms = false) {
+export function getTable(headItems, items, itemRowClass = null, id = '', tableClass = null, isItemsDoms = false) {
     let table = document.createElement('table')
     if (id != '') {
         table.id = id
+    }
+    if (notNullOrUndefined(tableClass)) {
+        table.className = tableClass
     }
 
     let tr = document.createElement('tr')

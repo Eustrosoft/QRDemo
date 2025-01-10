@@ -1,3 +1,11 @@
+* {
+    --switch-height: 24px;
+    --switch-padding: 0px;
+    --switch-width: calc((var(--switch-height) * 2) - var(--switch-padding));
+    --slider-height: calc(var(--switch-height) - var(--switch-padding));
+    --slider-on: calc(var(--switch-height) - var(--switch-padding));
+}
+
 :root {
     --gap-5px: 5px;
     --gap-10px: 10px;
@@ -17,21 +25,37 @@
     --height-74px: 74px;
     --height-12px: 12px;
     --height-40px: 40px;
+
+    --alpha-02: rgb(0, 0, 0, 0.2);
+    --alpha-middle: rgb(127, 127, 127, 0.5);
+    --alpha-1: rgb(0, 0, 0, 1);
+    --alpha: rgb(0, 0, 0, 1);
 }
 
 
 .light {
+    --body-color: #fff;
+
     --bg-dropdown-color: #f8f8f8;
 
     --border-color: #dedede;
     --font-color: #111;
+    --font-half-color: #888;
     --bg-color: #fff;
+    --box-shadow: #444;
+    --bg-secondary-color: #f8f8f8;
+    --a-visited: var(--font-color);
 }
 
 .dark {
-    --bg-dropdown-color: #9091f6;
+    --body-color: #212121;
+    --bg-dropdown-color: #212121;
 
-    --border-color: #dedede;
-    --font-color: #eee;
-    --bg-color: #111;
+    --border-color: #272727;
+    --font-color: #f3f3f3;
+    --font-half-color: #afafaf;
+    --bg-color: #212121;
+    --box-shadow: #252525;
+    --bg-secondary-color: #272727;
+    --a-visited: var(--font-color);
 }

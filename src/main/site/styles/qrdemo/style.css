@@ -103,15 +103,17 @@ video {
 }
 
 .basic_card {
-    padding: 12px;
-    border: 1px solid #ffffff22;
-    box-shadow: 0 7px 20px 5px #00000088;
+    padding: 7px;
+    border: 1px solid var(--bg-color);
+    box-shadow: 0 7px 20px 5px var(--alpha-1);
     border-radius: .7rem;
     overflow: hidden;
     transition: .5s all;
 
     display: flex;
     flex-direction: column;
+
+    background-color: var(--bg-color);
 }
 
 .modal {
@@ -129,8 +131,8 @@ video {
     .modal-header {
         height: 40px;
         padding: 5px;
-        border-bottom: #d2d2d2;
-        box-shadow: 0 10px 12px 0 #e1e1e1;
+        border-bottom: thin solid var(--border-color);
+        box-shadow: 0 10px 12px 0 var(--bg-color);
         margin-bottom: 12px;
 
         font-size: 1.1rem;
@@ -140,14 +142,14 @@ video {
         justify-content: space-between;
 
         .title {
-            color: black;
+            color: var(--font-color);
             font-size: 1.5em;
             font-weight: bold;
             padding: 0 2px 4px 8px;
         }
 
         .close {
-            color: #919191;
+            color: var(--font-half-color);
             font-weight: bold;
 
             font-size: 3em;
@@ -157,18 +159,18 @@ video {
 
         .close:hover,
         .close:focus {
-            color: black;
+            color: var(--font-color);
             text-decoration: none;
             cursor: pointer;
         }
     }
 
     .modal-content {
-        background-color: #fefefe;
+        background-color: var(--bg-secondary-color);
         margin: 15% auto;
-        border: 1px solid #888;
+        border: 1px solid var(--border-color);
         width: 80%;
-        box-shadow: 0 7px 20px 5px #00000088;
+        box-shadow: 0 7px 20px 5px var(--box-shadow);
         border-radius: .7rem;
 
         label {
@@ -197,12 +199,12 @@ video {
 .big_button {
     margin: 1px 1px 0 0;
     height: 100%;
-    border: 2px solid #919191;
-    background: #ececec;
+    border: 2px solid var(--alpha);
+    background: var(--bg-color);
     border-radius: 12px;
     font-weight: bold;
     font-size: 2em;
-    color: black;
+    color: var(--font-color);
     cursor: pointer;
     display: inline;
     padding: 0 8px;
@@ -210,7 +212,7 @@ video {
 
 .big_button:hover,
 .big_button:focus {
-    background: #b1b1b1;
+    background: var(--alpha-middle);
 }
 
 input[type='checkbox'] {
@@ -220,12 +222,12 @@ input[type='checkbox'] {
 .custom_button {
     margin: 1px 0 4px 4px;
     height: 100%;
-    border: 2px solid #919191;
-    background: #ececec;
+    border: 2px solid var(--font-color);
+    background: var(--bg-color);
     border-radius: 12px;
     font-weight: bold;
     font-size: 2em;
-    color: black;
+    color: var(--font-color);
 
     a {
         display: flex;
@@ -240,10 +242,15 @@ input[type='checkbox'] {
     }
 }
 
+.custom_button:hover {
+    background-color: var(--alpha-02);
+    cursor: pointer;
+}
+
 .qr_line {
     padding: 4px;
     margin: 0.4rem auto;
-    border: 1px solid #ffffff22;
+    border: 1px solid var(--border-color);
     overflow: scroll;
 
     display: flex;
@@ -309,10 +316,11 @@ table {
 table,
 td,
 th {
+    text-align: left;
+
     border: 1px black solid;
     padding: 1px;
 
-    text-align: center;
     text-overflow: ellipsis;
     overflow: hidden;
 
@@ -549,7 +557,7 @@ th {
     }
 
     a:hover {
-        color: rgba(0, 0, 0, 0.4)
+        color: var(--alpha-middle)
     }
 }
 
@@ -676,4 +684,47 @@ th {
     100% {
         transform: translate(200%)
     }
+}
+
+/* Tables */
+
+.compact_table {
+    border: none;
+    border-radius: 0.7rem;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.compact_table th {
+    background-color: #009879;
+    color: var(--bg-color);
+    text-align: left;
+}
+
+.compact_table th,
+.compact_table td {
+    padding: 12px 15px;
+    border: none;
+}
+
+.compact_table tr td {
+    border-bottom: thin solid #dddddd;
+    color: var(--font-color);
+}
+
+.compact_table tr td:nth-of-type(even) {
+    background-color: var(--bg-secondary-color);
+}
+
+.compact_table tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+
+.compact_table tr th.active-row {
+    font-weight: bold;
+    color: #009879;
 }

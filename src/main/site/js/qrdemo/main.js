@@ -1,15 +1,17 @@
 import { setLk } from "./lk.js";
 import { setCard } from "./card.js";
-import { emptyOrUndefined, processFetchError, processFetchErrorToLogin } from "./utils.js";
+import { emptyOrUndefined, notNullOrUndefined, processFetchError, processFetchErrorToLogin } from "./utils.js";
 import { setForm } from "./form.js";
 import { userApi } from "./api.js";
-import { LOCAL_STORAGE_USER } from "./localStorage.js";
+import { LOCAL_STORAGE_USER, LOCAL_STORAGE_USER_THEME } from "./localStorage.js";
 import { setFiles } from "./files.js";
 import { getLink } from "./components/link.js";
 import { getTextLabel } from "./components/labels.js";
 import { getHr } from "./components/hrs.js";
 import { showAboutModal, showContactModal } from "./components/modals.js";
 import { Loader } from "./components/loader.js";
+import { getSwitch } from "./components/inputs.js";
+import { getSpan } from "./components/texts.js";
 
 (function (window, document, undefined) {
     window.onload = init
@@ -28,6 +30,8 @@ import { Loader } from "./components/loader.js";
 
         // Basic listeners
         initBasicListeners()
+        // Init user settings
+        initUserSettings()
 
         if (login) {
             if (mainBlock) {
@@ -68,6 +72,15 @@ function setMainPage(parent) {
     parent.appendChild(mainPage)
 }
 
+export function initUserSettings() {
+    let theme = localStorage.getItem(LOCAL_STORAGE_USER_THEME)
+    if (notNullOrUndefined(theme)) {
+        if (theme === 'dark') {
+            document.body.classList.replace('light', 'dark')
+        }
+    }
+}
+
 function initBasicListeners() {
     const avatarDropdown = document.getElementById('avatar__dropdown')
     const avatarDropdownContent = document.getElementById('avatar__dropdown__content')
@@ -81,7 +94,7 @@ function initBasicListeners() {
             }
 
             // Close the dropdown by condition
-            if (event.target !== avatarDropdownContent 
+            if (event.target !== avatarDropdownContent
                 && !avatarDropdownContent.contains(event.target)) {
                 if (avatarDropdownContent.style.display == 'none') {
                     avatarDropdown.addEventListener('click', showAvatarDropdownContentListener)
@@ -142,6 +155,8 @@ function showAvatarDropdownContentListener() {
             avatarDropdownContent.appendChild(getHr())
             avatarDropdownContent.appendChild(settingsSection)
             avatarDropdownContent.appendChild(getHr())
+            avatarDropdownContent.appendChild(getThemeSection())
+            avatarDropdownContent.appendChild(getHr())
 
             // Exit section
             let exitSection = document.createElement('div')
@@ -166,9 +181,38 @@ function showAvatarDropdownContentListener() {
             enterSection.appendChild(enterLink)
             avatarDropdownContent.appendChild(getHelpSection())
             avatarDropdownContent.appendChild(getHr())
+            avatarDropdownContent.appendChild(getThemeSection())
+            avatarDropdownContent.appendChild(getHr())
             avatarDropdownContent.appendChild(enterSection)
         })
     this.removeEventListener('click', showAvatarDropdownContentListener)
+}
+
+function getThemeSection() {
+    let lsTheme = localStorage.getItem(LOCAL_STORAGE_USER_THEME)
+    let theme = notNullOrUndefined(lsTheme) ? lsTheme : 'light'
+
+    let themeSection = document.createElement('div')
+    themeSection.className = 'dropdown__content__section'
+
+    let themeLabel = getSpan('Тема')
+    themeLabel.style.lineHeight = '16px'
+    themeLabel.style.verticalAlign = 'center'
+    let themeSwitch = getSwitch(theme === 'dark', 30, 20)
+    themeSwitch.style.marginLeft = '6px'
+    themeSwitch.children[0].addEventListener('change', function () {
+        if (this.checked) {
+            document.body.classList.replace('light', 'dark')
+            localStorage.setItem(LOCAL_STORAGE_USER_THEME, 'dark')
+        } else {
+            document.body.classList.replace('dark', 'light')
+            localStorage.setItem(LOCAL_STORAGE_USER_THEME, 'light')
+        }
+        themeSwitch = getSwitch(theme === 'dark', 30, 20)
+    })
+    themeLabel.appendChild(themeSwitch)
+    themeSection.append(themeLabel)
+    return themeSection
 }
 
 function getHelpSection() {

@@ -416,6 +416,17 @@ export function userApi() {
             )
             return authFetch(req)
         },
+        tryGetSettings: () => {
+            const req = new Request(
+                `${QR_DEMO_API}secured/participants/settings`,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include',
+                }
+            )
+            return fetch(req)
+        },
         updateSettings: (settings) => {
             const req = new Request(
                 `${QR_DEMO_API}secured/participants/settings`,
