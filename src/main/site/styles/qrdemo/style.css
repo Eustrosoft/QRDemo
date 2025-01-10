@@ -199,7 +199,7 @@ video {
 .big_button {
     margin: 1px 1px 0 0;
     height: 100%;
-    border: 2px solid var(--alpha);
+    border: thin solid var(--alpha);
     background: var(--bg-color);
     border-radius: 12px;
     font-weight: bold;
@@ -700,7 +700,7 @@ th {
 }
 
 .compact_table th {
-    background-color: #009879;
+    background-color: var(--table-header-color);
     color: var(--bg-color);
     text-align: left;
 }
@@ -712,8 +712,9 @@ th {
 }
 
 .compact_table tr td {
-    border-bottom: thin solid #dddddd;
-    color: var(--font-color);
+    border-bottom: thin solid var(--table-body-bottom-border-color);
+    /* color: var(--font-color); */
+    color: var(--table-body-color);
 }
 
 .compact_table tr td:nth-of-type(even) {
@@ -721,10 +722,13 @@ th {
 }
 
 .compact_table tr:last-of-type {
-    border-bottom: 2px solid #009879;
+    border-bottom: 2px solid var(--table-body-bottom-border-color);
 }
 
-.compact_table tr th.active-row {
-    font-weight: bold;
-    color: #009879;
+.compact_table tr:hover td {
+    background-color: var(--table-body-hover-color);
+}
+
+.compact_table tr td .custom_button {
+    border: thin solid var(--alpha);
 }
