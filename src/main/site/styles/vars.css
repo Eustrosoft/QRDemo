@@ -4,6 +4,11 @@
     --switch-width: calc((var(--switch-height) * 2) - var(--switch-padding));
     --slider-height: calc(var(--switch-height) - var(--switch-padding));
     --slider-on: calc(var(--switch-height) - var(--switch-padding));
+
+    background-color: var(--bg-color);
+    color: var(--font-color);
+
+    word-break: break-word;
 }
 
 :root {

@@ -147,7 +147,7 @@ main {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--font-color);
+    background-color: var(--font-half-color);
     -webkit-transition: .4s;
     transition: .4s;
 }
@@ -211,7 +211,20 @@ p {
     color: var(--font-color)
 }
 
-input, select {
-    background-color: var(--bg-color);
-    color: var(--font-color);
+input {
+    font-family: inherit;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid var(--font-half-color);
+    outline: 0;
+    font-size: 1.3rem;
+    color: var(--table-body-color);
+    padding: 7px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+
+input[type='checkbox'] {
+    width: auto;
+    margin: 2px 4px 2px 4px;
 }

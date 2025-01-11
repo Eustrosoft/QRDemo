@@ -243,15 +243,19 @@ function setLoginForm(parent) {
         <input type="text" id="login" placeholder="Введите логин">
         <label>Пароль: </label>
         <input type="password" id="password" placeholder="Введите пароль">
-        <input type="submit" id="login_submit" value="Войти">
+        <button class="big_button" id="login_submit">Войти</button>
     `
     parent.appendChild(loginPart)
     document.getElementById("login_submit")
         .addEventListener('click', (e) => {
             login(e)
+            document.activeElement.blur()
         })
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') login(e)
+        if (e.key === 'Enter') {
+            login(e)
+            document.activeElement.blur()
+        }
     })
 }
 

@@ -125,7 +125,6 @@ video {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.4);
 
     .modal-header {
@@ -133,7 +132,7 @@ video {
         padding: 5px;
         border-bottom: thin solid var(--border-color);
         box-shadow: 0 10px 12px 0 var(--bg-color);
-        margin-bottom: 12px;
+        border-radius: .7rem .7rem 0 0;
 
         font-size: 1.1rem;
 
@@ -197,7 +196,7 @@ video {
 }
 
 .big_button {
-    margin: 1px 1px 0 0;
+    margin: 1px 4px;
     height: 100%;
     border: thin solid var(--alpha);
     background: var(--bg-color);
@@ -321,7 +320,6 @@ th {
     border: 1px black solid;
     padding: 1px;
 
-    text-overflow: ellipsis;
     overflow: hidden;
 
     word-break: break-word;
@@ -695,7 +693,7 @@ th {
     margin: 18px 0;
     font-size: 0.9em;
     font-family: sans-serif;
-    min-width: 400px;
+    min-width: 300px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 

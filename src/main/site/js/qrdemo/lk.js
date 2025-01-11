@@ -321,19 +321,19 @@ function setupQrsPart(div, settings) {
     let buttonsDiv = document.createElement('div')
     buttonsDiv.className = 'account_card_buttons'
 
-    let divQrCreatePart = document.createElement('button')
-    divQrCreatePart.id = 'qrs_create_part'
-    divQrCreatePart.className = 'big_button'
-    divQrCreatePart.innerHTML = `<a>Создать карточку</a>`
-    divQrCreatePart.addEventListener('click', () => {
+    let createQrBtn = getBigButton('Создать карточку', 'qrs_create_part')
+    createQrBtn.addEventListener('click', (e) => {
         qrApi().createQR('', '')
             .then(resp => {
                 if (resp.ok) {
                     alert('Карточка была создана!')
                     location.reload()
+                } else if (resp.status === 500) {
+                    alert("Вы достигли лимита карточек")
                 } else {
-                    alert("Карточка не была создана")
+                    alert('Ошибка при создании карточки')
                 }
+                document.activeElement.blur()
             })
             .catch(ex => alert(ex))
     })
@@ -346,7 +346,7 @@ function setupQrsPart(div, settings) {
         window.location = '?form=true'
     })
 
-    buttonsDiv.appendChild(divQrCreatePart)
+    buttonsDiv.appendChild(createQrBtn)
     buttonsDiv.appendChild(divFormCreatePart)
     divQrsPart.appendChild(buttonsDiv)
 
@@ -423,10 +423,17 @@ function getQRRow(data, settings) {
         : settings?.defaultQrPrintText
 
     let td = document.createElement('td')
-    td.innerHTML = `
-        <div class="custom_button fs-08rem"><a href="?q=${q}&edit=true">Редактировать</a></div>
-        <div class="custom_button fs-08rem"><a href="${QR_PRINTER_URL}?q=${q}&text=${printFormText}" target="_">Распечатать QR-код</a></div>
-    `
+    let editBtn = getBigButton('Редактировать', `edit_${q}`)
+    let printBtn = getBigButton('Распечатать QR-код', `print_${q}`)
+    editBtn.addEventListener('click', () => {
+        window.open(`?q=${q}&edit=true`, '_self')
+    })
+    printBtn.addEventListener('click', () => {
+        window.open(`${QR_PRINTER_URL}?q=${q}&text=${printFormText}`)
+    })
+
+    td.appendChild(editBtn)
+    td.appendChild(printBtn)
     qrLine.appendChild(td)
 
     return qrLine

@@ -29,8 +29,7 @@ export function setCard(q, creating = false) {
         create = true
     }
     if (!edit) {
-        let header = document.getElementById('qrdemo_header')
-        if (header) header.remove()
+        document.getElementsByClassName('header')[0].style.display = 'none'
     }
 
     mainBlock.appendChild(divCard)
@@ -57,11 +56,15 @@ function setQRInfo(q, div) {
                 ? getEditCardInfoHtml(json)
                 : getViewCardInfoHtml(json)
             divCardInfo.className = 'code_info'
-
+            
+            // QR image
             // const qrImageDiv = getQRImageDiv(longToHex(json?.code));
             // divCardInfo.append(qrImageDiv)
             if (cardInfoHtml.innerHTML === null || cardInfoHtml.innerHTML === undefined || cardInfoHtml.innerHTML === '') {
                 cardInfoHtml.innerHTML = '<h1>Нет информации для этой карточки</h1>'
+                cardInfoHtml.style.textAlign = 'center'
+                cardInfoHtml.style.justifyContent = 'center'
+                cardInfoHtml.style.height = 'calc(100vh - 8vw)'
             }
             divCardInfo.append(cardInfoHtml)
             div.appendChild(divCardInfo)

@@ -1,9 +1,12 @@
 
-export function getBigButton(text) {
+export function getBigButton(text, id = null) {
     let button = document.createElement('button')
     button.className = 'big_button'
     button.type = 'button'
     button.innerHTML = text
+    if (id !== null) {
+        button.id = id
+    }
     return button
 }
 
