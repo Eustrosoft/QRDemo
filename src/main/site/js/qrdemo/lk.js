@@ -10,6 +10,7 @@ import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getHr } from "./components/hrs.js";
 import { Loader } from "./components/loader.js";
+import { getTable, TableHead } from "./components/tables.js";
 
 const mainBlock = document.getElementById('main_block')
 let divLk = document.createElement('div')
@@ -561,22 +562,136 @@ function setUserPanel(parenDiv, participantId) {
     adminApi().getParticipant(participantId)
         .then(resp => resp.json())
         .then(json => {
-            let usern = get2TextLabels('Username: ', json?.username)
-            let ranges = getTextLabel('Ranges: ')
-            let preRanges = document.createElement('pre')
-            preRanges.innerHTML = JSON.stringify(json?.ranges)
+            let username = get2TextLabels('Имя участника: ', json?.username)
+            let email = get2TextLabels('Email участника: ', json?.email)
+            let blocked = get2TextLabels('Заблокирован:', json?.banned ? ' Да' : ' Нет')
+            let blockingBtn
+            if (json.banned !== undefined) {
+                let btnText = json.banned ? 'Разблокировать' : 'Заблокировать'
+                blockingBtn = getBigButton(btnText, 'block_user_btn')
 
-            let qrs = getTextLabel('QRS: ')
-            let preQRS = document.createElement('pre')
-            preQRS.innerHTML = JSON.stringify(json?.qrs)
+                if (json.banned) { 
+                    blockingBtn.addEventListener('click', () => {
+                        const cf = confirm('Разблокировать пользователя?')
+                        if (cf) {
+                            adminApi().unblockUser(json?.id)
+                                .then(resp => {
+                                    if (resp.ok) {
+                                        alert('Пользователь разблокирован')
+                                        return
+                                    }
+                                    return resp.json()
+                                })
+                                .then(json => {
+                                    if (json) {
+                                        alert(JSON.stringify(json))
+                                    }
+                                })
+                        }
+                    })
+                } else {
+                    blockingBtn.addEventListener('click', () => {
+                        let blockContent = document.createElement('div')
+                        let reasonLabel = getTextLabel('Причина')
+                        let reasonInput = getSingleInput('text', false, 'reason_text')
+                        let blockBtn = getBigButton('Подтвердить')
+                        blockContent.appendChild(reasonLabel)
+                        blockContent.appendChild(reasonInput)
+                        blockContent.appendChild(blockBtn)
 
-            parenDiv.appendChild(usern)
+                        let modal = getModalWindow('Блокировка пользователя пользователя', blockContent)
+                        modal.style.display = 'block'
+
+                        blockBtn.addEventListener('click', () => {
+                            const cf = confirm('Заблокировать пользователя?')
+                            if (cf) {
+                                adminApi().blockUser(json?.id, reasonInput?.value)
+                                    .then(resp => {
+                                        if (resp.ok) {
+                                            alert('Пользователь заблокирован')
+                                            window
+                                            return
+                                        }
+                                        return resp?.json()
+                                    })
+                                    .then(json => {
+                                        if (json) {
+                                            alert(JSON.stringify(json))
+                                        }
+                                    })
+                            }
+                        })
+                    })
+                }
+            }
+
+            let rangesLabel = getTextLabel('Диапазоны: ')
+            let rangesHeader = [
+                new TableHead('ID', '10%'), new TableHead('От', '20%'),
+                new TableHead('До', '20%'), new TableHead('Создан', '20%')
+            ]
+            let rangesBody = []
+            for (let i in json?.ranges) {
+                let range = json.ranges[i]
+                rangesBody.push(
+                    {
+                        id: range?.id,
+                        from: Number(range?.from).toString(16),
+                        to: Number(range?.to).toString(16),
+                        created: range?.created
+                    }
+                )
+            }
+            let rangesTable = getTable(rangesHeader, rangesBody, '', '', 'compact_table')
+
+            let qrsLabel = getTextLabel('Карточки: ')
+            let qrsHeaders = [
+                new TableHead('ID', '10%'), new TableHead('Код', '10%'), new TableHead('Имя', '20%'),
+                new TableHead('Описание', '20%'), new TableHead('Создана', '20%')
+            ]
+            let qrsBody = []
+            for (let i in json?.qrs) {
+                let qr = json.qrs[i]
+                qrsBody.push(
+                    {
+                        id: qr?.id,
+                        code: Number(qr?.code).toString(16),
+                        name: qr?.name,
+                        description: qr?.description,
+                        created: qr?.created
+                    }
+                )
+            }
+            let qrsTable = getTable(qrsHeaders, qrsBody, 'qr_item_row', '', 'compact_table')
+
+            parenDiv.appendChild(username)
+            parenDiv.appendChild(email)
+            parenDiv.appendChild(blocked)
+            if (blockingBtn) {
+                parenDiv.appendChild(blockingBtn)
+            }
+            if (json?.banned) {
+                parenDiv.append(get2TextLabels('Причина блокировки: ', json?.bannedReason))
+            }
             parenDiv.appendChild(document.createElement('br'))
-            parenDiv.appendChild(ranges)
-            parenDiv.appendChild(preRanges)
 
-            parenDiv.appendChild(qrs)
-            parenDiv.appendChild(preQRS)
+            parenDiv.appendChild(rangesLabel)
+            parenDiv.appendChild(rangesTable)
+            parenDiv.appendChild(qrsLabel)
+            parenDiv.appendChild(qrsTable)
+
+            let qrRows = document.getElementsByClassName('qr_item_row')
+            for (let i = 0; i < qrRows?.length; i++) {
+                let qrRow = qrRows[i]
+                qrRow.addEventListener('click', (e) => {
+                    let qrCode = qrRow?.childNodes[1]?.textContent
+                    if (qrCode) {
+                        window.open(`?q=${qrCode}`)
+                    } else {
+                        alert('Ошибка при получении qr кода')
+                    }
+                })
+            }
         })
         .catch(ex => alert(ex))
 }
@@ -585,6 +700,7 @@ function setUsersPanel(parenDiv) {
     parenDiv.innerHTML = ''
 
     let participantsTable = document.createElement('table')
+    participantsTable.className = 'compact_table'
 
     let tableHeader = document.createElement('tr')
     let td1 = document.createElement('th')
@@ -635,7 +751,7 @@ function getParticipantTr(participantJson, parentDiv) {
     let td4 = document.createElement('td')
     td4.innerHTML = roles?.map(getRoleName)
     let td5 = document.createElement('td')
-    td5.innerHTML = ranges?.map(getRangeList)
+    td5.innerHTML = ranges?.map(getRangeList).join(', ')
 
     tr.style = 'cursor: pointer;'
     tr.className = 'hoverable'
@@ -653,5 +769,5 @@ function getRoleName(role) {
 }
 
 function getRangeList(range) {
-    return [range.from, range.to].join(" - ");
+    return [Number(range?.from)?.toString(16), Number(range?.to)?.toString(16)].join(" - ");
 }

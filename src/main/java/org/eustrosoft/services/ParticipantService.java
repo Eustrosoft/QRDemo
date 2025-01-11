@@ -8,12 +8,14 @@ import org.apache.logging.log4j.util.Strings;
 import org.eustrosoft.dtos.PasswordChangeDto;
 import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.SettingsChangeDto;
+import org.eustrosoft.dtos.admin.ParticipantBlockDto;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.entitites.Role;
 import org.eustrosoft.entitites.enums.Roles;
 import org.eustrosoft.repositories.ParticipantRepository;
 import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
+import org.eustrosoft.repositories.projections.ParticipantAdminSimpleProjection;
 import org.eustrosoft.repositories.projections.ParticipantSettingsProjection;
 import org.eustrosoft.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +38,6 @@ import java.util.Optional;
 @Transactional
 public class ParticipantService {
     private final ParticipantRepository repository;
-    private final RoleService roleService;
     private final AuthorizationService authorizationService;
     @Lazy
     @Setter
@@ -51,8 +53,13 @@ public class ParticipantService {
     private UserService userService;
 
     @Transactional(readOnly = true)
-    public List<Participant> findAll() {
-        return CommonUtils.iterableToList(repository.findAll());
+    public List<ParticipantAdminSimpleProjection> findAll() {
+        return CommonUtils.iterableToList(
+                repository.findAllByCreatedBefore(
+                        new Date(),
+                        ParticipantAdminSimpleProjection.class
+                )
+        );
     }
 
     @Transactional(readOnly = true)
@@ -76,7 +83,7 @@ public class ParticipantService {
         }
         // TODO: make user provider or defining default security config
         try {
-            return getById(byToken.get().getId());
+            return byToken.get();
         } catch (Exception ex) {
             Participant participant = new Participant();
             participant.setId(byToken.get().getId());
@@ -89,7 +96,7 @@ public class ParticipantService {
 
     @Transactional(readOnly = true)
     public Participant getById(Long id) {
-        return repository.findById(id).get();
+        return repository.findById(id, Participant.class).get();
     }
 
     @Transactional(readOnly = true)
@@ -173,23 +180,55 @@ public class ParticipantService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void delete(Long id) {
+    public void delete(Long id) throws IllegalAccessException {
+        Participant me = getCurrentOrThrow();
+        if (!isAdmin(me.getRoles())) {
+            throw new IllegalAccessException("You have no admin rights");
+        }
+        Participant toDelete = getById(id);
+        if (isAdmin(toDelete.getRoles())) {
+            throw new IllegalAccessException("You can not delete admins");
+        }
         repository.deleteById(id);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void blockParticipant(Participant participant, String reason) {
-        participant.setBanned(true);
-        if (StringUtils.isNotBlank(reason)) {
-            participant.setBannedReason(reason);
+    public void blockParticipant(ParticipantBlockDto dto) throws IllegalAccessException {
+        if (dto == null || dto.getId() == null) {
+            throw new IllegalArgumentException("Participant id is not provided");
         }
-        repository.save(participant);
+        Participant me = getCurrentOrThrow();
+        if (!isAdmin(me.getRoles())) {
+            throw new IllegalAccessException("You have no admin rights");
+        }
+        if (me.getId().equals(dto.getId())) {
+            throw new IllegalAccessException("You can not ban yourself");
+        }
+        Participant toBan = getById(dto.getId());
+        if (isAdmin(toBan.getRoles())) {
+            throw new IllegalAccessException("You can not ban admins");
+        }
+        if (StringUtils.isBlank(dto.getReason())) {
+            repository.setParticipantBan(dto.getId(), true);
+        } else {
+            repository.setParticipantBan(dto.getId(), true, dto.getReason());
+        }
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void unblockParticipant(Participant participant) {
-        participant.setBanned(false);
-        repository.save(participant);
+    public void unblockParticipant(Long id) throws IllegalAccessException {
+        if (id == null) {
+            throw new IllegalArgumentException("Participant id is not provided");
+        }
+        Participant me = getCurrentOrThrow();
+        if (!isAdmin(me.getRoles())) {
+            throw new IllegalAccessException("You have no admin rights");
+        }
+        Participant toUnban = getById(id);
+        if (!toUnban.getBanned()) {
+            throw new IllegalArgumentException("This user is not banned");
+        }
+        repository.setParticipantBan(id, false, "");
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

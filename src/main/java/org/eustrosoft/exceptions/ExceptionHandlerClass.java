@@ -23,7 +23,6 @@ public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
             AccessDeniedException.class
     })
     public ResponseEntity<Object> handleAllTypeExceptions(Exception ex, WebRequest request) {
-        ex.printStackTrace();
         logger.error(ex.getLocalizedMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

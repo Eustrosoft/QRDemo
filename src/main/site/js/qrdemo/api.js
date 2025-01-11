@@ -1,3 +1,4 @@
+import { notEmptyOrUndefined } from "../commons/common.js";
 import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
 export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
@@ -331,6 +332,38 @@ export function adminApi() {
                     method: 'GET',
                     headers: headers,
                     credentials: 'include'
+                }
+            )
+            return authFetch(req)
+        },
+        unblockUser: (id) => {
+            if (emptyOrUndefined(id)) {
+                throw new Error('ID пользователя не задан')
+            }
+
+            const req = new Request(
+                `${QR_DEMO_API}admin/panel/participants/unblock`,
+                {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({ id: id })
+                }
+            )
+            return authFetch(req)
+        },
+        blockUser: (id, reason) => {
+            if (emptyOrUndefined(id)) {
+                throw new Error('ID пользователя не задан')
+            }
+
+            const req = new Request(
+                `${QR_DEMO_API}admin/panel/participants/block`,
+                {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({ id: id, reason: reason })
                 }
             )
             return authFetch(req)

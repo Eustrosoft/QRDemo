@@ -268,15 +268,22 @@ async function login(e) {
         alert("Заполните все поля")
         return
     }
-    const authResponse =
-        await userApi().login(login, password)
-            .catch(processFetchError)
-    if (!authResponse.ok) {
-        const statusText = authResponse.json();
-        processFetchError(JSON.stringify(statusText))
-        return
-    }
 
+    try {
+        let loginResp = await userApi().login(login, password)
+        let loginRespText = await loginResp.text()
+        if (!loginResp.ok) {
+            let loginRespJson = JSON.parse(loginRespText)
+            throw Error(loginRespJson?.message)
+        }
+        processToLk()
+        return
+    } catch(e) {
+        alert(e?.message)
+    }
+}
+
+async function processToLk() {
     await userApi()
         .me()
         .then((response) => response.json())

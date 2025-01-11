@@ -246,30 +246,8 @@ input[type='checkbox'] {
     cursor: pointer;
 }
 
-.qr_line {
-    padding: 4px;
-    margin: 0.4rem auto;
-    border: 1px solid var(--border-color);
-    overflow: scroll;
-
-    display: flex;
-    flex-direction: row;
-
-    .qr_line_image {
-        border-radius: .5rem;
-        max-width: 100%;
-        height: 6em;
-        width: 6em;
-        object-fit: cover;
-    }
-
-    .qr_line_col {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        font-size: 1.2em;
-    }
+.qr_item_row {
+    cursor: pointer;
 }
 
 h3 {
@@ -551,7 +529,7 @@ th {
 
     a {
         text-decoration: none;
-        padding: 3px 8px 0 4px;
+        padding: 3px 8px 0 0;
     }
 
     a:hover {
@@ -560,7 +538,8 @@ th {
 }
 
 .dropdown__content__section {
-    padding: 8px 32px 8px 16px;
+    padding: 6px 32px 6px 16px;
+    margin: 2px 0;
 }
 
 .dropdown__content>*,

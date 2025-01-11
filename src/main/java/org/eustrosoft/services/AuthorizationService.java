@@ -1,6 +1,7 @@
 package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.UserLoginDto;
@@ -87,17 +88,20 @@ public class AuthorizationService {
 
     @Transactional(readOnly = true)
     private ResponseEntity<?> validateUserLogin(final UserLoginDto userLoginDto) {
-        Optional<Participant> Participant = userService.getByUsername(userLoginDto.getUsername());
-        if (!Participant.isPresent()) {
+        Optional<Participant> participant = userService.getByUsername(userLoginDto.getUsername());
+        if (!participant.isPresent()) {
             return new ResponseEntity<>(
-                    new Error(HttpStatus.BAD_REQUEST.value(), "Participant with this username does not exists."),
+                    new Error(HttpStatus.BAD_REQUEST.value(), "Пользователя не существует."),
                     HttpStatus.BAD_REQUEST
             );
         }
-        Participant usr = Participant.get();
-        if (usr.getBanned()) {
+        if (participant.get().getBanned()) {
+            String bannedReason = participant.get().getBannedReason();
+            if (StringUtils.isBlank(bannedReason)) {
+                bannedReason = "неизвестной причины";
+            }
             return new ResponseEntity<>(
-                    new Error(HttpStatus.BAD_REQUEST.value(), "Participant is banned due to " + usr.getBannedReason()),
+                    new Error(HttpStatus.BAD_REQUEST.value(), "Пользователь заблокирован из-за " + bannedReason),
                     HttpStatus.BAD_REQUEST
             );
         }

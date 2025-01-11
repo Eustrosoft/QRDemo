@@ -41,7 +41,7 @@
 .light {
     --body-color: #fff;
 
-    --bg-dropdown-color: #f8f8f8;
+    --bg-dropdown-color: var(--bg-color);
 
     --border-color: #dedede;
     --font-color: #111;

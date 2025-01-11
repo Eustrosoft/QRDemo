@@ -1,11 +1,13 @@
 package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
+import org.eustrosoft.dtos.admin.ParticipantBlockDto;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QR;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.entitites.Role;
 import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
+import org.eustrosoft.repositories.projections.ParticipantAdminSimpleProjection;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +28,7 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public List<Participant> findALl() {
+    public List<ParticipantAdminSimpleProjection> findALl() {
         return participantService.findAll();
     }
 
@@ -44,7 +46,7 @@ public class AdminService {
         return roleService.findRoles();
     }
 
-    public void deleteParticipant(Long id) {
+    public void deleteParticipant(Long id) throws Exception {
         participantService.delete(id);
     }
 
@@ -61,11 +63,11 @@ public class AdminService {
         return qrRangeService.getFreeRanges();
     }
 
-    public void blockParticipant(Participant participant, String reason) {
-        participantService.blockParticipant(participant, reason);
+    public void blockParticipant(ParticipantBlockDto dto) throws Exception {
+        participantService.blockParticipant(dto);
     }
 
-    public void unblockParticipant(Participant participant) {
-        participantService.unblockParticipant(participant);
+    public void unblockParticipant(Long id) throws Exception {
+        participantService.unblockParticipant(id);
     }
 }
