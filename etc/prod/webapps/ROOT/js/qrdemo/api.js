@@ -334,6 +334,50 @@ export function adminApi() {
                 }
             )
             return authFetch(req)
+        },
+        unblockUser: (id) => {
+            if (emptyOrUndefined(id)) {
+                throw new Error('ID пользователя не задан')
+            }
+
+            const req = new Request(
+                `${QR_DEMO_API}admin/panel/participants/unblock`,
+                {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({ id: id })
+                }
+            )
+            return authFetch(req)
+        },
+        blockUser: (id, reason) => {
+            if (emptyOrUndefined(id)) {
+                throw new Error('ID пользователя не задан')
+            }
+
+            const req = new Request(
+                `${QR_DEMO_API}admin/panel/participants/block`,
+                {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({ id: id, reason: reason })
+                }
+            )
+            return authFetch(req)
+        },
+        changeParticipantPassword: (id, password, confirmPassword) => {
+            const req = new Request(
+                `${QR_DEMO_API}admin/panel/participants/${id}/change-password`,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({password: password, confirmPassword: confirmPassword})
+                }
+            )
+            return authFetch(req)
         }
     }
 }
@@ -415,6 +459,17 @@ export function userApi() {
                 }
             )
             return authFetch(req)
+        },
+        tryGetSettings: () => {
+            const req = new Request(
+                `${QR_DEMO_API}secured/participants/settings`,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include',
+                }
+            )
+            return fetch(req)
         },
         updateSettings: (settings) => {
             const req = new Request(
