@@ -11,7 +11,7 @@ import { getHr } from "./components/hrs.js";
 import { showAboutModal, showContactModal } from "./components/modals.js";
 import { Loader } from "./components/loader.js";
 import { getSwitch } from "./components/inputs.js";
-import { getSpan } from "./components/texts.js";
+import { getSpan, MAIN_TEXT } from "./components/texts.js";
 
 (function (window, document, undefined) {
     window.onload = init
@@ -59,14 +59,9 @@ function setMainPage(parent) {
     mainPage.id = 'main_page'
 
     mainPage.innerHTML = `
-        <p> Данный сайт предназначен для ознакомления с функциональностью системы <span class="color-red">QXYZ</span> </p>
-
+        <h1> Данный сайт предназначен для ознакомления с функциональностью системы <span class="color-red">QXYZ</span> </h1>
         <video src="videos/demonstration.mp4" controls> </video>
-        
-        <p>  Полная версия сайта располагается по адресу: <a href="https://qr.qxyz.ru" target="_">QR.QXYZ.RU</a></p>
-        <p>  Ознакомиться с документацией можно тут: <a href="https://qr.qxyz.ru/help/doc/qr.qxyz.ru-doc.pdf" target="_"> QXYZ Manifest</a></p>
-
-        <p> В данной версии приложения разработчик не несёт ответственности за сохранность данных, стабильность системы и прочие причененные неудобства </p>
+        ${MAIN_TEXT}
     `
 
     parent.appendChild(mainPage)
@@ -128,9 +123,9 @@ function showAvatarDropdownContentListener() {
             personDataSection.className = 'dropdown__content__section'
             let usernameLabel = getTextLabel(json?.username)
             let emailLabel = getTextLabel(json?.email, 'color-grey')
-            let cardsLink = getLink('Карточки', 'index.html?lk=true', '')
-            let templatesLink = getLink('Шаблоны', 'index.html?form=true', '')
-            let filesLink = getLink('Загруженные файлы', 'index.html?files=true', '')
+            let cardsLink = getLink('Карточки', '?lk=true', '')
+            let templatesLink = getLink('Шаблоны', '?form=true', '')
+            let filesLink = getLink('Загруженные файлы', '?files=true', '')
 
             personDataSection.appendChild(usernameLabel)
             personDataSection.appendChild(emailLabel)
@@ -177,7 +172,7 @@ function showAvatarDropdownContentListener() {
             loader.destroy()
             let enterSection = document.createElement('div')
             enterSection.className = 'dropdown__content__section'
-            let enterLink = getLink('Войти', 'index.html?login=true', '')
+            let enterLink = getLink('Войти', '?login=true', '')
             enterSection.appendChild(enterLink)
             avatarDropdownContent.appendChild(getHelpSection())
             avatarDropdownContent.appendChild(getHr())
@@ -278,7 +273,7 @@ async function login(e) {
         }
         processToLk()
         return
-    } catch(e) {
+    } catch (e) {
         alert(e?.message)
     }
 }
@@ -290,6 +285,6 @@ async function processToLk() {
         .then(data => {
             localStorage.setItem(LOCAL_STORAGE_USER, JSON.stringify(data))
         })
-        .then(rsp => window.location.href = 'index.html?lk=true')
+        .then(rsp => window.location.href = '?lk=true')
         .catch(processFetchErrorToLogin)
 }

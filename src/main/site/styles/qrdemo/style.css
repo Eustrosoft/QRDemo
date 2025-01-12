@@ -22,22 +22,27 @@ input {
 
     align-items: center;
     justify-items: center;
-    text-align: center;
 
     padding: 8px;
-    margin: 4px;
+    margin: auto;
+    max-width: 1200px;
 
-    font-size: 3em;
-    color: #414141;
+    color: var(--font-color);
+
+    h1 {
+        text-align: center;
+        margin: 8px;
+    }
+
+    pre {
+        color: var(--font-color);
+        font-size: 1.2em;
+        font-family: inherit;
+    }
 }
 
 #main_block {
     padding: 8px;
-}
-
-video {
-    height: 100%;
-    width: 80vw;
 }
 
 .box-shadow-silver {
@@ -176,7 +181,7 @@ video {
             font-size: 1.6rem;
         }
 
-        input {
+        input[type='text'], input[type='password'], input[type='number'] {
             width: 98%;
         }
 
@@ -212,10 +217,6 @@ video {
 .big_button:hover,
 .big_button:focus {
     background: var(--alpha-middle);
-}
-
-input[type='checkbox'] {
-    zoom: 2;
 }
 
 .custom_button {
@@ -335,8 +336,6 @@ th {
     th {
         margin: 2px;
         padding: 1px;
-
-        text-align: center;
         font-size: 1.1em;
     }
 
@@ -427,7 +426,11 @@ th {
 }
 
 .red_border {
-    background-color: rgba(255, 0, 0, 0.9);
+    background-color: var(--incorrect-color) !important;
+
+    > td {
+        background-color: var(--incorrect-color) !important;
+    }
 }
 
 /* Header */
@@ -672,7 +675,7 @@ th {
     margin: 18px 0;
     font-size: 0.9em;
     font-family: sans-serif;
-    min-width: 300px;
+    min-width: 200px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
@@ -707,4 +710,15 @@ th {
 
 .compact_table tr td .custom_button {
     border: thin solid var(--alpha);
+}
+
+/* File row in table */
+tr.fileRow {
+    cursor: pointer;
+    
+    td {
+        text-decoration: underline;
+        color: var(--a-color);
+        text-align: center;
+    }
 }

@@ -565,12 +565,13 @@ function setUserPanel(parenDiv, participantId) {
             let username = get2TextLabels('Имя участника: ', json?.username)
             let email = get2TextLabels('Email участника: ', json?.email)
             let blocked = get2TextLabels('Заблокирован:', json?.banned ? ' Да' : ' Нет')
+            let changePasswordBtn = getBigButton('Изменить пароль', 'change_participant_password')
             let blockingBtn
             if (json.banned !== undefined) {
                 let btnText = json.banned ? 'Разблокировать' : 'Заблокировать'
                 blockingBtn = getBigButton(btnText, 'block_user_btn')
 
-                if (json.banned) { 
+                if (json.banned) {
                     blockingBtn.addEventListener('click', () => {
                         const cf = confirm('Разблокировать пользователя?')
                         if (cf) {
@@ -578,6 +579,7 @@ function setUserPanel(parenDiv, participantId) {
                                 .then(resp => {
                                     if (resp.ok) {
                                         alert('Пользователь разблокирован')
+                                        setUserPanel(parenDiv, participantId)
                                         return
                                     }
                                     return resp.json()
@@ -609,7 +611,8 @@ function setUserPanel(parenDiv, participantId) {
                                     .then(resp => {
                                         if (resp.ok) {
                                             alert('Пользователь заблокирован')
-                                            window
+                                            setUserPanel(parenDiv, participantId)
+                                            modal.remove()
                                             return
                                         }
                                         return resp?.json()
@@ -624,6 +627,43 @@ function setUserPanel(parenDiv, participantId) {
                     })
                 }
             }
+            changePasswordBtn.addEventListener('click', (e) => {
+                let blockContent = document.createElement('div')
+                let passwordLabel = getTextLabel('Пароль')
+                let passwordInput = getSingleInput('password', false, 'password')
+                let confirmPasswordLabel = getTextLabel('Повтор пароля')
+                let confirmPasswordInput = getSingleInput('password', false, 'confirm_password')
+                let changePasswordBtn = getBigButton('Подтвердить')
+                blockContent.appendChild(passwordLabel)
+                blockContent.appendChild(passwordInput)
+                blockContent.appendChild(confirmPasswordLabel)
+                blockContent.appendChild(confirmPasswordInput)
+                blockContent.appendChild(changePasswordBtn)
+
+                let modal = getModalWindow('Смена пароля пользователю', blockContent)
+                modal.style.display = 'block'
+
+                changePasswordBtn.addEventListener('click', () => {
+                    const cf = confirm('Сменить пароль пользователю?')
+                    if (cf) {
+                        adminApi().changeParticipantPassword(json?.id, passwordInput?.value, confirmPasswordInput?.value)
+                            .then(resp => {
+                                if (resp.ok) {
+                                    alert('Пароль изменен')
+                                    setUserPanel(parenDiv, participantId)
+                                    modal.remove()
+                                    return
+                                }
+                                return resp?.json()
+                            })
+                            .then(json => {
+                                if (json) {
+                                    alert(JSON.stringify(json))
+                                }
+                            })
+                    }
+                })
+            })
 
             let rangesLabel = getTextLabel('Диапазоны: ')
             let rangesHeader = [
@@ -673,6 +713,7 @@ function setUserPanel(parenDiv, participantId) {
             if (json?.banned) {
                 parenDiv.append(get2TextLabels('Причина блокировки: ', json?.bannedReason))
             }
+            parenDiv.appendChild(changePasswordBtn)
             parenDiv.appendChild(document.createElement('br'))
 
             parenDiv.appendChild(rangesLabel)

@@ -34,7 +34,7 @@ export const processFetchErrorToLogin = (error) => {
     if (error !== undefined) {
         alert('Login to start using system!')
     }
-    window.location.href = 'index.html?login=true'
+    window.location.href = '?login=true'
 }
 
 export function getQRImage(code, x = 300) {

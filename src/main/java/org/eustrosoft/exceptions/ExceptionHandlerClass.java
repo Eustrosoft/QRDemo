@@ -1,5 +1,6 @@
 package org.eustrosoft.exceptions;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -23,9 +24,9 @@ public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
             AccessDeniedException.class
     })
     public ResponseEntity<Object> handleAllTypeExceptions(Exception ex, WebRequest request) {
-        logger.error(ex.getLocalizedMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(new ExceptionObject(ex));
     }
 }

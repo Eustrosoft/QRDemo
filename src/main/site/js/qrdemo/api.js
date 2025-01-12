@@ -367,6 +367,18 @@ export function adminApi() {
                 }
             )
             return authFetch(req)
+        },
+        changeParticipantPassword: (id, password, confirmPassword) => {
+            const req = new Request(
+                `${QR_DEMO_API}admin/panel/participants/${id}/change-password`,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({password: password, confirmPassword: confirmPassword})
+                }
+            )
+            return authFetch(req)
         }
     }
 }

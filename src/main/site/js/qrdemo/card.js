@@ -285,10 +285,6 @@ function getViewCardInfoHtml(qr) {
         cardDiv.appendChild(tableFields)
     }
 
-    let filesHeaders = [
-        new TableHead('Название', '50%'),
-        new TableHead('Скачать', '50%')
-    ]
     let files = qr?.files
 
     if (qr?.form?.files != null) {
@@ -299,14 +295,13 @@ function getViewCardInfoHtml(qr) {
     for (let index in files) {
         const file = files[index];
         fileItems.push({
-            name: `<input name="id" type="hidden" value="${file?.id}"/>` + file?.name,
-            actions: `<button class="big_button" id="download_file_btn_${index}">Скачать</button>`
+            name: `<input name="id" type="hidden" value="${file?.id}"/>` + file?.name
         })
     }
     let tableFiles = getTable(
-        filesHeaders,
+        [],
         fileItems,
-        'formFileRow',
+        'fileRow',
         'files_table',
         'compact_table'
     )
@@ -407,12 +402,12 @@ function getDataFromForm(form, key) {
 }
 
 function addDownloadPublicFileRowActions() {
-    let rows = document.getElementsByClassName('formFileRow')
+    let rows = document.getElementsByClassName('fileRow')
     for (let i = 0; i < rows.length; i++) {
-        let fileId = rows[i]?.firstElementChild?.firstElementChild?.value // TODO
-        let elem = document.getElementById(`download_file_btn_${i}`)
-        if (elem) {
-            elem.addEventListener('click', () => downloadFileUnsecured(fileId))
+        let row = rows[i]
+        let fileId = row?.firstElementChild?.firstElementChild?.value
+        if (fileId) {
+            row.addEventListener('click', () => downloadFileUnsecured(fileId))
         }
     }
 }

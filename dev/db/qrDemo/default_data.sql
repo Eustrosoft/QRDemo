@@ -10,6 +10,9 @@ VALUES ('spring.servlet.multipart.max-file-size', '10MB'), -- max file upload si
        ('spring.servlet.multipart.enabled', 'true'), -- enabling file upload
 	   ('spring.servlet.multipart.max-request-size', '10MB'), -- max request size
 	   ('jwt.secret', 'Jqwnjqnwje'), -- cookie secret
+	   ('ranges.rangeStart', '1070000'),
+	   ('ranges.rangeEnd', '107FFFF'),
+	   ('ranges.codesForRange', '15'),
 	   ('jwt.lifetime', '24h'); -- cookie lifetime
 
 insert into dictionary(name, code, value, description)

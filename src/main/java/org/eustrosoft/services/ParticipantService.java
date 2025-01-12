@@ -270,9 +270,6 @@ public class ParticipantService {
                 || StringUtils.isEmpty(dto.getConfirmNewPassword())) {
             throw new IllegalArgumentException("New passwords can not be null or empty!");
         }
-        if (!dto.getNewPassword().equals(dto.getConfirmNewPassword())) {
-            throw new IllegalArgumentException("New password and confirm password are not the same!");
-        }
         Participant participant = getCurrentOrThrow();
         if (!passwordEncoder.matches(dto.getOldPassword(), participant.getPassword())) {
             throw new IllegalArgumentException("Not correct old password value!");
@@ -280,11 +277,26 @@ public class ParticipantService {
         if (passwordEncoder.matches(dto.getNewPassword(), participant.getPassword())) {
             throw new IllegalArgumentException("New and old password can not be the same!");
         }
-        participant.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-        repository.save(participant);
+        changePassword(participant.getId(), dto.getNewPassword(), dto.getConfirmNewPassword());
     }
 
-    private boolean isAdmin(Collection<Role> roles) {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void changePassword(
+            Long participantId,
+            String newPassword,
+            String confirmNewPassword
+    ) {
+        if (StringUtils.isEmpty(newPassword)
+                || StringUtils.isEmpty(confirmNewPassword)) {
+            throw new IllegalArgumentException("New passwords can not be null or empty!");
+        }
+        if (!newPassword.equals(confirmNewPassword)) {
+            throw new IllegalArgumentException("New password and confirm password are not the same!");
+        }
+        repository.updatePassword(participantId, passwordEncoder.encode(newPassword));
+    }
+
+    public boolean isAdmin(Collection<Role> roles) {
         if (CollectionUtils.isEmpty(roles)) {
             return false;
         }

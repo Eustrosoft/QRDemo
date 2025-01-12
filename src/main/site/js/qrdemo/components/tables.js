@@ -1,4 +1,4 @@
-import { notNullOrUndefined } from "../../commons/common.js"
+import { notEmptyOrUndefined, notNullOrUndefined } from "../../commons/common.js"
 
 export function getTable(headItems, items, itemRowClass = null, id = '', tableClass = null, isItemsDoms = false) {
     let table = document.createElement('table')
@@ -9,14 +9,16 @@ export function getTable(headItems, items, itemRowClass = null, id = '', tableCl
         table.className = tableClass
     }
 
-    let tr = document.createElement('tr')
-    for (let hi in headItems) {
-        let th = document.createElement('th')
-        th.innerHTML = headItems[hi].name
-        th.style = `width: ${headItems[hi].width}`
-        tr.appendChild(th)
+    if (notEmptyOrUndefined(headItems) && headItems.length !== 0) {
+        let tr = document.createElement('tr')
+        for (let hi in headItems) {
+            let th = document.createElement('th')
+            th.innerHTML = headItems[hi].name
+            th.style = `width: ${headItems[hi].width}`
+            tr.appendChild(th)
+        }
+        table.appendChild(tr)
     }
-    table.appendChild(tr)
 
     for (let item in items) {
         let tr = document.createElement('tr')

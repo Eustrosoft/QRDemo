@@ -7,6 +7,7 @@ import org.eustrosoft.dtos.QRRangeDto;
 import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.RoleDto;
 import org.eustrosoft.dtos.admin.ParticipantBlockDto;
+import org.eustrosoft.dtos.admin.ParticipantChangePasswordDto;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.mappers.ParticipantMapper;
@@ -64,6 +65,11 @@ public class AdminController {
     @PostMapping("/participants")
     public Participant addParticipant(@RequestBody RegistrationDto registrationDto) {
         return adminService.addParticipant(participantMapper.fromRegistrationDto(registrationDto));
+    }
+
+    @PutMapping("/participants/{id}/change-password")
+    public void addParticipant(@PathVariable("id") Long id, @RequestBody ParticipantChangePasswordDto dto) {
+        adminService.changeParticipantPassword(id, dto);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

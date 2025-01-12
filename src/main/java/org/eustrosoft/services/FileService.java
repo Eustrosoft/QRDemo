@@ -101,10 +101,10 @@ public class FileService {
     private ResponseEntity<byte[]> getFileResponse(Long id, FileProjection file) {
         byte[] fileData = repository.findById(id, FileBytesProjection.class).get().getFileData();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", file.getFileType());
-        headers.add("Content-Length", file.getFileSize().toString());
+        headers.add(HttpHeaders.CONTENT_TYPE, file.getFileType());
+        headers.add(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
         headers.add(
-                "Content-Disposition",
+                HttpHeaders.CONTENT_DISPOSITION,
                 String.format(
                         "inline; filename*=UTF-8''%s",
                         URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())

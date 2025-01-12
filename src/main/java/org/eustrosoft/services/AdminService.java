@@ -2,6 +2,7 @@ package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.dtos.admin.ParticipantBlockDto;
+import org.eustrosoft.dtos.admin.ParticipantChangePasswordDto;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QR;
 import org.eustrosoft.entitites.QRRange;
@@ -9,6 +10,7 @@ import org.eustrosoft.entitites.Role;
 import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
 import org.eustrosoft.repositories.projections.ParticipantAdminSimpleProjection;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -69,5 +71,15 @@ public class AdminService {
 
     public void unblockParticipant(Long id) throws Exception {
         participantService.unblockParticipant(id);
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void changeParticipantPassword(Long id, ParticipantChangePasswordDto dto) {
+        ParticipantAdminProjection participant = findById(id);
+        if (!participantService.isAdmin(participant.getRoles())) {
+            participantService.changePassword(id, dto.getPassword(), dto.getConfirmPassword());
+        } else {
+            throw new IllegalArgumentException("You can not change password for admin");
+        }
     }
 }

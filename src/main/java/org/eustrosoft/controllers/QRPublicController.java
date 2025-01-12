@@ -2,6 +2,7 @@ package org.eustrosoft.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.services.QRService;

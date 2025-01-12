@@ -1,6 +1,7 @@
 package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
+import org.eustrosoft.configurations.QRRangeConfig;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.repositories.QRRangeRepository;
@@ -14,14 +15,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.eustrosoft.Constants.CODES_FOR_RANGE;
-import static org.eustrosoft.Constants.RANGE_END;
-import static org.eustrosoft.Constants.RANGE_START;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class QRRangeService {
+    private final QRRangeConfig qrRangeConfig;
     private final QRRangeRepository repository;
     private final ParticipantService participantService;
 
@@ -55,12 +53,12 @@ public class QRRangeService {
         QRRange foundRange = null;
         for (QRRange qrRange : freeRanges) {
             long codesSize = qrRange.getTo() - qrRange.getFrom();
-            if (codesSize < CODES_FOR_RANGE) {
+            if (codesSize < qrRangeConfig.getCodesForRange()) {
                 continue;
             } else {
                 foundRange = new QRRange();
                 foundRange.setFrom(qrRange.getFrom());
-                foundRange.setTo(qrRange.getFrom() + CODES_FOR_RANGE);
+                foundRange.setTo(qrRange.getFrom() + qrRangeConfig.getCodesForRange());
             }
         }
         if (foundRange == null) {
@@ -72,7 +70,7 @@ public class QRRangeService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public QRRange create(QRRange qrRange) {
         long codes = qrRange.getTo() - qrRange.getFrom();
-        if (codes != CODES_FOR_RANGE) {
+        if (codes != qrRangeConfig.getCodesForRange()) {
             throw new IllegalArgumentException("Not 16 codes for range");
         }
         List<QRRange> existed = findAll();
@@ -100,7 +98,7 @@ public class QRRangeService {
         }
         List<QRRange> unusedRanges = new ArrayList<>();
         long unused = 0L;
-        for (long i = RANGE_START; i <= RANGE_END; i++) {
+        for (long i = qrRangeConfig.getRangeStart(); i <= qrRangeConfig.getRangeEnd(); i++) {
             if (!usedQrs.contains(i)) {
                 unused++;
             } else {
@@ -112,7 +110,7 @@ public class QRRangeService {
                 }
                 unused = 0L;
             }
-            if (unused != 0L && i == RANGE_END) {
+            if (unused != 0L && i == qrRangeConfig.getRangeEnd()) {
                 QRRange unusedRange = new QRRange();
                 unusedRange.setFrom(i - unused + 1);
                 unusedRange.setTo(i);
@@ -128,7 +126,7 @@ public class QRRangeService {
         if (from == null || to == null) {
             return false;
         }
-        if (from < RANGE_START || to > RANGE_END) {
+        if (from < qrRangeConfig.getRangeStart() || to > qrRangeConfig.getRangeEnd()) {
             return false;
         }
         if (ranges == null || ranges.isEmpty()) {

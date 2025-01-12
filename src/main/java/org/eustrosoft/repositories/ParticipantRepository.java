@@ -17,6 +17,10 @@ public interface ParticipantRepository extends CrudRepository<Participant, Long>
     @Query(value = "update participant set settings = ?2 where id = ?1", nativeQuery = true)
     Integer updateSettings(Long id, String settings);
 
+    @Modifying
+    @Query(value = "update participant set password = ?2 where id = ?1", nativeQuery = true)
+    Integer updatePassword(Long id, String password);
+
     @EntityGraph(attributePaths = { "roles" })
     <T> Optional<T> findById(Long id, Class<T> type);
 

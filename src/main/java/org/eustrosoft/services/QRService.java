@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.eustrosoft.configurations.QRRangeConfig;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.entitites.Form;
@@ -43,8 +44,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.eustrosoft.Constants.EMPTY_JSON;
-import static org.eustrosoft.Constants.RANGE_END;
-import static org.eustrosoft.Constants.RANGE_START;
 import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
 
@@ -52,6 +51,7 @@ import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
 @RequiredArgsConstructor
 @Transactional
 public class QRService {
+    private final QRRangeConfig qrRangeConfig;
     private final QRRepository qrRepository;
     private final ParticipantService participantService;
     private final SecurityComponent securityComponent;
@@ -142,7 +142,7 @@ public class QRService {
             checkUsedQr(current.getRanges(), current.getQrs(), qr.getCode());
         }
         Long code = qr.getCode();
-        if (code < RANGE_START || code > RANGE_END) {
+        if (code < qrRangeConfig.getRangeStart() || code > qrRangeConfig.getRangeEnd()) {
             throw new IllegalArgumentException("Code has illegal character");
         }
         qr.setParticipantId(current.getId());
