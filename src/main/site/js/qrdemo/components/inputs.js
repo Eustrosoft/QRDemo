@@ -11,7 +11,7 @@ export function getSingleInput(type, required = false, id = '', placeholder = ''
     return htmlInput
 }
 
-export function getInput(labelText, type, required = false, id = '', placeholder = '', inline = false) {
+export function getInput(labelText, type, required = false, id = '', placeholder = '', inline = false, autocomplete) {
     let htmlInputDiv = document.createElement('div');
     if (inline) {
         htmlInputDiv.style.display = 'flex'
@@ -30,6 +30,9 @@ export function getInput(labelText, type, required = false, id = '', placeholder
     htmlInput.placeholder = placeholder
     htmlInput.required = required
     htmlInput.id = id
+    if (notEmptyOrUndefined(autocomplete)) {
+        htmlInput.autocomplete = autocomplete
+    }
 
     htmlInputDiv.appendChild(htmlInput)
 

@@ -2,7 +2,7 @@ import { emptyOrUndefined, getQRImage, hasAdminRole, isUpperCase, longToHex, pro
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
-import { getModalWindow } from "./components/modals.js";
+import { getModalWindow, showGenerateRandomPasswordModal } from "./components/modals.js";
 import { getInput, getSelect, getSingleInput, getSwitch } from "./components/inputs.js";
 import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
 import { notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
@@ -158,8 +158,8 @@ function setSettings(div, settingsJson, userDetails) {
         innerDiv.className = 'modal-content-inner'
 
         const oldPassword = getInput('Старый пароль', 'password', true, 'old_password', 'Введите старый пароль...')
-        const passw1 = getInput('Новый пароль', 'password', true, 'new_password_1', 'Введите пароль...')
-        const passw2 = getInput('Повтор нового пароля', 'password', true, 'new_password_2', 'Повторите новый пароль...')
+        const passw1 = getInput('Новый пароль', 'password', true, 'new_password_1', 'Введите пароль...', false, 'new-password')
+        const passw2 = getInput('Повтор нового пароля', 'password', true, 'new_password_2', 'Повторите новый пароль...', false, 'new-password')
         const saveBtn = getBigButton('Обновить пароль')
 
         saveBtn.addEventListener('click', () => {
@@ -178,7 +178,10 @@ function setSettings(div, settingsJson, userDetails) {
                 }).catch(ex => alert(ex))
         })
 
-        innerDiv.append(oldPassword, passw1, passw2, saveBtn)
+        let passGenerateBtn = getBigButton('Сгенерировать пароль')
+        passGenerateBtn.addEventListener('click', () => showGenerateRandomPasswordModal())
+
+        innerDiv.append(oldPassword, passw1, passw2, saveBtn, passGenerateBtn)
 
         const modal = getModalWindow('Изменение пароля', innerDiv);
         modal.style.display = 'block'
@@ -507,10 +510,10 @@ function setupAdminPanel(div) {
         let innerDiv = document.createElement('div')
         innerDiv.className = 'modal-content-inner'
 
-        const username = getInput('Имя пользователя', 'text', true, 'create_participant_username', 'Введите имя пользователя...')
-        const passw1 = getInput('Пароль', 'password', true, 'create_participant_password_1', 'Введите пароль...')
-        const passw2 = getInput('Повтор пароля', 'password', true, 'create_participant_password_2', 'Повторите пароль...')
-        const email = getInput('Емейл', 'email', true, 'create_participant_email', 'Введите электронную почту...')
+        const username = getInput('Имя пользователя', 'text', true, 'create_participant_username', 'Введите имя пользователя...', false, 'off')
+        const passw1 = getInput('Пароль', 'password', true, 'create_participant_password_1', 'Введите пароль...', false, 'new-password')
+        const passw2 = getInput('Повтор пароля', 'password', true, 'create_participant_password_2', 'Повторите пароль...', false, 'new-password')
+        const email = getInput('Почта', 'email', true, 'create_participant_email', 'Введите электронную почту...')
         let swtch = getSelect('Роль', 'role', ['ROLE_USER', 'ROLE_ADMIN'], 'ROLE_USER')
         const saveBtn = getBigButton('Создать пользователя')
         saveBtn.style = 'margin-top: 8px;'
@@ -536,12 +539,15 @@ function setupAdminPanel(div) {
                 }).catch(ex => alert(ex))
         })
 
+        let passGenerateBtn = getBigButton('Сгенерировать пароль')
+        passGenerateBtn.addEventListener('click', () => showGenerateRandomPasswordModal())
+
         dictionaryApi().getDictionariesByCode(DICTIONARIES.ROLES)
             .then(resp => resp.json())
             .then(json => {
                 roles = json
                 swtch = getSelect('Роль', 'role', roles.map((role => role.name)), USER_ROLES.USER)
-                innerDiv.append(username, passw1, passw2, email, swtch, saveBtn)
+                innerDiv.append(username, passw1, passw2, email, swtch, saveBtn, passGenerateBtn)
                 const modal = getModalWindow('Создание нового пользователя', innerDiv);
                 modal.style.display = 'block'
             })
@@ -566,10 +572,12 @@ function setUserPanel(parenDiv, participantId) {
             let email = get2TextLabels('Email участника: ', json?.email)
             let blocked = get2TextLabels('Заблокирован:', json?.banned ? ' Да' : ' Нет')
             let changePasswordBtn = getBigButton('Изменить пароль', 'change_participant_password')
-            let blockingBtn
+            let participantActionsDiv = document.createElement('div')
+            participantActionsDiv.appendChild(changePasswordBtn)
             if (json.banned !== undefined) {
                 let btnText = json.banned ? 'Разблокировать' : 'Заблокировать'
-                blockingBtn = getBigButton(btnText, 'block_user_btn')
+                let blockingBtn = getBigButton(btnText, 'block_user_btn')
+                participantActionsDiv.appendChild(blockingBtn)
 
                 if (json.banned) {
                     blockingBtn.addEventListener('click', () => {
@@ -631,14 +639,19 @@ function setUserPanel(parenDiv, participantId) {
                 let blockContent = document.createElement('div')
                 let passwordLabel = getTextLabel('Пароль')
                 let passwordInput = getSingleInput('password', false, 'password')
+                passwordInput.autocomplete = 'new-password'
                 let confirmPasswordLabel = getTextLabel('Повтор пароля')
                 let confirmPasswordInput = getSingleInput('password', false, 'confirm_password')
+                confirmPasswordInput.autocomplete = 'new-password'
                 let changePasswordBtn = getBigButton('Подтвердить')
                 blockContent.appendChild(passwordLabel)
                 blockContent.appendChild(passwordInput)
                 blockContent.appendChild(confirmPasswordLabel)
                 blockContent.appendChild(confirmPasswordInput)
                 blockContent.appendChild(changePasswordBtn)
+                let passGenerateBtn = getBigButton('Сгенерировать пароль')
+                passGenerateBtn.addEventListener('click', () => showGenerateRandomPasswordModal())
+                blockContent.appendChild(passGenerateBtn)
 
                 let modal = getModalWindow('Смена пароля пользователю', blockContent)
                 modal.style.display = 'block'
@@ -707,13 +720,10 @@ function setUserPanel(parenDiv, participantId) {
             parenDiv.appendChild(username)
             parenDiv.appendChild(email)
             parenDiv.appendChild(blocked)
-            if (blockingBtn) {
-                parenDiv.appendChild(blockingBtn)
-            }
+            parenDiv.appendChild(participantActionsDiv)
             if (json?.banned) {
                 parenDiv.append(get2TextLabels('Причина блокировки: ', json?.bannedReason))
             }
-            parenDiv.appendChild(changePasswordBtn)
             parenDiv.appendChild(document.createElement('br'))
 
             parenDiv.appendChild(rangesLabel)

@@ -17,8 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -107,7 +107,7 @@ public class FileService {
                 HttpHeaders.CONTENT_DISPOSITION,
                 String.format(
                         "inline; filename*=UTF-8''%s",
-                        URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
+                        UriUtils.encodePath(file.getFileName(), StandardCharsets.UTF_8.name())
                 )
         );
         return new ResponseEntity<>(

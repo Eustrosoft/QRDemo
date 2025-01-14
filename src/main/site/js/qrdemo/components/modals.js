@@ -1,6 +1,9 @@
+import { copyToClipboard, generateRandomPassword, notEmptyOrUndefined } from "../../commons/common.js"
 import { qrApi } from "../api.js"
 import { APP_VERSION } from "../version.js"
+import { getCustomButton } from "./buttons.js"
 import { getHr } from "./hrs.js"
+import { getInput } from "./inputs.js"
 import { getTextLabel } from "./labels.js"
 import { getParagraph, getSpan } from "./texts.js"
 
@@ -49,6 +52,40 @@ function getModalHeader(modal, headerName) {
     return modalContentHeader
 }
 
+export function showGenerateRandomPasswordModal() {
+    let generatePasswordBlock = document.createElement('div')
+    let randomPasswordInput = getInput('Пароль', 'text', false, 'random_password_input')
+    let randomPasswordGenerateBtn = getCustomButton('Сгенерировать')
+    let copyToBufferBtn = getCustomButton('Скопировать')
+    generatePasswordBlock.append(randomPasswordInput, copyToBufferBtn, randomPasswordGenerateBtn)
+
+    randomPasswordGenerateBtn.addEventListener('click', async () => {
+        const randomPassword = generateRandomPassword()
+        let input = document.getElementById('random_password_input')
+        if (input) {
+            input.value = randomPassword
+        }
+
+    })
+    copyToBufferBtn.addEventListener('click', () => {
+        let input = document.getElementById('random_password_input')
+        if (input) {
+            if (notEmptyOrUndefined(input.value)) {
+                copyToClipboard(input.value)
+                copyToBufferBtn.classList.add('green_pulse')
+                setTimeout(() => {
+                    copyToBufferBtn.classList.remove('green_pulse')
+                }, 1_000)
+                return
+            }
+            alert('Нечего копировать')
+        }
+    })
+
+    let modal = getModalWindow('Генерация случайного пароля', generatePasswordBlock)
+    modal.style.display = 'block'
+}
+
 export function showAboutModal() {
     let aboutBlock = document.createElement('div')
 
@@ -92,7 +129,7 @@ export function showContactModal() {
 
     let contactEmailParagraph = getParagraph(`По всем вопросам пишите на e-mail: `, 'fs-14rem fw-400 fs-italic margin-10')
     let emailSpan = getSpan('denis2211@yandex.ru', 'contact_address')
-    
+
     emailSpan.addEventListener('click', (e) => {
         window.open(`mailto:${e.target.innerText}`);
     })
@@ -101,7 +138,7 @@ export function showContactModal() {
 
     let contactPhoneParagraph = getParagraph(`Или звоните на номер: `, 'fs-14rem fw-400 fs-italic margin-10')
     let phoneSpan = getSpan('+7(916)666-24-90', 'contact_address')
-    
+
     phoneSpan.addEventListener('click', (e) => {
         window.open(`tel:${e.target.innerText}`);
     })

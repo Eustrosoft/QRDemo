@@ -77,6 +77,24 @@ export function getMeFromLS() {
     throw new Error('Has no user in LS')
 }
 
+export function generateRandomPassword() {
+    const allowedPasswordCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@$%^&*()?;'
+    const allowedPassChatLength = allowedPasswordCharacters.length
+
+    let pass = ''
+    for (let i = 0; i < 16; i++) {
+        var arr = new Uint8Array(1);
+        self.crypto.getRandomValues(arr)
+        let indx = arr[0] % allowedPassChatLength | 0
+        pass += allowedPasswordCharacters.charAt(indx)
+    }
+    return pass
+}
+
+export function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+}
+
 // Structures
 export const USER_ROLES = {
     ADMIN: "ROLE_ADMIN",
