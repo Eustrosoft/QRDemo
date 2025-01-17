@@ -14,6 +14,10 @@ public class RegistrationDto {
     private String password;
     private String confirmPassword;
     private String email;
+    private String lei;
+    private String organization;
+    private String address;
+    private String website;
     private List<RoleDto> roles;
 
     public RegistrationDto(String username, String password, String confirmPassword, String email) {

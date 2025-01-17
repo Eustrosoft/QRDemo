@@ -2,6 +2,7 @@ package org.eustrosoft.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.dtos.EntityDto;
+import org.eustrosoft.dtos.ParticipantChangeDto;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.dtos.QRRangeDto;
 import org.eustrosoft.dtos.RegistrationDto;
@@ -67,8 +68,19 @@ public class AdminController {
         return adminService.addParticipant(participantMapper.fromRegistrationDto(registrationDto));
     }
 
+    @PutMapping("/participants/{id}")
+    public void updateParticipant(
+            @PathVariable("id") Long id,
+            @RequestBody ParticipantChangeDto dto
+    ) {
+        adminService.updateParticipant(id, participantMapper.fromChangeDto(dto));
+    }
+
     @PutMapping("/participants/{id}/change-password")
-    public void addParticipant(@PathVariable("id") Long id, @RequestBody ParticipantChangePasswordDto dto) {
+    public void changeParticipantPassword(
+            @PathVariable("id") Long id,
+            @RequestBody ParticipantChangePasswordDto dto
+    ) {
         adminService.changeParticipantPassword(id, dto);
     }
 

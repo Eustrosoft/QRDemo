@@ -1,12 +1,14 @@
 package org.eustrosoft.mappers;
 
 import lombok.RequiredArgsConstructor;
+import org.eustrosoft.dtos.ParticipantChangeDto;
 import org.eustrosoft.dtos.ParticipantDto;
 import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.SettingsDto;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.Role;
 import org.eustrosoft.entitites.enums.Roles;
+import org.eustrosoft.entitites.subentities.ParticipantData;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -24,6 +26,10 @@ public class ParticipantMapper extends EntityMapper {
         ParticipantDto dto = super.toDto(entity, ParticipantDto.class);
         dto.setUsername(entity.getUsername());
         dto.setEmail(entity.getEmail());
+        dto.setLei(entity.getLei());
+        dto.setOrganization(entity.getOrganization());
+        dto.setAddress(entity.getAddress());
+        dto.setWebsite(entity.getWebsite());
         dto.setRoles(
                 entity.getRoles().stream()
                         .map(roleMapper::toDto)
@@ -41,9 +47,29 @@ public class ParticipantMapper extends EntityMapper {
         participant.setUsername(registrationDto.getUsername());
         participant.setPassword(registrationDto.getPassword());
         participant.setEmail(registrationDto.getEmail());
+        participant.setLei(registrationDto.getLei());
+        participant.setOrganization(registrationDto.getOrganization());
+        participant.setAddress(registrationDto.getAddress());
+        participant.setWebsite(registrationDto.getWebsite());
         participant.setRoles(getRolesFromRegistrationDto(registrationDto));
         participant.setActive(true);
         participant.setBanned(false);
+        return participant;
+    }
+
+    public Participant fromChangeDto(ParticipantChangeDto dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        Participant participant = new Participant();
+        participant.setUsername(dto.getUsername());
+        participant.setEmail(dto.getEmail());
+        participant.setLei(dto.getLei());
+        participant.setOrganization(dto.getOrganization());
+        participant.setAddress(dto.getAddress());
+        participant.setWebsite(dto.getWebsite());
+        participant.setRoles(getRolesFromParticipantDto(dto));
         return participant;
     }
 
@@ -58,6 +84,10 @@ public class ParticipantMapper extends EntityMapper {
         participantDto.setEmail(participant.getEmail());
         participantDto.setCreated(participant.getCreated());
         participantDto.setUpdated(participant.getUpdated());
+        participantDto.setLei(participant.getLei());
+        participantDto.setOrganization(participant.getOrganization());
+        participantDto.setAddress(participant.getAddress());
+        participantDto.setWebsite(participant.getWebsite());
         participantDto.setRoles(roleMapper.toListDto(participant.getRoles()));
         if (hasNoAdminRoles(participant.getRoles())) {
             participantDto.setRanges(qrRangeMapper.toDtoList(participant.getRanges()));
@@ -82,11 +112,45 @@ public class ParticipantMapper extends EntityMapper {
         return dto;
     }
 
+    public ParticipantData participantToParticipantData(Participant participant) {
+        ParticipantData pd = new ParticipantData();
+        pd.setId(participant.getId());
+        pd.setOrganization(participant.getOrganization());
+        pd.setLei(participant.getLei());
+        pd.setAddress(participant.getAddress());
+        pd.setWebsite(participant.getWebsite());
+        pd.setUsername(participant.getUsername());
+        pd.setEmail(participant.getEmail());
+        return pd;
+    }
+
+    public Participant participantDataToParticipant(ParticipantData participantData) {
+        Participant participant = new Participant();
+        participant.setId(participantData.getId());
+        participant.setOrganization(participantData.getOrganization());
+        participant.setLei(participantData.getLei());
+        participant.setAddress(participantData.getAddress());
+        participant.setWebsite(participantData.getWebsite());
+        participant.setUsername(participantData.getUsername());
+        participant.setEmail(participantData.getEmail());
+        participant.setCreated(participantData.getCreated());
+        participant.setUpdated(participantData.getUpdated());
+        participant.setParticipantId(participantData.getParticipantId());
+        return participant;
+    }
+
     private List<Role> getRolesFromRegistrationDto(RegistrationDto registrationDto) {
         if (registrationDto == null || CollectionUtils.isEmpty(registrationDto.getRoles())) {
             return Collections.emptyList();
         }
         return roleMapper.toListModels(registrationDto.getRoles());
+    }
+
+    private List<Role> getRolesFromParticipantDto(ParticipantDto dto) {
+        if (dto == null || CollectionUtils.isEmpty(dto.getRoles())) {
+            return Collections.emptyList();
+        }
+        return roleMapper.toListModels(dto.getRoles());
     }
 
     private boolean hasNoAdminRoles(List<Role> roles) {

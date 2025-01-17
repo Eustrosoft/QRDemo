@@ -379,6 +379,18 @@ export function adminApi() {
                 }
             )
             return authFetch(req)
+        },
+        updateParticipant: (id, participantData) => {
+            const req = new Request(
+                `${QR_DEMO_API}admin/panel/participants/${id}`,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify(participantData)
+                }
+            )
+            return authFetch(req)
         }
     }
 }

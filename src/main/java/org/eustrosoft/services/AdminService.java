@@ -1,6 +1,7 @@
 package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
+import org.eustrosoft.dtos.ParticipantChangeDto;
 import org.eustrosoft.dtos.admin.ParticipantBlockDto;
 import org.eustrosoft.dtos.admin.ParticipantChangePasswordDto;
 import org.eustrosoft.entitites.Participant;
@@ -80,6 +81,17 @@ public class AdminService {
             participantService.changePassword(id, dto.getPassword(), dto.getConfirmPassword());
         } else {
             throw new IllegalArgumentException("You can not change password for admin");
+        }
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updateParticipant(Long id, Participant participant) {
+        ParticipantAdminProjection pap = findById(id);
+        if (!participantService.isAdmin(pap.getRoles())) {
+            participant.setId(id);
+            participantService.update(participant);
+        } else {
+            throw new IllegalArgumentException("You can not change data for admin");
         }
     }
 }

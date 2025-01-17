@@ -514,6 +514,10 @@ function setupAdminPanel(div) {
         const passw1 = getInput('Пароль', 'password', true, 'create_participant_password_1', 'Введите пароль...', false, 'new-password')
         const passw2 = getInput('Повтор пароля', 'password', true, 'create_participant_password_2', 'Повторите пароль...', false, 'new-password')
         const email = getInput('Почта', 'email', true, 'create_participant_email', 'Введите электронную почту...')
+        const lei = getInput('LEI', 'text', false, 'create_participant_lei', 'LEI...')
+        const address = getInput('Адрес', 'text', false, 'create_participant_address', 'Введите адрес...')
+        const organization = getInput('Организация', 'text', false, 'create_participant_organization', 'Введите организацию...')
+        const website = getInput('Вебсайт', 'url', false, 'create_participant_website', 'Введите вебсайт...')
         let swtch = getSelect('Роль', 'role', ['ROLE_USER', 'ROLE_ADMIN'], 'ROLE_USER')
         const saveBtn = getBigButton('Создать пользователя')
         saveBtn.style = 'margin-top: 8px;'
@@ -528,6 +532,10 @@ function setupAdminPanel(div) {
                         password: document.getElementById('create_participant_password_1').value,
                         confirmPassword: document.getElementById('create_participant_password_2').value,
                         email: document.getElementById('create_participant_email').value,
+                        lei: document.getElementById('create_participant_lei').value,
+                        address: document.getElementById('create_participant_address').value,
+                        organization: document.getElementById('create_participant_organization').value,
+                        website: document.getElementById('create_participant_website').value,
                         roles: [roles.find(x => x.name === document.getElementById('role').value)]
                     }
                 ).then(resp => {
@@ -547,7 +555,7 @@ function setupAdminPanel(div) {
             .then(json => {
                 roles = json
                 swtch = getSelect('Роль', 'role', roles.map((role => role.name)), USER_ROLES.USER)
-                innerDiv.append(username, passw1, passw2, email, swtch, saveBtn, passGenerateBtn)
+                innerDiv.append(username, passw1, passw2, email, lei, address, organization, website, swtch, saveBtn, passGenerateBtn)
                 const modal = getModalWindow('Создание нового пользователя', innerDiv);
                 modal.style.display = 'block'
             })
@@ -568,11 +576,17 @@ function setUserPanel(parenDiv, participantId) {
     adminApi().getParticipant(participantId)
         .then(resp => resp.json())
         .then(json => {
-            let username = get2TextLabels('Имя участника: ', json?.username)
-            let email = get2TextLabels('Email участника: ', json?.email)
+            let username = get2TextLabels('Имя: ', json?.username)
+            let email = get2TextLabels('Email: ', json?.email)
+            let lei = get2TextLabels('LEI: ', json?.lei)
+            let address = get2TextLabels('Адрес: ', json?.address)
+            let website = get2TextLabels('Вебсайт: ', json?.website)
+            let organization = get2TextLabels('Организация: ', json?.organization)
             let blocked = get2TextLabels('Заблокирован:', json?.banned ? ' Да' : ' Нет')
             let changePasswordBtn = getBigButton('Изменить пароль', 'change_participant_password')
+            let changeParticipantData = getBigButton('Изменить данные пользователя', 'change_participant_data')
             let participantActionsDiv = document.createElement('div')
+            participantActionsDiv.appendChild(changeParticipantData)
             participantActionsDiv.appendChild(changePasswordBtn)
             if (json.banned !== undefined) {
                 let btnText = json.banned ? 'Разблокировать' : 'Заблокировать'
@@ -677,6 +691,55 @@ function setUserPanel(parenDiv, participantId) {
                     }
                 })
             })
+            changeParticipantData.addEventListener('click', () => {
+                let blockContent = document.createElement('div')
+                const usernameInp = getInput('Имя пользователя', 'text', true, 'change_participant_username', 'Введите имя пользователя...', false, 'off', json?.username)
+                const emailInp = getInput('Почта', 'email', true, 'change_participant_email', 'Введите электронную почту...', false, 'off', json?.email)
+                const leiInp = getInput('LEI', 'text', false, 'change_participant_lei', 'LEI...', false, 'off', json?.lei)
+                const addressInp = getInput('Адрес', 'text', false, 'change_participant_address', 'Введите адрес...', false, 'off', json?.address)
+                const organizationInp = getInput('Организация', 'text', false, 'change_participant_organization', 'Введите организацию...', false, 'off', json?.organization)
+                const websiteInp = getInput('Вебсайт', 'url', false, 'change_participant_website', 'Введите вебсайт...', false, 'off', json?.website)
+                const changeDataBtn = getBigButton('Подтвердить')
+                blockContent.appendChild(usernameInp)
+                blockContent.appendChild(emailInp)
+                blockContent.appendChild(leiInp)
+                blockContent.appendChild(addressInp)
+                blockContent.appendChild(organizationInp)
+                blockContent.appendChild(websiteInp)
+                blockContent.appendChild(changeDataBtn)
+
+                let modal = getModalWindow('Смена данных пользователя', blockContent)
+                modal.style.display = 'block'
+
+                changeDataBtn.addEventListener('click', () => {
+                    const cf = confirm('Сменить данные пользователя?')
+                    if (cf) {
+                        adminApi().updateParticipant(
+                            json?.id,
+                            {
+                                username: document.getElementById('change_participant_username').value,
+                                email: document.getElementById('change_participant_email').value,
+                                lei: document.getElementById('change_participant_lei').value,
+                                address: document.getElementById('change_participant_address').value,
+                                organization: document.getElementById('change_participant_organization').value,
+                                website: document.getElementById('change_participant_website').value
+                            }
+                        ).then(resp => {
+                            if (resp.ok) {
+                                alert('Данные изменены')
+                                setUserPanel(parenDiv, participantId)
+                                modal.remove()
+                                return
+                            }
+                            return resp?.json()
+                        }).then(json => {
+                            if (json) {
+                                alert(JSON.stringify(json))
+                            }
+                        })
+                    }
+                })
+            })
 
             let rangesLabel = getTextLabel('Диапазоны: ')
             let rangesHeader = [
@@ -720,6 +783,10 @@ function setUserPanel(parenDiv, participantId) {
             parenDiv.appendChild(username)
             parenDiv.appendChild(email)
             parenDiv.appendChild(blocked)
+            parenDiv.appendChild(lei)
+            parenDiv.appendChild(address)
+            parenDiv.appendChild(organization)
+            parenDiv.appendChild(website)
             parenDiv.appendChild(participantActionsDiv)
             if (json?.banned) {
                 parenDiv.append(get2TextLabels('Причина блокировки: ', json?.bannedReason))
@@ -759,13 +826,15 @@ function setUsersPanel(parenDiv) {
     let th2 = document.createElement('th')
     th2.innerHTML = 'Почта'
     let th3 = document.createElement('th')
-    th3.innerHTML = 'Создан'
+    th3.innerHTML = 'Организация'
     let th4 = document.createElement('th')
     th4.innerHTML = 'Роли'
     let th5 = document.createElement('th')
-    th5.innerHTML = 'Диапазоны'
+    th5.innerHTML = 'Создан'
+    let th6 = document.createElement('th')
+    th6.innerHTML = 'Диапазоны'
 
-    tableHeader.append(td1, th2, th3, th4, th5)
+    tableHeader.append(td1, th2, th3, th4, th5, th6)
     participantsTable.append(tableHeader)
 
     adminApi().getParticipants()
@@ -785,10 +854,11 @@ function setUsersPanel(parenDiv) {
 }
 
 function getParticipantTr(participantJson, parentDiv) {
-    const username = participantJson?.username;
-    const email = participantJson?.email;
-    const roles = participantJson?.roles;
-    const ranges = participantJson?.ranges;
+    const username = participantJson?.username
+    const email = participantJson?.email
+    const organization = participantJson?.organization
+    const roles = participantJson?.roles
+    const ranges = participantJson?.ranges
     const created = participantJson?.created
 
     let tr = document.createElement('tr')
@@ -798,11 +868,13 @@ function getParticipantTr(participantJson, parentDiv) {
     let td2 = document.createElement('td')
     td2.innerHTML = email
     let td3 = document.createElement('td')
-    td3.innerHTML = new Date(created).toLocaleString()
+    td3.innerHTML = organization
     let td4 = document.createElement('td')
     td4.innerHTML = roles?.map(getRoleName)
     let td5 = document.createElement('td')
-    td5.innerHTML = ranges?.map(getRangeList).join(', ')
+    td5.innerHTML = new Date(created).toLocaleString()
+    let td6 = document.createElement('td')
+    td6.innerHTML = ranges?.map(getRangeList).join(', ')
 
     tr.style = 'cursor: pointer;'
     tr.className = 'hoverable'
@@ -810,15 +882,15 @@ function getParticipantTr(participantJson, parentDiv) {
         setUserPanel(parentDiv, participantJson?.id)
     })
 
-    tr.append(td1, td2, td3, td4, td5)
+    tr.append(td1, td2, td3, td4, td5, td6)
 
-    return tr;
+    return tr
 }
 
 function getRoleName(role) {
-    return [role.name].join(", ");
+    return [role.name].join(", ")
 }
 
 function getRangeList(range) {
-    return [Number(range?.from)?.toString(16), Number(range?.to)?.toString(16)].join(" - ");
+    return [Number(range?.from)?.toString(16), Number(range?.to)?.toString(16)].join(" - ")
 }

@@ -11,7 +11,7 @@ export function getSingleInput(type, required = false, id = '', placeholder = ''
     return htmlInput
 }
 
-export function getInput(labelText, type, required = false, id = '', placeholder = '', inline = false, autocomplete) {
+export function getInput(labelText, type, required = false, id = '', placeholder = '', inline = false, autocomplete = 'on', value = '') {
     let htmlInputDiv = document.createElement('div');
     if (inline) {
         htmlInputDiv.style.display = 'flex'
@@ -19,7 +19,8 @@ export function getInput(labelText, type, required = false, id = '', placeholder
 
     if (notEmptyOrUndefined(labelText)) {
         let htmlLabel = document.createElement('label');
-        htmlLabel.innerHTML = labelText
+        let requiredStar = required ? ' *' : ''
+        htmlLabel.innerHTML = labelText + requiredStar
         htmlInputDiv.appendChild(htmlLabel)
         if (!inline) {
             htmlInputDiv.appendChild(document.createElement('br'))
@@ -30,6 +31,9 @@ export function getInput(labelText, type, required = false, id = '', placeholder
     htmlInput.placeholder = placeholder
     htmlInput.required = required
     htmlInput.id = id
+    if (notEmptyOrUndefined(value)) {
+        htmlInput.value = value
+    }
     if (notEmptyOrUndefined(autocomplete)) {
         htmlInput.autocomplete = autocomplete
     }

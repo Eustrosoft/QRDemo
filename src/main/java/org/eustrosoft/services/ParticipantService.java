@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.Strings;
+import org.eustrosoft.dtos.ParticipantDto;
 import org.eustrosoft.dtos.PasswordChangeDto;
 import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.SettingsChangeDto;
@@ -13,10 +13,13 @@ import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.entitites.Role;
 import org.eustrosoft.entitites.enums.Roles;
+import org.eustrosoft.entitites.subentities.ParticipantData;
+import org.eustrosoft.mappers.ParticipantMapper;
 import org.eustrosoft.repositories.ParticipantRepository;
 import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
 import org.eustrosoft.repositories.projections.ParticipantAdminSimpleProjection;
 import org.eustrosoft.repositories.projections.ParticipantSettingsProjection;
+import org.eustrosoft.repositories.sub.ParticipantDataRepository;
 import org.eustrosoft.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -38,7 +41,10 @@ import java.util.Optional;
 @Transactional
 public class ParticipantService {
     private final ParticipantRepository repository;
+    private final ParticipantDataRepository pdRepository;
     private final AuthorizationService authorizationService;
+    private final ParticipantValidationService participantValidationService;
+    private final ParticipantMapper mapper;
     @Lazy
     @Setter
     @Autowired
@@ -137,7 +143,7 @@ public class ParticipantService {
         if (resp != null) {
             throw new IllegalArgumentException("Invalid user credentials");
         }
-        validateParticipant(participant);
+        participantValidationService.validateParticipantCreation(participant);
         participant.setPassword(passwordEncoder.encode(participant.getPassword()));
         if (CollectionUtils.isEmpty(participant.getRoles())) {
             List<Role> roles = new ArrayList<>();
@@ -160,23 +166,24 @@ public class ParticipantService {
         return repository.save(participant);
     }
 
-    private void validateParticipant(Participant participant) {
-        if (Strings.isEmpty(participant.getUsername())
-                || Strings.isEmpty(participant.getEmail())
-                || Strings.isEmpty(participant.getPassword())) {
-            throw new IllegalArgumentException("Required parameters missing!");
-        }
-        if (repository.findByUsername(participant.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already in use!");
-        }
-        if (repository.findByEmail(participant.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already in use!");
-        }
-    }
-
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Participant update(Participant participant) {
-        return repository.save(participant);
+        ParticipantAdminProjection existed = getByIdAdminProjection(participant.getId());
+        if (participant.getId() == null) {
+            throw new IllegalArgumentException("Participant id is not provided");
+        }
+        if (StringUtils.isAnyBlank(participant.getUsername(), participant.getEmail())) {
+            throw new IllegalArgumentException("Username or Email can not be empty");
+        }
+        if (!participant.getUsername().equals(existed.getUsername())) {
+            participantValidationService.validateUsername(participant.getUsername());
+        }
+        if (!participant.getEmail().equals(existed.getEmail())) {
+            participantValidationService.validateEmail(participant.getEmail());
+        }
+        return mapper.participantDataToParticipant(
+                pdRepository.save(mapper.participantToParticipantData(participant))
+        );
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

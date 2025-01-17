@@ -13,6 +13,14 @@ public interface ParticipantAdminSimpleProjection extends EntityProjection {
 
     Boolean getActive();
 
+    String getLei();
+
+    String getAddress();
+
+    String getWebsite();
+    
+    String getOrganization();
+
     Boolean getBanned();
 
     Collection<Role> getRoles();
