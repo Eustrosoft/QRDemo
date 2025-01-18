@@ -724,6 +724,10 @@ tr.fileRow {
     }
 }
 
+tr.participantRow {
+    cursor: pointer;
+}
+
 .green_pulse {
     animation: pulse 1s linear;
 }

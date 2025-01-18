@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
-import org.eustrosoft.dtos.ParticipantDto;
 import org.eustrosoft.dtos.PasswordChangeDto;
 import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.SettingsChangeDto;
@@ -13,7 +12,6 @@ import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.entitites.Role;
 import org.eustrosoft.entitites.enums.Roles;
-import org.eustrosoft.entitites.subentities.ParticipantData;
 import org.eustrosoft.mappers.ParticipantMapper;
 import org.eustrosoft.repositories.ParticipantRepository;
 import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
@@ -61,7 +59,7 @@ public class ParticipantService {
     @Transactional(readOnly = true)
     public List<ParticipantAdminSimpleProjection> findAll() {
         return CommonUtils.iterableToList(
-                repository.findAllByCreatedBefore(
+                repository.findAllByCreatedBeforeOrderByCreatedDesc(
                         new Date(),
                         ParticipantAdminSimpleProjection.class
                 )

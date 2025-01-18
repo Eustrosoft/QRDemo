@@ -10,7 +10,7 @@ import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getHr } from "./components/hrs.js";
 import { Loader } from "./components/loader.js";
-import { getTable, TableHead } from "./components/tables.js";
+import { DOWNRAISING_INDEX, getComplexTable, getTable, TableHead } from "./components/tables.js";
 
 const mainBlock = document.getElementById('main_block')
 let divLk = document.createElement('div')
@@ -814,28 +814,18 @@ function setUserPanel(parenDiv, participantId) {
         .catch(ex => alert(ex))
 }
 
-function setUsersPanel(parenDiv) {
-    parenDiv.innerHTML = ''
+function setUsersPanel(parentDiv) {
+    parentDiv.innerHTML = ''
 
-    let participantsTable = document.createElement('table')
-    participantsTable.className = 'compact_table'
-
-    let tableHeader = document.createElement('tr')
-    let td1 = document.createElement('th')
-    td1.innerHTML = 'Имя пользователя'
-    let th2 = document.createElement('th')
-    th2.innerHTML = 'Почта'
-    let th3 = document.createElement('th')
-    th3.innerHTML = 'Организация'
-    let th4 = document.createElement('th')
-    th4.innerHTML = 'Роли'
-    let th5 = document.createElement('th')
-    th5.innerHTML = 'Создан'
-    let th6 = document.createElement('th')
-    th6.innerHTML = 'Диапазоны'
-
-    tableHeader.append(td1, th2, th3, th4, th5, th6)
-    participantsTable.append(tableHeader)
+    let headers = [
+        new TableHead('№', '3%', DOWNRAISING_INDEX),
+        new TableHead('Имя', '10%', 'username'),
+        new TableHead('Почта', '10%', 'email'),
+        new TableHead('Организация', '10%', 'organization'),
+        new TableHead('Роли', '10%', 'roles', getRolesCallback),
+        new TableHead('Создан', '10%', 'created', getDateCallback),
+        new TableHead('Диапазоны', '15%', 'ranges', getRangesCallback)
+    ]
 
     adminApi().getParticipants()
         .then(resp => {
@@ -844,47 +834,36 @@ function setUsersPanel(parenDiv) {
             return resp.json()
         })
         .then(json => {
-            for (let part in json) {
-                participantsTable.append(getParticipantTr(json[part], parenDiv))
-            }
+            let table = getComplexTable(
+                headers,
+                json,
+                'participantRow',
+                'participantsTable',
+                'compact_table',
+                'id',
+                (e) => {
+                    let pId = e.currentTarget.getAttribute('key')
+                    let selection = document.getSelection()
+                    if (selection.type !== "Range") {
+                        setUserPanel(parentDiv, pId)
+                    }
+                }
+            )
+            parentDiv.append(table)
         })
         .catch(ex => alert(ex))
-
-    parenDiv.append(participantsTable)
 }
 
-function getParticipantTr(participantJson, parentDiv) {
-    const username = participantJson?.username
-    const email = participantJson?.email
-    const organization = participantJson?.organization
-    const roles = participantJson?.roles
-    const ranges = participantJson?.ranges
-    const created = participantJson?.created
+function getRangesCallback(ranges) {
+    return ranges?.map(getRangeList).join(', ')
+}
 
-    let tr = document.createElement('tr')
+function getRolesCallback(roles) {
+    return roles?.map(getRoleName)
+}
 
-    let td1 = document.createElement('td')
-    td1.innerHTML = username
-    let td2 = document.createElement('td')
-    td2.innerHTML = email
-    let td3 = document.createElement('td')
-    td3.innerHTML = organization
-    let td4 = document.createElement('td')
-    td4.innerHTML = roles?.map(getRoleName)
-    let td5 = document.createElement('td')
-    td5.innerHTML = new Date(created).toLocaleString()
-    let td6 = document.createElement('td')
-    td6.innerHTML = ranges?.map(getRangeList).join(', ')
-
-    tr.style = 'cursor: pointer;'
-    tr.className = 'hoverable'
-    tr.addEventListener('click', () => {
-        setUserPanel(parentDiv, participantJson?.id)
-    })
-
-    tr.append(td1, td2, td3, td4, td5, td6)
-
-    return tr
+function getDateCallback(date) {
+    return new Date(date)?.toLocaleString()
 }
 
 function getRoleName(role) {

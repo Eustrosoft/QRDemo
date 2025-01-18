@@ -25,7 +25,7 @@ public interface ParticipantRepository extends CrudRepository<Participant, Long>
     <T> Optional<T> findById(Long id, Class<T> type);
 
     @EntityGraph(attributePaths = { "ranges" })
-    <T> Iterable<T> findAllByCreatedBefore(Date before, Class<T> type);
+    <T> Iterable<T> findAllByCreatedBeforeOrderByCreatedDesc(Date before, Class<T> type);
 
     @EntityGraph(attributePaths = { "roles" })
     Optional<Participant> findByUsername(String username);
