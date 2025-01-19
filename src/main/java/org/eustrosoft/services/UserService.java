@@ -1,6 +1,7 @@
 package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.eustrosoft.configurations.security.UserToken;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.repositories.ParticipantRepository;
@@ -53,9 +54,12 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Participant> getByToken() {
+    @Transactional(readOnly = true, noRollbackFor = {IllegalAccessException.class})
+    public Optional<Participant> getByToken() throws IllegalAccessException {
         String token = userToken.getToken();
+        if (token == null) {
+            throw new IllegalAccessException();
+        }
         Optional<Participant> participant = getByUsername(jwtTokenUtils.getUsername(token));
         if (participant.isPresent() && participant.get().getBanned()) {
             if (httpUtils != null) {
@@ -67,6 +71,7 @@ public class UserService implements UserDetailsService {
         return participant;
     }
 
+    @SneakyThrows
     @Transactional(readOnly = true)
     public String getUsername() {
         return jwtTokenUtils.getUsername(userToken.getToken());

@@ -22,7 +22,7 @@ public class UserController {
     private final ParticipantMapper participantMapper;
 
     @GetMapping("/secured/me")
-    public ParticipantDto getCurrentUser() {
+    public ParticipantDto getCurrentUser() throws IllegalAccessException {
         Participant user = userService.getByToken()
                 .orElse(null);
         return participantMapper.toDto(user);

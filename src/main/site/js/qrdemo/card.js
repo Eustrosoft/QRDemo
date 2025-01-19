@@ -265,9 +265,16 @@ function getViewCardInfoHtml(qr) {
     for (let index in fields) {
         const field = fields[index];
         let key = field?.name
-        let value = (data === null || data[field?.name] === '' || data[field?.name] === undefined)
-            ? field?.placeholder
-            : data[field?.name]
+        let isStaticField = field?.isStatic
+        let value
+        if (isStaticField) {
+            value = (data === null || data[field?.name] === '' || data[field?.name] === undefined)
+                ? field?.placeholder
+                : data[field?.name]
+        } else {
+            let dataVal = data?.[field?.name]
+            value = dataVal === undefined ? '' : dataVal
+        }
         fieldsItems.push({
             key: key,
             value: value

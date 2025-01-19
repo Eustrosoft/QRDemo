@@ -3,8 +3,10 @@ package org.eustrosoft.mappers;
 import lombok.SneakyThrows;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.dtos.FileChangeDto;
 import org.eustrosoft.dtos.FileDto;
 import org.eustrosoft.entitites.File;
+import org.eustrosoft.entitites.subentities.FileData;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.utils.ChecksumUtils;
 import org.springframework.stereotype.Component;
@@ -129,6 +131,16 @@ public class FileMapper extends EntityMapper {
         entity.setIsPublic(fur.isPublic());
         entity.setFileType(file.getContentType());
         return entity;
+    }
+
+    public FileData toEntity(FileChangeDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        FileData fd = super.toEntity(dto, FileData.class);
+        fd.setIsActive(dto.getIsActive());
+        fd.setIsPublic(dto.getIsPublic());
+        return fd;
     }
 
 }

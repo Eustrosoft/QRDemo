@@ -33,6 +33,9 @@ export function getInput(labelText, type, required = false, id = '', placeholder
     htmlInput.id = id
     if (notEmptyOrUndefined(value)) {
         htmlInput.value = value
+        if ('checkbox' === type) {
+            htmlInput.checked = value
+        }
     }
     if (notEmptyOrUndefined(autocomplete)) {
         htmlInput.autocomplete = autocomplete

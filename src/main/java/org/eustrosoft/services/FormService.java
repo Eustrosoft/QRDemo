@@ -18,23 +18,18 @@ import org.eustrosoft.repositories.projections.FormSimpleProjection;
 import org.eustrosoft.repositories.projections.FormWithFieldsProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
 import org.eustrosoft.repositories.projections.SimpleProjection;
-import org.eustrosoft.security.SecurityComponent;
+import org.eustrosoft.services.caches.QRCacheControlService;
 import org.eustrosoft.utils.CommonUtils;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
 import static org.eustrosoft.utils.CommonUtils.distinctByKey;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
 import static org.eustrosoft.utils.FileUtils.getFileIndex;
@@ -47,7 +42,7 @@ public class FormService {
     private final FormRepository formRepository;
     private final ParticipantService participantService;
     private final FileService fileService;
-    private final CacheManager cacheManager;
+    private final QRCacheControlService qrCacheControlService;
     private final QRService qrService;
 
     @Transactional(readOnly = true)
@@ -96,13 +91,13 @@ public class FormService {
             form.setData(mergeDataAndGetString(existedForm.get().getData(), form.getData()));
         }
         populateFieldsWithFormAndParticipantIds(form.getFields(), current.getId(), form.getId());
-        evictFromQrsCache(current.getId(), existedForm.get().getId());
+        qrCacheControlService.evictFromQrsCacheByFormId(current.getId(), existedForm.get().getId());
         return formRepository.save(form);
     }
 
     public void delete(Long id) throws IllegalAccessException {
         EntityProjection form = get(id, EntityProjection.class).get();
-        List<QRSimplestProjection> evicted = evictFromQrsCache(form.getParticipantId(), form.getId());
+        List<QRSimplestProjection> evicted = qrCacheControlService.evictFromQrsCacheByFormId(form.getParticipantId(), form.getId());
         formRepository.deleteById(id);
         if (!evicted.isEmpty()) {
             qrService.annulForm(evicted.stream().map(SimpleProjection::getId).collect(Collectors.toList()));
@@ -119,7 +114,7 @@ public class FormService {
         }
         form.getFiles().add(new File(file.getId()));
         update(form);
-        evictFromQrsCache(form.getParticipantId(), form.getId());
+        qrCacheControlService.evictFromQrsCacheByFormId(form.getParticipantId(), form.getId());
         return file;
     }
 
@@ -133,7 +128,7 @@ public class FormService {
         int index = getFileIndex(fileId, files);
         files.remove(index);
         update(form);
-        evictFromQrsCache(form.getParticipantId(), form.getId());
+        qrCacheControlService.evictFromQrsCacheByFormId(form.getParticipantId(), form.getId());
     }
 
     @SneakyThrows
@@ -177,29 +172,5 @@ public class FormService {
                 throw new IllegalArgumentException("Field names can not be same");
             }
         }
-    }
-
-    private List<QRSimplestProjection> evictFromQrsCache(Long participantId, Long formId) {
-        if (formId == null || participantId == null) {
-            return Collections.emptyList();
-        }
-        List<QRSimplestProjection> qrs = qrService.findAllByFormIdAndParticipantId(
-                participantId, formId,
-                QRSimplestProjection.class
-        );
-        Cache qrsCache = cacheManager.getCache(QR_CACHE_NAME);
-        if (qrsCache == null) {
-            return Collections.emptyList();
-        }
-        qrs.stream().map(QRSimplestProjection::getCode)
-                .filter(Objects::nonNull)
-                .forEach(c -> {
-                    try {
-                        qrsCache.evict(c);
-                    } catch (Exception e) {
-                        // cache value is not present
-                    }
-                });
-        return qrs;
     }
 }

@@ -27,6 +27,9 @@ public interface QRRepository extends JpaRepository<QR, Long> {
 
     <T> Iterable<T> findAllByParticipantIdAndFormId(Long participantId, Long formId, Class<T> clazz);
 
+    @Query("select q from QR q inner join fetch q.files f where q.participantId = ?1 and f.id = ?2")
+    <T> Iterable<T> findAllByParticipantIdAndFileId(Long participantId, Long fileId, Class<T> clazz);
+
     @Query("select q from QR q left outer join fetch q.form f where q.id = ?1")
     <T> Optional<T> findById(Long id, Class<T> clazz);
 

@@ -6,6 +6,7 @@ import { getInput } from "./components/inputs.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getTable, getTr, TableHead } from "./components/tables.js";
 import { showUploadFileModal } from "./files.js";
+import { getNavigationMenu } from "./components/blocks.js";
 
 var formFields = []
 var fieldTypes = []
@@ -24,8 +25,12 @@ function init(formId) {
     formFields = []
 
     const mainBlock = document.getElementById('main_block')
+    mainBlock.prepend(getNavigationMenu())
+    const basicCard = document.createElement('div')
+    basicCard.className = 'basic_card'
+    mainBlock.appendChild(basicCard)
 
-    mainBlock.innerHTML = getStartPage()
+    basicCard.innerHTML = getStartPage()
     setStartActions()
 
     const urlParams = new URLSearchParams(window.location.search)
@@ -33,13 +38,13 @@ function init(formId) {
     const id = urlParams.get('id')
 
     if (create || id) {
-        mainBlock.appendChild(getTextLabel('Название шаблона'))
-        mainBlock.appendChild(getInput(null, 'text', false, 'formName', 'Шаблон без имени'))
-        mainBlock.appendChild(getTextLabel('Описание шаблона'))
-        mainBlock.appendChild(getInput(null, 'text', false, 'formDescription', 'Шаблон без описания'))
+        basicCard.appendChild(getTextLabel('Название шаблона'))
+        basicCard.appendChild(getInput(null, 'text', false, 'formName', 'Шаблон без имени'))
+        basicCard.appendChild(getTextLabel('Описание шаблона'))
+        basicCard.appendChild(getInput(null, 'text', false, 'formDescription', 'Шаблон без описания'))
 
         let formDiv = document.createElement('div')
-        mainBlock.appendChild(formDiv)
+        basicCard.appendChild(formDiv)
 
         let formName = document.getElementById('formName')
         let formDescription = document.getElementById('formDescription')
@@ -83,7 +88,7 @@ function init(formId) {
                     .catch(() => alert('Ошибка при создании шаблона'))
             }
         })
-        mainBlock.appendChild(saveFormBtn)
+        basicCard.appendChild(saveFormBtn)
 
         if (id) {
             qrApi().getFormById(id)
@@ -107,7 +112,7 @@ function init(formId) {
         }
     } else {
         qrApi().getAllForms().then(resp => resp.json())
-            .then(json => printFormsList(mainBlock, json))
+            .then(json => printFormsList(basicCard, json))
             .catch(ex => alert(ex))
     }
 }
@@ -312,14 +317,10 @@ export function addDeleteFileRowActions() {
 
 function getStartPage() {
     return `
-        <div class="toolbar">
+        <div class="account_card_buttons">
             <button class="big_button" id="create_form_button">
                     Создать новый шаблон
             </button>
-            <button class="big_button" id="list_forms_button">
-                    Список шаблонов
-            </button>
-        
         </div>
     
     `
@@ -329,10 +330,6 @@ function setStartActions() {
     document.getElementById('create_form_button')
         .addEventListener('click', () => {
             location.href = '?form=true&create=true'
-        })
-    document.getElementById('list_forms_button')
-        .addEventListener('click', () => {
-            location.href = '?form=true'
         })
 }
 

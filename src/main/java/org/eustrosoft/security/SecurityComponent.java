@@ -13,21 +13,8 @@ import java.util.function.Supplier;
 public class SecurityComponent {
     private final ParticipantService participantService;
 
-    public void checkUserRight(Supplier<Participant> participantSupplier) throws IllegalAccessException {
-        if (participantSupplier == null) {
-            throw new IllegalArgumentException("Supplier not provided");
-        }
-        Participant participant = participantSupplier.get();
-        if (participant == null) {
-            throw new IllegalAccessException("Participant not found for this qr");
-        }
-        Participant current = participantService.getCurrentOrThrow();
-        if (!Objects.equals(current.getId(), participant.getId())) {
-            throw new IllegalAccessException("Participant is not the same as this qr");
-        }
-    }
-
-    public void checkUserRightById(Supplier<Long> participantIdSupplier) throws IllegalAccessException {
+    public void checkUserRightById(Supplier<Long> participantIdSupplier)
+            throws IllegalArgumentException, IllegalAccessException {
         if (participantIdSupplier == null) {
             throw new IllegalArgumentException("Supplier not provided");
         }
@@ -37,7 +24,7 @@ public class SecurityComponent {
         }
         Participant current = participantService.getCurrentOrThrow();
         if (!Objects.equals(current.getId(), participantId)) {
-            throw new IllegalAccessException("Participant is not the same as this qr");
+            throw new IllegalAccessException("You are not the owner of this object");
         }
     }
 

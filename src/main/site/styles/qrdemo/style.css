@@ -119,6 +119,7 @@ input {
     flex-direction: column;
 
     background-color: var(--bg-color);
+    margin-bottom: 12px;
 }
 
 .modal {
@@ -741,4 +742,16 @@ tr.participantRow {
     100% {
         background: transparent;
     }
+}
+
+/* */
+
+.nav_menu {
+    display: flex;
+    flex-direction: row;
+}
+
+.i-icon-qr::before {
+    display: block;
+    content: url('/icons/qr-light.svg');
 }

@@ -79,10 +79,10 @@ public class ParticipantService {
         return participant;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, noRollbackFor = {IllegalAccessException.class})
     public Participant getCurrentOrThrow() throws IllegalAccessException {
         Optional<Participant> byToken = userService.getByToken();
-        if (!byToken.isPresent()) {
+        if (byToken == null || !byToken.isPresent()) {
             throw new IllegalAccessException("Can not find current user");
         }
         // TODO: make user provider or defining default security config
@@ -99,12 +99,12 @@ public class ParticipantService {
     }
 
     @Transactional(readOnly = true)
-    public Participant getById(Long id) {
+    public Participant findById(Long id) {
         return repository.findById(id, Participant.class).get();
     }
 
     @Transactional(readOnly = true)
-    public ParticipantAdminProjection getByIdAdminProjection(Long id) {
+    public ParticipantAdminProjection findByIdAdminProjection(Long id) {
         return repository.findById(id, ParticipantAdminProjection.class).get();
     }
 
@@ -118,6 +118,7 @@ public class ParticipantService {
     }
 
     @SneakyThrows
+    @Transactional
     public String updateSettings(SettingsChangeDto settings) {
         if (settings == null || settings.getSettings() == null || settings.getSettings().isEmpty()) {
             throw new IllegalArgumentException("Illegal settings parameter");
@@ -166,7 +167,7 @@ public class ParticipantService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public Participant update(Participant participant) {
-        ParticipantAdminProjection existed = getByIdAdminProjection(participant.getId());
+        ParticipantAdminProjection existed = findByIdAdminProjection(participant.getId());
         if (participant.getId() == null) {
             throw new IllegalArgumentException("Participant id is not provided");
         }
@@ -190,7 +191,7 @@ public class ParticipantService {
         if (!isAdmin(me.getRoles())) {
             throw new IllegalAccessException("You have no admin rights");
         }
-        Participant toDelete = getById(id);
+        Participant toDelete = findById(id);
         if (isAdmin(toDelete.getRoles())) {
             throw new IllegalAccessException("You can not delete admins");
         }
@@ -209,7 +210,7 @@ public class ParticipantService {
         if (me.getId().equals(dto.getId())) {
             throw new IllegalAccessException("You can not ban yourself");
         }
-        Participant toBan = getById(dto.getId());
+        Participant toBan = findById(dto.getId());
         if (isAdmin(toBan.getRoles())) {
             throw new IllegalAccessException("You can not ban admins");
         }
@@ -229,7 +230,7 @@ public class ParticipantService {
         if (!isAdmin(me.getRoles())) {
             throw new IllegalAccessException("You have no admin rights");
         }
-        Participant toUnban = getById(id);
+        Participant toUnban = findById(id);
         if (!toUnban.getBanned()) {
             throw new IllegalArgumentException("This user is not banned");
         }
@@ -247,7 +248,7 @@ public class ParticipantService {
         Collection<QRRange> ranges = part.get().getRanges();
         ranges.add(qrRange);
         update(participant);
-        return getById(participant.getId());
+        return findById(participant.getId());
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -263,7 +264,7 @@ public class ParticipantService {
             qrRangeService.delete(r.getId());
         });
         update(participant);
-        return getById(participant.getId());
+        return findById(participant.getId());
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

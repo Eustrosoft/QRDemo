@@ -32,13 +32,13 @@ public class FormsController {
     private final FormFieldMapper formFieldMapper;
 
     @GetMapping
-    public List<FormDto> getAllForms() throws Exception {
+    public List<FormDto> findAll() throws Exception {
         return formService.findAll().stream()
                 .map(formMapper::toDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public FormDto getById(@PathVariable Long id) throws IllegalAccessException {
+    public FormDto findById(@PathVariable Long id) throws IllegalAccessException {
         return formMapper.toDto(formService.get(id).get());
     }
 
@@ -66,19 +66,19 @@ public class FormsController {
     }
 
     @PutMapping("/{id}")
-    public FormDto updateForm(@RequestBody FormChangeDto dto) throws IllegalAccessException, JsonProcessingException {
+    public FormDto update(@RequestBody FormChangeDto dto) throws IllegalAccessException, JsonProcessingException {
         return formMapper.toDto(
                 formService.update(formMapper.fromChangeDto(dto))
         );
     }
 
     @DeleteMapping("/{id}")
-    public void deleteForm(@PathVariable Long id) throws IllegalAccessException {
+    public void delete(@PathVariable Long id) throws IllegalAccessException {
         formService.delete(id);
     }
 
     @GetMapping("/fields")
-    public List<FormFieldDto> getAllFormFields() {
+    public List<FormFieldDto> findAllFormFields() {
         return formFieldMapper.toListDto(formService.findAllFields());
     }
 }

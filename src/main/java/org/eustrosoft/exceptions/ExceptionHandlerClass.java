@@ -1,5 +1,6 @@
 package org.eustrosoft.exceptions;
 
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,11 @@ public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
             AccessDeniedException.class
     })
     public ResponseEntity<Object> handleAllTypeExceptions(Exception ex, WebRequest request) {
+        try {
+            Class.forName("org.apache.catalina.connector.ClientAbortException");
+        } catch (ClassNotFoundException cnfe) {
+
+        }
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")

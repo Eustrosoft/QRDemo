@@ -1,3 +1,4 @@
+import { notEmptyOrUndefined } from "../../commons/common.js"
 
 export function getBigButton(text, id = null) {
     let button = document.createElement('button')
@@ -15,5 +16,22 @@ export function getCustomButton(text) {
     button.className = 'custom_button'
     button.type = 'button'
     button.innerHTML = text
+    return button
+}
+
+export function getIconBtn(text, src) {
+    let button = document.createElement('button')
+    button.className = 'icon-btn'
+    button.type = 'button'
+
+    let icon = document.createElement('img')
+    icon.className = 'i-icon'
+    if (notEmptyOrUndefined(src)) {
+        icon.src = src
+    }
+    if (notEmptyOrUndefined(text)) {
+        button.innerHTML = text
+    }
+    button.appendChild(icon)
     return button
 }

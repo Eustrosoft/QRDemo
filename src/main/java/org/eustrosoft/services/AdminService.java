@@ -1,7 +1,6 @@
 package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
-import org.eustrosoft.dtos.ParticipantChangeDto;
 import org.eustrosoft.dtos.admin.ParticipantBlockDto;
 import org.eustrosoft.dtos.admin.ParticipantChangePasswordDto;
 import org.eustrosoft.entitites.Participant;
@@ -27,7 +26,7 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public ParticipantAdminProjection findById(Long id) {
-        return participantService.getByIdAdminProjection(id);
+        return participantService.findByIdAdminProjection(id);
     }
 
     @Transactional(readOnly = true)
@@ -37,7 +36,7 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public Collection<QR> getParticipantQrs(Long id) {
-        return participantService.getById(id).getQrs();
+        return participantService.findById(id).getQrs();
     }
 
     public Participant addParticipant(Participant participant) {

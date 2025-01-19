@@ -118,21 +118,6 @@ public class QRService {
         );
     }
 
-    @Transactional(readOnly = true)
-    public <T extends EntityProjection> List<T> findAllByFormIdAndParticipantId(
-            Long participantId,
-            Long formId,
-            Class<T> clazz
-    ) {
-        return CommonUtils.iterableToList(
-                qrRepository.findAllByParticipantIdAndFormId(
-                        participantId,
-                        formId,
-                        clazz
-                )
-        );
-    }
-
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public QR create(QR qr) throws IllegalAccessException, IllegalArgumentException {
         Participant current = participantService.getCurrentOrThrow();

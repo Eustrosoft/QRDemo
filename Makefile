@@ -39,6 +39,7 @@ ROOT:
 	install -m 644 src/main/site/js/qrdemo/components/inputs.js work/webapps/ROOT/js/qrdemo/components/inputs.js
 	install -m 644 src/main/site/js/qrdemo/components/labels.js work/webapps/ROOT/js/qrdemo/components/labels.js
 	install -m 644 src/main/site/js/qrdemo/components/modals.js work/webapps/ROOT/js/qrdemo/components/modals.js
+	install -m 644 src/main/site/js/qrdemo/components/blocks.js work/webapps/ROOT/js/qrdemo/components/blocks.js
 	install -m 644 src/main/site/js/qrdemo/components/fileScroll.js work/webapps/ROOT/js/qrdemo/components/fileScroll.js
 	install -m 644 src/main/site/js/qrdemo/components/tables.js work/webapps/ROOT/js/qrdemo/components/tables.js
 	install -m 644 src/main/site/js/qrdemo/components/versions.js work/webapps/ROOT/js/qrdemo/components/versions.js

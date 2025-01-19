@@ -11,6 +11,7 @@ import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getHr } from "./components/hrs.js";
 import { Loader } from "./components/loader.js";
 import { DOWNRAISING_INDEX, getComplexTable, getTable, TableHead } from "./components/tables.js";
+import { getNavigationMenu } from "./components/blocks.js";
 
 const mainBlock = document.getElementById('main_block')
 let divLk = document.createElement('div')
@@ -49,6 +50,9 @@ export function setLk() {
 
 function setUserAccount(userDetails, div) {
     if (userDetails && div) {
+        if (!admin) {
+            div.prepend(getNavigationMenu())
+        }
         if (settings) {
             userApi()
                 .getSettings()
@@ -195,7 +199,7 @@ function setSettings(div, settingsJson, userDetails) {
 
 function printSettingsTableAttribute(parent, existedQrTableSettings, settingsJson) {
     parent.innerHTML = ''
-    let qrTableSettingsHeader = getTextLabel('Настройки таблицы QR')
+    let qrTableSettingsHeader = getTextLabel('Настройки таблицы карточек')
     parent.appendChild(qrTableSettingsHeader)
     parent.appendChild(document.createElement('br'))
 
@@ -250,7 +254,7 @@ function printSettingsTableAttribute(parent, existedQrTableSettings, settingsJso
         parent.appendChild(document.createElement('br'))
     }
 
-    let addSelfAttributeBtn = getBigButton('Добавить атрибут из созданных')
+    let addSelfAttributeBtn = getBigButton('Добавить атрибут')
     parent.appendChild(addSelfAttributeBtn)
 
     addSelfAttributeBtn.addEventListener('click', () => {
@@ -342,16 +346,7 @@ function setupQrsPart(div, settings) {
             .catch(ex => alert(ex))
     })
 
-    let divFormCreatePart = document.createElement('button')
-    divFormCreatePart.id = 'forms_create_part'
-    divFormCreatePart.className = 'big_button'
-    divFormCreatePart.innerHTML = `Шаблоны`
-    divFormCreatePart.addEventListener('click', () => {
-        window.location = '?form=true'
-    })
-
     buttonsDiv.appendChild(createQrBtn)
-    buttonsDiv.appendChild(divFormCreatePart)
     divQrsPart.appendChild(buttonsDiv)
 
     let qrsTable = document.createElement('table')
@@ -405,7 +400,7 @@ function getQRRow(data, settings) {
                         break
                     }
                     case "qr_code": {
-                        td.innerHTML = q;
+                        td.innerHTML = `<a style='text-decoration:none;' target='_blank' href="?q=${q}">${q}</a>`;
                         break
                     }
                     case "qr_image": {

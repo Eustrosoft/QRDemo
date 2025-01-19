@@ -224,8 +224,10 @@ input {
     transition: border-color 0.2s;
 }
 
-input[type='text'], input[type='password'], 
-input[type='number'], input[type='email'],
+input[type='text'],
+input[type='password'],
+input[type='number'],
+input[type='email'],
 input[type='url'] {
     border-bottom: 2px solid var(--font-half-color);
 }
@@ -234,7 +236,9 @@ input[type='checkbox'] {
     zoom: 2;
 }
 
-input[type='switch'], input[type='file'], input[type='checkbox'] {
+input[type='switch'],
+input[type='file'],
+input[type='checkbox'] {
     width: auto;
     margin: 2px 4px 2px 4px;
 }
@@ -243,4 +247,32 @@ video {
     height: 100%;
     max-height: 700px;
     max-width: 70vw;
+}
+
+.icon-btn {
+    height: 48px;
+    width: 48px;
+    background-color: var(--table-header-background-color);
+    border: none;
+    color: var(--font-color);
+    cursor: pointer;
+    display: inline;
+    margin: 4px 8px;
+    padding: 2px;
+}
+
+.icon-btn:hover {
+    background-color: var(--alpha-middle);
+    color: var(--alpha-middle);
+}
+
+.i-icon {
+    height: 48px;
+    width: 48px;
+    padding: 2px;
+    background-color: var(--table-header-background-color);
+}
+
+.i-icon:hover {
+    opacity: 0.5;
 }

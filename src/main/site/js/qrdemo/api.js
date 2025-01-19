@@ -212,6 +212,19 @@ export function qrApi() {
             )
             return authFetch(req)
         },
+        getById: (id) => {
+            let url = `${QR_DEMO_API}secured/files/${id}`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
+        },
         deleteFile: (id) => {
             let url = `${QR_DEMO_API}secured/files/${id}`;
 
@@ -273,6 +286,19 @@ export function qrApi() {
         uploadFile: (fileRequest) => {
             let url = `${QR_DEMO_API}secured/files/upload`;
             uploadSingleFile(url, fileRequest)
+        },
+        updateFile: (id, data) => {
+            let url = `${QR_DEMO_API}secured/files/${id}`;
+            const req = new Request(
+                url,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                }
+            )
+            return authFetch(req)
         }
     }
 }

@@ -4,6 +4,7 @@ import { getInput } from "./components/inputs.js";
 import { getModalWindow } from "./components/modals.js";
 import { getBigButton } from "./components/buttons.js";
 import { notEmptyOrUndefined } from "../commons/common.js";
+import { getNavigationMenu } from "./components/blocks.js";
 
 export function setFiles(filesParam) {
     init()
@@ -14,12 +15,16 @@ function init() {
     document.title = `QRDemo - My Files`
 
     const mainBlock = document.getElementById('main_block')
+    mainBlock.prepend(getNavigationMenu())
+    const basicCard = document.createElement('div')
+    basicCard.className = 'basic_card'
+    mainBlock.appendChild(basicCard)
 
-    mainBlock.innerHTML = getStartPage()
+    basicCard.innerHTML = getStartPage()
     setStartActions()
 
     files.then(resp => resp.json())
-        .then(json => printFilesList(mainBlock, json))
+        .then(json => printFilesList(basicCard, json))
 }
 
 function printFilesList(parent, json) {
@@ -28,13 +33,13 @@ function printFilesList(parent, json) {
     parent.appendChild(tableForms)
 
     let tableHeaderRow = document.createElement('tr')
-    tableHeaderRow.innerHTML = `<th>Название</th><th>Оригинальное название</th><th>Описание</th><th>Создан</th><th>Размер</th><th>Действия</th>`
+    tableHeaderRow.innerHTML = `<th>Название</th><th>Оригинальное название</th><th>Описание</th><th>Создан</th><th>Размер</th><th>Публичный</th><th>Действия</th>`
     tableForms.appendChild(tableHeaderRow)
 
     for (let i = 0; i < json.length; i++) {
         const deleteBtnId = `file_delete_btn_${json[i]?.id}`;
         const downloadBtnId = `file_download_btn_${json[i]?.id}`;
-        const openBtnId = `file_open_btn_${json[i]?.id}`;
+        const editBtnId = `file_edit_btn_${json[i]?.id}`;
         let tableRow = document.createElement('tr')
 
         tableRow.innerHTML =
@@ -44,22 +49,60 @@ function printFilesList(parent, json) {
                <td>${json[i]?.description}</td>
                <td>${new Date(json[i]?.created).toLocaleString()}</td>
                <td>${formatBytes(json[i]?.fileSize)}</td>
+               <td>${json[i]?.isPublic}</td>
                <td>
                     <button id="${deleteBtnId}" class="big_button fs-18rem">Удалить</button>
                     <button id="${downloadBtnId}" class="big_button fs-18rem">Скачать</button>
-                    <button id="${openBtnId}" class="big_button fs-18rem">Открыть</button>
+                    <button id="${editBtnId}" class="big_button fs-18rem">Редактировать</button>
                </td>
         </tr>`
 
         tableForms.appendChild(tableRow)
         document.getElementById(deleteBtnId).addEventListener('click', () => {
-            deleteFile(json[i].id)
+            deleteFile(json[i]?.id)
         })
         document.getElementById(downloadBtnId).addEventListener('click', () => {
-            downloadFile(json[i].id)
+            qrApi().downloadFile(json[i]?.id)
         })
-        document.getElementById(openBtnId).addEventListener('click', () => {
-            openFile(json[i].id)
+        document.getElementById(editBtnId).addEventListener('click', () => {
+            qrApi().getById(json[i]?.id)
+                .then(resp => resp.json())
+                .then(json => {
+                    let fileEditForm = document.createElement('div')
+
+                    let fileNameInput = getInput('Имя файла', 'text', true, 'file_edit_name', 'Введите имя', false, 'off', json?.name)
+                    let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_edit_description', 'Введите описание', false, 'off', json?.description)
+                    let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_edit_public', '', true, 'off', json?.isPublic)
+                    let isActiveInput = getInput('Доступный', 'checkbox', true, 'file_edit_active', '', true, 'off', json?.isActive)
+                    let nameInput = fileNameInput.getElementsByTagName('input')[0];
+                    nameInput.maxLength = '127'
+                    let descriptionInput = fileDescriptionInput.getElementsByTagName('input')[0];
+                    descriptionInput.maxLength = '511'
+                    let updateBtn = getBigButton('Обновить')
+                
+                    fileEditForm.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, updateBtn)
+                    let modal = getModalWindow('Редактирование файла', fileEditForm)
+                    modal.style.display = 'block'
+
+                    updateBtn.addEventListener('click', () => {
+                        qrApi().updateFile(
+                            json?.id,
+                            {
+                                name: document.getElementById('file_edit_name')?.value,
+                                description: document.getElementById('file_edit_description')?.value,
+                                isPublic: document.getElementById('file_edit_public')?.checked,
+                                isActive: document.getElementById('file_edit_active')?.checked
+                            }
+                        ).then(resp => {
+                            if (resp.ok)
+                                return resp.json
+                            throw new Error('Неизвестная ошибка')
+                        }).then(json => {
+                            alert('Файл был обновлен')
+                            window.location.reload()
+                        }).catch(ex => alert('Неизвестная ошибка при обновлении файла'))
+                    })
+                })
         })
     }
 }
@@ -74,21 +117,13 @@ export function deleteFile(id) {
     }
 }
 
-export function openFile(id) {
-    qrApi().openFile(id)
-}
-
-export function downloadFile(id) {
-    qrApi().downloadFile(id)
-}
-
 export function downloadFileUnsecured(id) {
     qrApi().downloadFileUnsecured(id)
 }
 
 function getStartPage() {
     return `
-        <div class="toolbar">
+        <div class="account_card_buttons">
             <button class="big_button" id="upload_file_btn">
                     Загрузить новый файл
             </button>

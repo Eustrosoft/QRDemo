@@ -30,7 +30,7 @@ public class QRRangeService {
 
     @Transactional(readOnly = true)
     public Collection<QRRange> getMyRanges() throws IllegalAccessException {
-        Participant participant = participantService.getById(
+        Participant participant = participantService.findById(
                 participantService.getCurrentSimpleOrThrow().getId()
         );
         if (participant == null) {

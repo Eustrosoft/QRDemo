@@ -5,11 +5,14 @@ import lombok.SneakyThrows;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Participant;
+import org.eustrosoft.entitites.subentities.FileData;
 import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.repositories.FileRepository;
 import org.eustrosoft.repositories.projections.FileBytesProjection;
 import org.eustrosoft.repositories.projections.FileProjection;
+import org.eustrosoft.repositories.sub.FileDataRepository;
 import org.eustrosoft.security.SecurityComponent;
+import org.eustrosoft.services.caches.QRCacheControlService;
 import org.eustrosoft.utils.CommonUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,8 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriUtils;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -27,16 +30,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FileService {
     private final FileRepository repository;
+    private final FileDataRepository fileDataRepository;
     private final ParticipantService participantService;
     private final FileMapper mapper;
     private final SecurityComponent securityComponent;
+    private final QRCacheControlService qrCacheControlService;
 
     @SneakyThrows
     @Transactional(readOnly = true)
     public List<FileProjection> findAllMyFiles() {
         Participant participant = participantService.getCurrentOrThrow();
         return CommonUtils.iterableToList(
-                repository.findAllByParticipantId(participant.getId(), FileProjection.class)
+                repository.findAllByParticipantIdOrderByUpdatedDesc(participant.getId(), FileProjection.class)
         );
     }
 
@@ -70,13 +75,36 @@ public class FileService {
         }
         Participant current = participantService.getCurrentSimpleOrThrow();
         entity.setParticipantId(current.getId());
-        return repository.save(entity);
+        File saved = repository.save(entity);
+        qrCacheControlService.evictFromQrsCacheByFileId(current.getId(), saved.getId());
+        return saved;
+    }
+
+    @SneakyThrows
+    public FileProjection changeFile(Long id, FileUploadRequest fur) {
+        FileProjection byId = findById(id);
+        securityComponent.checkUserRightById(byId::getParticipantId);
+        File entity = mapper.toEntity(fur);
+        entity.setId(id);
+        FileProjection saved = save(entity);
+        qrCacheControlService.evictFromQrsCacheByFileId(byId.getParticipantId(), id);
+        return saved;
+    }
+
+    @SneakyThrows
+    public FileProjection update(FileData fileData) {
+        FileProjection byId = findById(fileData.getId());
+        securityComponent.checkUserRightById(byId::getParticipantId);
+        fileDataRepository.save(fileData);
+        qrCacheControlService.evictFromQrsCacheByFileId(byId.getParticipantId(), fileData.getId());
+        return findById(fileData.getId());
     }
 
     @SneakyThrows
     public void delete(Long id) {
         FileProjection file = findById(id);
         securityComponent.checkUserRightById(file::getParticipantId);
+        qrCacheControlService.evictFromQrsCacheByFileId(file.getParticipantId(), id);
         repository.deleteById(id);
     }
 
@@ -107,7 +135,8 @@ public class FileService {
                 HttpHeaders.CONTENT_DISPOSITION,
                 String.format(
                         "inline; filename*=UTF-8''%s",
-                        UriUtils.encodePath(file.getFileName(), StandardCharsets.UTF_8.name())
+                        URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
+                                .replaceAll("\\+", "%20")
                 )
         );
         return new ResponseEntity<>(
