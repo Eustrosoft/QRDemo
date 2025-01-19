@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
-
 @Component
 @RequiredArgsConstructor
 public class QRCacheCleaner {
@@ -25,7 +23,7 @@ public class QRCacheCleaner {
     public void clearCache() {
         try {
             qrCacheControlService.clearCache();
-            LOGGER.log(Level.OFF, "Cache, named \"{0}\" was cleared", QR_CACHE_NAME);
+            // LOGGER.log(Level.OFF, "Cache, named \"{0}\" was cleared", QR_CACHE_NAME);
         } catch (Exception ex) {
             LOGGER.log(Level.ALL, "Error while clearing cache: " + ex.getLocalizedMessage());
         }
