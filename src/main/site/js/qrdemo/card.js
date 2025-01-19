@@ -8,6 +8,7 @@ import { addDeleteFileRowActions, Field } from "./form.js";
 import { getTextLabel } from "./components/labels.js";
 import { getSingleInput } from "./components/inputs.js";
 import { notEmptyOrUndefined } from "../commons/common.js";
+import { getNavigationMenu } from "./components/blocks.js";
 
 const mainBlock = document.getElementById('main_block')
 let divCard = document.createElement('div')
@@ -56,6 +57,10 @@ function setQRInfo(q, div) {
                 ? getEditCardInfoHtml(json)
                 : getViewCardInfoHtml(json)
             divCardInfo.className = 'code_info'
+            if (edit) {
+                div.prepend(getNavigationMenu())
+                divCardInfo.classList.add('basic_card')
+            }
             
             // QR image
             // const qrImageDiv = getQRImageDiv(longToHex(json?.code));
