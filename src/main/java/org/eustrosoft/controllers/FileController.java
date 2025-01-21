@@ -51,9 +51,9 @@ public class FileController {
         return mapper.toDto(service.update(mapper.toEntity(dto)));
     }
 
-    @GetMapping("/{id}/download")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id) {
-        return service.downloadFile(id);
+    @GetMapping("/{id}/download/{fileName}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id, @PathVariable String fileName) {
+        return service.downloadFile(id, fileName);
     }
 
     @DeleteMapping("/{id}")

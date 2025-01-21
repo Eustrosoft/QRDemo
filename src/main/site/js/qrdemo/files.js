@@ -5,6 +5,9 @@ import { getModalWindow } from "./components/modals.js";
 import { getBigButton } from "./components/buttons.js";
 import { notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
+import { getTextLabel } from "./components/labels.js";
+
+let fileSelection
 
 export function setFiles(filesParam) {
     init()
@@ -13,6 +16,8 @@ export function setFiles(filesParam) {
 function init() {
     let files = qrApi().getAllFiles()
     document.title = `QRDemo - My Files`
+
+    fileSelection = window.location.hash.substring(1)
 
     const mainBlock = document.getElementById('main_block')
     mainBlock.prepend(getNavigationMenu())
@@ -41,9 +46,9 @@ function printFilesList(parent, json) {
         const downloadBtnId = `file_download_btn_${json[i]?.id}`;
         const editBtnId = `file_edit_btn_${json[i]?.id}`;
         let tableRow = document.createElement('tr')
+        tableRow.id = `tr-file-id-${json[i]?.id}` 
 
-        tableRow.innerHTML =
-        `<tr>
+        tableRow.innerHTML = `
                <td>${json[i]?.name}</td>
                <td>${json[i]?.fileName}</td>
                <td>${json[i]?.description}</td>
@@ -55,17 +60,33 @@ function printFilesList(parent, json) {
                     <button id="${downloadBtnId}" class="big_button fs-18rem">Скачать</button>
                     <button id="${editBtnId}" class="big_button fs-18rem">Редактировать</button>
                </td>
-        </tr>`
+        `
 
         tableForms.appendChild(tableRow)
         document.getElementById(deleteBtnId).addEventListener('click', () => {
             deleteFile(json[i]?.id)
         })
         document.getElementById(downloadBtnId).addEventListener('click', () => {
-            qrApi().downloadFile(json[i]?.id)
+            qrApi().downloadFile(json[i]?.id, json[i]?.fileName)
         })
-        document.getElementById(editBtnId).addEventListener('click', () => {
-            qrApi().getById(json[i]?.id)
+        document.getElementById(editBtnId).addEventListener('click', () => showEditFileModal(json[i]?.id))
+            
+    }
+    if (notEmptyOrUndefined(fileSelection)) {
+        let desiredRow = document.getElementById(`tr-file-id-${fileSelection}`)
+        desiredRow.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        })
+        desiredRow.classList.add('blue_pulse')
+        setTimeout(function() {
+            desiredRow.classList.remove('blue_pulse')
+        }, 3_000);
+    }
+}
+
+export function showEditFileModal(id, reloadAfterEdit = true) {
+    qrApi().getById(id)
                 .then(resp => resp.json())
                 .then(json => {
                     let fileEditForm = document.createElement('div')
@@ -79,7 +100,7 @@ function printFilesList(parent, json) {
                     let descriptionInput = fileDescriptionInput.getElementsByTagName('input')[0];
                     descriptionInput.maxLength = '511'
                     let updateBtn = getBigButton('Обновить')
-                
+
                     fileEditForm.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, updateBtn)
                     let modal = getModalWindow('Редактирование файла', fileEditForm)
                     modal.style.display = 'block'
@@ -99,12 +120,12 @@ function printFilesList(parent, json) {
                             throw new Error('Неизвестная ошибка')
                         }).then(json => {
                             alert('Файл был обновлен')
-                            window.location.reload()
+                            if (reloadAfterEdit) {
+                                window.location.reload()
+                            }
                         }).catch(ex => alert('Неизвестная ошибка при обновлении файла'))
                     })
                 })
-        })
-    }
 }
 
 export function deleteFile(id) {
@@ -117,8 +138,8 @@ export function deleteFile(id) {
     }
 }
 
-export function downloadFileUnsecured(id) {
-    qrApi().downloadFileUnsecured(id)
+export function downloadFileUnsecured(id, fileName) {
+    qrApi().downloadFileUnsecured(id, fileName)
 }
 
 function getStartPage() {
@@ -135,25 +156,65 @@ function getStartPage() {
 function setStartActions() {
     document.getElementById('upload_file_btn')
         .addEventListener('click', () => {
-        showUploadFileModal(() => {
-            let name = document.getElementById('file_name')
-            let description = document.getElementById('file_description')
-            let file = document.getElementById('file_content')
-            let isPublic = document.getElementById('file_public')
+            showUploadFileModal(() => {
+                let name = document.getElementById('file_name')
+                let description = document.getElementById('file_description')
+                let file = document.getElementById('file_content')
+                let isPublic = document.getElementById('file_public')
 
-            try {
-                qrApi().uploadFile({ name: name.value, description: description.value, file: file, public: isPublic.checked })
-                alert('Файл успешно загружен!')
-                window.location.reload()
-            } catch (e) {
-                alert(e)
-            }
+                try {
+                    qrApi().uploadFile({ name: name.value, description: description.value, file: file, public: isPublic.checked })
+                    alert('Файл успешно загружен!')
+                    window.location.reload()
+                } catch (e) {
+                    alert(e)
+                }
+            })
         })
-    })
 }
 
-export function showUploadFileModal(uploadFileCallback, closeOnComplete = true, closeOnError = false) {
+export function showUploadFileModal(uploadFileCallback, chooseUploadOption = false, chooseUploadFileCallback, closeOnComplete = true, closeOnError = false) {
     let fileUploadForm = document.createElement('div')
+    let fileUploadNewWindow = document.createElement('div')
+
+    if (chooseUploadOption) {
+        fileUploadNewWindow.style.display = 'none'
+        let fileChooseOldWindow = document.createElement('div')
+        fileChooseOldWindow.style.display = 'none'
+
+        let fileChooseOrUploadWindow = document.createElement('div')
+        let chooseOldFileBtn = getBigButton('Выбрать загруженный')
+        let textLabel = getTextLabel('или')
+        let uploadNewFileBtn = getBigButton('Загрузить новый')
+        chooseOldFileBtn.addEventListener('click', () => {
+            fileChooseOrUploadWindow.style.display = 'none'
+            fileChooseOldWindow.style.display = 'block'
+
+            let fileSelectBtn = getBigButton('Выбрать')
+            if (notEmptyOrUndefined(chooseUploadFileCallback)) {
+                fileSelectBtn.addEventListener('click', () => {
+                    try {
+                        chooseUploadFileCallback()
+                        if (closeOnComplete) {
+                            modal.remove()
+                        }
+                    } catch (e) {
+                        if (closeOnError) {
+                            modal.remove()
+                        }
+                        alert(e)
+                    }
+                })
+            }
+            fileChooseOldWindow.append(getFileChooseSelect(), fileSelectBtn)
+        })
+        uploadNewFileBtn.addEventListener('click', () => {
+            fileUploadNewWindow.style.display = 'block'
+            fileChooseOrUploadWindow.style.display = 'none'
+        })
+        fileChooseOrUploadWindow.append(chooseOldFileBtn, textLabel, uploadNewFileBtn)
+        fileUploadForm.append(fileChooseOrUploadWindow, fileChooseOldWindow)
+    }
 
     let fileNameInput = getInput('Имя файла', 'text', true, 'file_name')
     let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_description')
@@ -172,8 +233,8 @@ export function showUploadFileModal(uploadFileCallback, closeOnComplete = true, 
     publicInput.style.width = '11px'
     publicInput.style.height = '11px'
 
-    fileUploadForm.append(fileNameInput, fileDescriptionInput, isPublicInput, fileInput, uploadFileBtn)
-
+    fileUploadNewWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, fileInput, uploadFileBtn)
+    fileUploadForm.append(fileUploadNewWindow)
     let modal = getModalWindow('Загрузка файла', fileUploadForm)
     modal.style.display = 'block'
 
@@ -186,7 +247,7 @@ export function showUploadFileModal(uploadFileCallback, closeOnComplete = true, 
                 if (closeOnComplete) {
                     modal.remove()
                 }
-            } catch(e) {
+            } catch (e) {
                 if (closeOnError) {
                     modal.remove()
                 }
@@ -195,4 +256,36 @@ export function showUploadFileModal(uploadFileCallback, closeOnComplete = true, 
             alert('Необходимо ввести имя файла и выбрать файл')
         }
     })
+}
+
+function getFileChooseSelect() {
+    let fileLabel = document.createElement('label')
+    fileLabel.innerHTML = 'Файл: '
+
+    let fileSelectDiv = document.createElement('div')
+    let fileSelectElement = document.createElement('select')
+    fileSelectElement.id = 'file_select'
+    fileSelectElement.style.width = '100%'
+    fileSelectElement.style.height = '100%'
+    fileSelectElement.style.fontSize = '1.2em'
+
+    const opt = document.createElement('option')
+    opt.value = ''
+    opt.id = ''
+    opt.innerHTML = ''
+    fileSelectElement.append(opt)
+
+    qrApi().getAllFiles()
+        .then(resp => resp.json())
+        .then(json => {
+            for (let i = 0; i < json.length; i++) {
+                const opt = document.createElement('option')
+                opt.value = json[i]?.name
+                opt.id = json[i]?.id
+                opt.innerHTML = `${json[i]?.name} (${json[i]?.description}) [${json[i]?.fileName}]`
+                fileSelectElement.append(opt)
+            }
+        })
+    fileSelectDiv.append(fileLabel, fileSelectElement)
+    return fileSelectDiv
 }

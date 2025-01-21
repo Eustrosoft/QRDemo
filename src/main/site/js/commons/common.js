@@ -91,6 +91,13 @@ export function generateRandomPassword() {
     return pass
 }
 
+export function booleanToString(bool) {
+    if (emptyOrUndefined(bool)) {
+        return ''
+    }
+    return Boolean(bool) ? 'Да' : 'Нет'
+}
+
 export function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
 }

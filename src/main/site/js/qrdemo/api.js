@@ -172,6 +172,34 @@ export function qrApi() {
         getFileLinkV2: (id, fileId) => {
             return QR_DEMO_API + `unsecured/qrs/${id}/files/v2/${fileId}`
         },
+        connectFileToQR: (id, fileId) => {
+            let url = `${QR_DEMO_API}secured/qrs/${id}/files/choose`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({id: fileId})
+                }
+            )
+            return authFetch(req)
+        },
+        connectFileToForm: (id, fileId) => {
+            let url = `${QR_DEMO_API}secured/forms/${id}/files/choose`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({id: fileId})
+                }
+            )
+            return authFetch(req)
+        },
         getRanges: () => {
             let url = `${QR_DEMO_API}secured/ranges`;
 
@@ -238,43 +266,18 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        openFile: (id) => {
-            let url = `${QR_DEMO_API}secured/files/${id}/download`;
-
-            const req = new Request(
-                url,
-                {
-                    method: 'GET',
-                    headers: headers,
-                    credentials: 'include'
-                }
-            )
-            fetch(req)
-                .then(resp => resp.status === 200 ? resp.blob() : Promise.reject('Что-то пошло не так'))
-                .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.target = '_'
-                a.style.display = 'none';
-                a.href = url;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-            })
-                .catch(() => alert('oh no!'));
-        },
-        downloadFile: (id) => {
-            let url = `${QR_DEMO_API}secured/files/${id}/download`;
+        downloadFile: (id, fileName) => {
+            let url = `${QR_DEMO_API}secured/files/${id}/download/${fileName}`;
 
             var link = document.createElement('a')
-            link.target = '_'
+            link.target = '_blank'
             link.href = url
             document.body.appendChild(link)
             link.click()
             link.remove()
         },
-        downloadFileUnsecured: (id) => {
-            let url = `${QR_DEMO_API}unsecured/files/${id}/download`;
+        downloadFileUnsecured: (id, fileName) => {
+            let url = `${QR_DEMO_API}unsecured/files/${id}/download/${fileName}`;
 
             var link = document.createElement('a')
             link.target = '_'

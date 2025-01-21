@@ -6,3 +6,10 @@ export function getDateTime(date) {
     }
     return date.toLocaleString()
 }
+
+export function formatDate(str) {
+    if (emptyOrUndefined(str)) {
+        return ''
+    }
+    return new Date(str).toLocaleString()
+}

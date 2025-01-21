@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
@@ -23,7 +24,6 @@ import org.eustrosoft.utils.CommonUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,7 @@ import static org.eustrosoft.utils.FileUtils.getFileIndex;
 @Transactional
 public class FormService {
     private final FormMapper formMapper;
-    private final FormRepository formRepository;
+    private final FormRepository repository;
     private final ParticipantService participantService;
     private final FileService fileService;
     private final QRCacheControlService qrCacheControlService;
@@ -48,13 +48,13 @@ public class FormService {
     @Transactional(readOnly = true)
     public List<FormSimpleProjection> findAll() throws IllegalAccessException {
         return CommonUtils.iterableToList(
-                formRepository.findAllByParticipantIdOrderByUpdatedDesc(participantService.getCurrentSimpleOrThrow().getId())
+                repository.findAllByParticipantIdOrderByUpdatedDesc(participantService.getCurrentSimpleOrThrow().getId())
         );
     }
 
     @Transactional(readOnly = true)
     public Optional<FormComplexProjection> get(Long id) throws IllegalAccessException {
-        return formRepository.findByIdAndParticipantId(
+        return repository.findByIdAndParticipantId(
                 id, participantService.getCurrentOrThrow().getId(),
                 FormComplexProjection.class
         );
@@ -62,7 +62,7 @@ public class FormService {
 
     @Transactional(readOnly = true)
     public <T extends EntityProjection> Optional<T> get(Long id, Class<T> clazz) throws IllegalAccessException {
-        return formRepository.findByIdAndParticipantId(
+        return repository.findByIdAndParticipantId(
                 id, participantService.getCurrentOrThrow().getId(),
                 clazz
         );
@@ -79,7 +79,7 @@ public class FormService {
                     form.getId()
             );
         }
-        return formRepository.save(form);
+        return repository.save(form);
     }
 
     public Form update(Form form) throws IllegalAccessException, JsonProcessingException {
@@ -92,30 +92,30 @@ public class FormService {
         }
         populateFieldsWithFormAndParticipantIds(form.getFields(), current.getId(), form.getId());
         qrCacheControlService.evictFromQrsCacheByFormId(current.getId(), existedForm.get().getId());
-        return formRepository.save(form);
+        return repository.save(form);
     }
 
     public void delete(Long id) throws IllegalAccessException {
         EntityProjection form = get(id, EntityProjection.class).get();
         List<QRSimplestProjection> evicted = qrCacheControlService.evictFromQrsCacheByFormId(form.getParticipantId(), form.getId());
-        formRepository.deleteById(id);
+        repository.deleteById(id);
         if (!evicted.isEmpty()) {
             qrService.annulForm(evicted.stream().map(SimpleProjection::getId).collect(Collectors.toList()));
         }
     }
 
-    @SneakyThrows
-    public FileProjection uploadFile(Long id, FileUploadRequest fur) {
-        Form form = formMapper.toEntity(get(id).get());
+    public FileProjection uploadFile(Long id, FileUploadRequest fur) throws IllegalAccessException {
+        FormComplexProjection form = get(id).get();
         FileProjection file = fileService.uploadFile(fur);
-        List<File> files = form.getFiles();
-        if (files == null) {
-            form.setFiles(new ArrayList<>());
-        }
-        form.getFiles().add(new File(file.getId()));
-        update(form);
+        repository.insertFile(form.getId(), file.getId());
         qrCacheControlService.evictFromQrsCacheByFormId(form.getParticipantId(), form.getId());
         return file;
+    }
+
+    public void chooseFile(Long id, FileChooseRequest fcr) throws IllegalAccessException {
+        FormComplexProjection form = get(id).get();
+        repository.insertFile(id, fcr.getId());
+        qrCacheControlService.evictFromQrsCacheByFormId(form.getParticipantId(), form.getId());
     }
 
     @SneakyThrows
@@ -135,7 +135,7 @@ public class FormService {
     @Transactional(readOnly = true)
     public List<FormField> findAllFields() {
         List<FormWithFieldsProjection> forms = CommonUtils.iterableToList(
-                formRepository.findAllByParticipantId(
+                repository.findAllByParticipantId(
                         participantService.getCurrentSimpleOrThrow().getId(),
                         FormWithFieldsProjection.class
                 )

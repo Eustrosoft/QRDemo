@@ -1,0 +1,12 @@
+package org.eustrosoft.dtos;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+@NoArgsConstructor
+public class FileChooseRequest extends EntityDto {
+
+}

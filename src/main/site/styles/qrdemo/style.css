@@ -169,7 +169,7 @@ input {
     }
 
     .modal-content {
-        background-color: var(--bg-secondary-color);
+        background-color: var(--bg-color);
         margin: 15% auto;
         border: 1px solid var(--border-color);
         width: 80%;
@@ -189,6 +189,8 @@ input {
 
         .modal-content-inner {
             padding: 6px;
+            border-bottom-right-radius: 50%;
+            border-bottom-left-radius: 50%;
         }
     }
 }
@@ -204,7 +206,6 @@ input {
 
 .big_button {
     margin: 1px 4px;
-    height: 100%;
     border: thin solid var(--alpha);
     background: var(--bg-color);
     border-radius: 12px;
@@ -316,6 +317,10 @@ th {
         width: 99%;
         height: 98%;
     }
+}
+
+.formFileRow {
+    cursor: pointer;
 }
 
 .toolbar {
@@ -729,14 +734,20 @@ tr.participantRow {
     cursor: pointer;
 }
 
-.green_pulse {
-    animation: pulse 1s linear;
+.blue_pulse, .blue_pulse > td {
+    --pulse-color: #809dda;
+    animation: pulse_action 2s linear;
 }
 
-@keyframes pulse {
+.green_pulse {
+    --pulse-color: #88E788;
+    animation: pulse_action 1s linear;
+}
+
+@keyframes pulse_action {
 
     0% {
-        background-color: #88E788;
+        background-color: var(--pulse-color);
     }
 
     100% {

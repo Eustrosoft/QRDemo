@@ -1,14 +1,15 @@
-import { fieldToHtml, formatBytes } from "./utils.js";
-import { qrApi } from "./api.js";
+import { emptyOrUndefined, fieldToHtml, formatBytes } from "./utils.js";
+import { QR_DEMO_API, qrApi } from "./api.js";
 import { getModalWindow } from "./components/modals.js";
-import { getTable, getTr, TableHead } from "./components/tables.js";
+import { ActionColumn, getComplexTable, getTable, getTr, TableHead } from "./components/tables.js";
 import { getBigButton, getCustomButton } from "./components/buttons.js";
-import { downloadFileUnsecured, showUploadFileModal } from "./files.js";
+import { downloadFileUnsecured, showEditFileModal, showUploadFileModal } from "./files.js";
 import { addDeleteFileRowActions, Field } from "./form.js";
 import { getTextLabel } from "./components/labels.js";
 import { getSingleInput } from "./components/inputs.js";
-import { notEmptyOrUndefined } from "../commons/common.js";
+import { booleanToString, notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
+import { formatDate } from "../commons/dateUtils.js";
 
 const mainBlock = document.getElementById('main_block')
 let divCard = document.createElement('div')
@@ -61,7 +62,7 @@ function setQRInfo(q, div) {
                 div.prepend(getNavigationMenu())
                 divCardInfo.classList.add('basic_card')
             }
-            
+
             // QR image
             // const qrImageDiv = getQRImageDiv(longToHex(json?.code));
             // divCardInfo.append(qrImageDiv)
@@ -75,7 +76,6 @@ function setQRInfo(q, div) {
             div.appendChild(divCardInfo)
             if (edit) {
                 addCodeBtnListeners()
-                addDeleteFileRowActions()
             } else {
                 addDownloadPublicFileRowActions()
             }
@@ -174,10 +174,12 @@ function getEditCardInfoHtml(qr) {
     }
 
     let filesHeaders = [
-        new TableHead('Название', '10%'), new TableHead('Оригинальное название', '10%'),
-        new TableHead('Описание', '20%'), new TableHead('Размер', '9%'),
-        new TableHead('Создан', '8%'), new TableHead('Публичный', '8%'),
-        new TableHead('Удалить', '8%')
+        new TableHead('Название', '8%', 'name'),
+        new TableHead('Оригинальное название', '10%', 'fileName'),
+        new TableHead('Описание', '18%', 'description'),
+        new TableHead('Размер', '7%', 'fileSize', formatBytes),
+        new TableHead('Создан', '8%', 'created', formatDate),
+        new TableHead('Публичный', '8%', 'isPublic', booleanToString)
     ]
     let fileItems = []
 
@@ -185,59 +187,90 @@ function getEditCardInfoHtml(qr) {
     if (formFiles) {
         for (let index in formFiles) {
             const file = formFiles[index];
-            fileItems.push({
-                name: file?.name,
-                fileName: file?.fileName,
-                description: file?.description,
-                fileSize: formatBytes(file?.fileSize),
-                created: file?.created,
-                isPublic: file?.isPublic,
-                actions: ''
+            let actionCol = document.createElement('td')
+            let openBtn = getBigButton('Открыть')
+            openBtn.addEventListener('click', () => {
+                qrApi().downloadFile(file?.id, file?.fileName)
             })
+            let editBtn = getBigButton('Ред.')
+            editBtn.addEventListener('click', () => {
+                showEditFileModal(file?.id, true)
+            })
+            actionCol.append(openBtn, editBtn)
+            file['actions'] = actionCol
+            fileItems.push(file)
         }
     }
-
     let files = qr?.files
     for (let index in files) {
         const file = files[index];
-        fileItems.push({
-            name: `<input name="id" type="hidden" value="${file?.id}"/>` + file?.name,
-            fileName: file?.fileName,
-            description: file?.description,
-            fileSize: formatBytes(file?.fileSize),
-            created: file?.created,
-            isPublic: file?.isPublic,
-            actions: `<button class="big_button" id="delete_file_btn_${index}">X</button>`
+        let actionCol = document.createElement('td')
+        let openBtn = getBigButton('Открыть')
+        openBtn.addEventListener('click', () => {
+            qrApi().downloadFile(file?.id, file?.fileName)
         })
+        let editBtn = getBigButton('Ред.')
+        editBtn.addEventListener('click', () => {
+            showEditFileModal(file?.id, true)
+        })
+        let removeBtn = getBigButton('Убрать')
+        removeBtn.addEventListener('click', () => {
+            removeBtn.parentElement.parentElement.remove()
+        })
+        actionCol.append(openBtn, editBtn, removeBtn)
+        file['actions'] = actionCol
+        fileItems.push(file)
     }
-    let tableFiles = getTable(
+    let tableFiles = getComplexTable(
         filesHeaders,
         fileItems,
         'formFileRow',
         'files_table',
-        'compact_table'
+        'compact_table',
+        'id',
+        null, true
     )
+
 
     let addFileButton = document.createElement('button')
     addFileButton.className = 'custom_button'
     addFileButton.innerText = '+'
     addFileButton.addEventListener('click', () => {
-        showUploadFileModal(() => {
-            let name = document.getElementById('file_name')
-            let description = document.getElementById('file_description')
-            let file = document.getElementById('file_content')
-            let isPublic = document.getElementById('file_public')
+        showUploadFileModal(
+            () => {
+                let name = document.getElementById('file_name')
+                let description = document.getElementById('file_description')
+                let file = document.getElementById('file_content')
+                let isPublic = document.getElementById('file_public')
 
-            try {
-                qrApi().uploadQRFile(qr?.id, { name: name.value, description: description.value, file: file, public: isPublic.checked })
-                alert('Файл успешно загружен!')
-                window.location.reload()
-            } catch (e) {
-                alert(e)
-            }
-        })
+                try {
+                    qrApi().uploadQRFile(qr?.id, { name: name.value, description: description.value, file: file, public: isPublic.checked })
+                    alert('Файл успешно загружен!')
+                    window.location.reload()
+                } catch (e) {
+                    alert(e)
+                }
+            }, true,
+            () => {
+                let fileSelect = document.getElementById('file_select')
+                qrApi().connectFileToQR(qr?.id, fileSelect?.options[fileSelect?.selectedIndex]?.id)
+                    .then(resp => {
+                        if (!resp.ok) {
+                            throw new Error('Ошибка при приклеплении файла. Возможно, такой файл уже прикреплен')
+                        }
+                        return resp.text()
+                    })
+                    .then(text => {
+                        alert('Файл успешно прикреплен!')
+                        window.location.reload()
+                    })
+                    .catch(ex => {
+                        alert(ex)
+                    })
+
+            })
     })
-    let fileTr = getTr(addFileButton, filesHeaders.length)
+    let fileTr = getTr(addFileButton, filesHeaders.length + 1)
     tableFiles.appendChild(fileTr)
     codeDiv.appendChild(tableFiles)
 
@@ -307,7 +340,7 @@ function getViewCardInfoHtml(qr) {
     for (let index in files) {
         const file = files[index];
         fileItems.push({
-            name: `<input name="id" type="hidden" value="${file?.id}"/>` + file?.name
+            file: `<a target='_blank' href='${QR_DEMO_API}unsecured/files/${file?.id}/download/${file?.fileName}'>${file?.name}</a>`
         })
     }
     let tableFiles = getTable(
@@ -336,7 +369,7 @@ function addCodeBtnListeners() {
             let descriptionElem = document.getElementById('description_input')
             let formElement = document.getElementById('form_select')
 
-            const collectedFiles = Field.htmlToFiles(document.getElementById('files_table'))
+            const collectedFiles = Field.htmlToFilesFromComplexTable(document.getElementById('files_table'), isCardFile)
             const data = collectFormData()
             qrApi().saveQr({
                 id: qrId,
@@ -371,6 +404,18 @@ function addCodeBtnListeners() {
             modal.firstChild.style.height = '622px'
         })
     }
+}
+
+// TODO: change logic cardinally
+function isCardFile(tableRow) {
+    if (emptyOrUndefined(tableRow)) {
+        return false
+    }
+    let lastChild = tableRow.lastChild
+    if (emptyOrUndefined(lastChild.innerHTML) || lastChild?.children?.length == 2) {
+        return false
+    }
+    return true
 }
 
 const processedTags = ['INPUT']
@@ -419,7 +464,7 @@ function addDownloadPublicFileRowActions() {
         let row = rows[i]
         let fileId = row?.firstElementChild?.firstElementChild?.value
         if (fileId) {
-            row.addEventListener('click', () => downloadFileUnsecured(fileId))
+            row.addEventListener('click', () => downloadFileUnsecured(fileId, null))
         }
     }
 }

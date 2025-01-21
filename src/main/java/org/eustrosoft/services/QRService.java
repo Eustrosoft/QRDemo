@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.eustrosoft.configurations.QRRangeConfig;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
@@ -165,11 +166,18 @@ public class QRService {
     }
 
     @CacheEvict(key = "#result.code", value = QR_CACHE_NAME)
-    public QRProjection uploadFile(Long id, FileUploadRequest fur) throws IllegalAccessException, IOException {
+    public QRSimplestProjection uploadFile(Long id, FileUploadRequest fur) throws IllegalAccessException, IOException {
         QRSimplestProjection qr = get(id, QRSimplestProjection.class).get();
         FileProjection file = fileService.uploadFile(fur);
         qrRepository.insertFile(qr.getId(), file.getId());
-        return get(id, QRProjection.class).get();
+        return get(id, QRSimplestProjection.class).get();
+    }
+
+    @CacheEvict(key = "#result.code", value = QR_CACHE_NAME)
+    public QRSimplestProjection chooseFile(Long id, FileChooseRequest fcr) throws IllegalAccessException {
+        get(id, QRSimplestProjection.class).get();
+        qrRepository.insertFile(id, fcr.getId());
+        return get(id, QRSimplestProjection.class).get();
     }
 
     @SneakyThrows

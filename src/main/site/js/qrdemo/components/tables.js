@@ -3,7 +3,7 @@ import { notEmptyOrUndefined, notNullOrUndefined } from "../../commons/common.js
 export const DOWNRAISING_INDEX = 'downraisingIndex'
 export const UPRAISING_INDEX = 'upraisingIndex'
 
-export function getTable(headItems, items, itemRowClass = null, id = '', tableClass = null, rowClickCallback = null) {
+export function getTable(headItems, items, itemRowClass = null, id = '', tableClass = null, rowClickCallback) {
     let table = document.createElement('table')
     if (id != '') {
         table.id = id
@@ -44,7 +44,10 @@ export function getTable(headItems, items, itemRowClass = null, id = '', tableCl
     return table
 }
 
-export function getComplexTable(headItems, items, itemRowClass = null, tableId = '', tableClass = null, trKey = null, rowClickCallback = null) {
+export function getComplexTable(
+    headItems, items, 
+    itemRowClass = null, tableId = '', tableClass = null, trKey = null, 
+    rowClickCallback = null, hasActionsItem = false) {
     let table = document.createElement('table')
     if (tableId != '') {
         table.id = tableId
@@ -59,6 +62,12 @@ export function getComplexTable(headItems, items, itemRowClass = null, tableId =
             let th = document.createElement('th')
             th.innerHTML = headItems[hi].name
             th.style = `width: ${headItems[hi].width}`
+            tr.appendChild(th)
+        }
+        if (hasActionsItem) {
+            let th = document.createElement('th')
+            th.innerHTML = 'Действия'
+            th.style = `width: 8%`
             tr.appendChild(th)
         }
         table.appendChild(tr)
@@ -94,6 +103,9 @@ export function getComplexTable(headItems, items, itemRowClass = null, tableId =
             }
             tr.appendChild(td)
         }
+        if (hasActionsItem && notEmptyOrUndefined(item['actions'])) {
+            tr.appendChild(item['actions'])
+        }
         if (rowClickCallback != null) {
             tr.addEventListener('click', rowClickCallback)
         }
@@ -118,5 +130,15 @@ export class TableHead {
         this.width = width
         this.key = key
         this.itemCallback = itemCallback
+    }
+}
+
+export class ActionColumn {
+    constructor(buttons) {
+        this.buttons = buttons
+    }
+
+    getButtons() {
+        return this.buttons
     }
 }

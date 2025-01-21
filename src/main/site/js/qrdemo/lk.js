@@ -376,7 +376,7 @@ function getQRRow(data, settings) {
     for (let cs in colSettings) {
         if (colSettings[cs].enable) {
             let td = document.createElement('td')
-            let fieldName = colSettings[cs].fieldName
+            let fieldName = colSettings[cs]?.fieldName
             let fieldType = colSettings[cs]?.type
 
             if (isUpperCase(fieldType)) {

@@ -1,12 +1,14 @@
 import { emptyOrUndefined, fieldToHtmlItems, formatBytes, setQueryParamsAndRefresh } from "./utils.js";
 import { dictionaryApi, qrApi } from "./api.js";
-import { notEmptyOrUndefined } from "../commons/common.js";
+import { booleanToString, notEmptyOrUndefined } from "../commons/common.js";
 import { getTextLabel } from "./components/labels.js";
 import { getInput } from "./components/inputs.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
-import { getTable, getTr, TableHead } from "./components/tables.js";
-import { showUploadFileModal } from "./files.js";
+import { getComplexTable, getTable, getTr, TableHead } from "./components/tables.js";
+import { showEditFileModal, showUploadFileModal } from "./files.js";
 import { getNavigationMenu } from "./components/blocks.js";
+import { formatDate } from "../commons/dateUtils.js";
+import { getBigButton } from "./components/buttons.js";
 
 var formFields = []
 var fieldTypes = []
@@ -58,7 +60,7 @@ function init(formId) {
                 return
             }
             const collectedFields = Field.htmlToFields(formDiv);
-            const collectedFiles = Field.htmlToFiles(formDiv);
+            const collectedFiles = Field.htmlToFilesFromComplexTable(formDiv);
 
             if (id !== null) {
                 qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles, formId))
@@ -219,11 +221,14 @@ function renderForm(parentDiv, objects, json) {
     // end processing same field names
 
     parentDiv.appendChild(getTextLabel('Файлы:'))
+
     let filesHeaders = [
-        new TableHead('Название', '10%'), new TableHead('Оригинальное название', '10%'),
-        new TableHead('Описание', '20%'), new TableHead('Размер', '9%'),
-        new TableHead('Публичный', '9%'), new TableHead('Создан', '8%'),
-        new TableHead('Удалить', '8%')
+        new TableHead('Название', '8%', 'name'),
+        new TableHead('Оригинальное название', '10%', 'fileName'),
+        new TableHead('Описание', '18%', 'description'),
+        new TableHead('Размер', '7%', 'fileSize', formatBytes),
+        new TableHead('Создан', '8%', 'created', formatDate),
+        new TableHead('Публичный', '8%', 'isPublic', booleanToString)
     ]
 
     let files = json?.files
@@ -231,22 +236,32 @@ function renderForm(parentDiv, objects, json) {
     let fileItems = []
     for (let index in files) {
         const file = files[index];
-        fileItems.push({
-            name: `<input name="id" type="hidden" value="${file?.id}"/>` + file?.name,
-            fileName: file?.fileName,
-            description: file?.description,
-            fileSize: formatBytes(file?.fileSize),
-            isPublic: file?.isPublic,
-            created: file?.created,
-            actions: `<button class="big_button" id="delete_file_btn_${index}">X</button>`
+        let actionCol = document.createElement('td')
+        let openBtn = getBigButton('Открыть')
+        openBtn.addEventListener('click', () => {
+            qrApi().downloadFile(file?.id, file?.fileName)
         })
+        let editBtn = getBigButton('Ред.')
+        editBtn.addEventListener('click', () => {
+            showEditFileModal(file?.id, true)
+        })
+        let removeBtn = getBigButton('Убрать')
+        removeBtn.addEventListener('click', () => {
+            removeBtn.parentElement.parentElement.remove()
+        })
+        actionCol.append(openBtn, editBtn, removeBtn)
+        file['actions'] = actionCol
+        fileItems.push(file)
     }
-    let tableFiles = getTable(
+
+    let tableFiles = getComplexTable(
         filesHeaders,
         fileItems,
         'formFileRow',
         'files_table',
-        'compact_table'
+        'compact_table',
+        'id',
+        null, true
     )
 
     let addFileButton = document.createElement('button')
@@ -254,39 +269,60 @@ function renderForm(parentDiv, objects, json) {
     addFileButton.innerText = '+'
 
     addFileButton.addEventListener('click', () => {
-        showUploadFileModal(() => {
-            let name = document.getElementById('file_name')
-            let description = document.getElementById('file_description')
-            let file = document.getElementById('file_content')
-            let isPublic = document.getElementById('file_public')
+        showUploadFileModal(
+            () => {
+                let name = document.getElementById('file_name')
+                let description = document.getElementById('file_description')
+                let file = document.getElementById('file_content')
+                let isPublic = document.getElementById('file_public')
 
-            qrApi().uploadFormFile(json?.id,
-                {
-                    name: name.value,
-                    description: description.value,
-                    file: file,
-                    public: isPublic.checked
-                }
-            )
-            alert('Файл успешно загружен!')
-
-            formFields = Field.htmlToFields(parentDiv)
-            qrApi().getFormById(json?.id)
-                .then(resp => {
-                    return resp.json()
-                }).then(json => {
-                    renderForm(parentDiv, formFields, json)
-                })
-        })
+                qrApi().uploadFormFile(json?.id,
+                    {
+                        name: name.value,
+                        description: description.value,
+                        file: file,
+                        public: isPublic.checked
+                    }
+                )
+                alert('Файл успешно загружен!')
+                saveFieldsAndRefreshForm(parentDiv, formFields, json)
+            }, true,
+            () => {
+                let fileSelect = document.getElementById('file_select')
+                qrApi().connectFileToForm(json?.id, fileSelect?.options[fileSelect?.selectedIndex]?.id)
+                    .then(resp => {
+                        if (!resp.ok) {
+                            throw new Error('Ошибка при приклеплении файла. Возможно, такой файл уже прикреплен')
+                        }
+                        return resp.text()
+                    })
+                    .then(text => {
+                        alert('Файл успешно прикреплен!')
+                        saveFieldsAndRefreshForm(parentDiv, formFields, json)
+                    })
+                    .catch(ex => {
+                        alert(ex)
+                    })
+            })
     })
 
-    let fileTr = getTr(addFileButton, filesHeaders.length)
+    let fileTr = getTr(addFileButton, filesHeaders.length + 1)
     tableFiles.appendChild(fileTr)
 
     parentDiv.appendChild(tableFiles)
 
     addDeleteRowActions(parentDiv, objects, json)
     addDeleteFileRowActions()
+}
+
+function saveFieldsAndRefreshForm(parentDiv, formFields, json) {
+    formFields = Field.htmlToFields(parentDiv)
+    qrApi().getFormById(json?.id)
+        .then(resp => {
+            return resp.json()
+        }).then(json => {
+            renderForm(parentDiv, formFields, json)
+        })
 }
 
 function addDeleteRowActions(parentDiv, objects, json) {
@@ -378,7 +414,7 @@ export class Field {
         return fields
     }
 
-    static htmlToFiles(div) {
+    static htmlToFiles(div, additionalCondition = null) {
         const formFiles = div.getElementsByClassName('formFileRow')
         if (formFiles.length === 0) {
             return []
@@ -386,10 +422,44 @@ export class Field {
 
         let files = []
         for (let i = 0; i < formFiles.length; i++) {
-            let formFileIdElement = formFiles[i].children[0].firstElementChild
-            if (formFileIdElement) {
-                const fileId = formFileIdElement.value
-                files.push({ id: fileId })
+            if (notEmptyOrUndefined(additionalCondition)) {
+                if (additionalCondition(formFiles[i])) {
+                    let formFileIdElement = formFiles[i].children[0].firstElementChild
+                    if (formFileIdElement) {
+                        const fileId = formFileIdElement.value
+                        files.push({ id: fileId })
+                    }
+                }
+            } else {
+                let formFileIdElement = formFiles[i].children[0].firstElementChild
+                if (formFileIdElement) {
+                    const fileId = formFileIdElement.value
+                    files.push({ id: fileId })
+                }
+            }
+        }
+        return files
+    }
+
+    static htmlToFilesFromComplexTable(div, additionalCondition = null) {
+        const fileRow = div.getElementsByClassName('formFileRow')
+        if (fileRow.length === 0) {
+            return []
+        }
+
+        let files = []
+        for (let i = 0; i < fileRow.length; i++) {
+            let fileId = fileRow[i]?.getAttribute('key')
+            if (notEmptyOrUndefined(additionalCondition)) {
+                if (additionalCondition(fileRow[i])) {
+                    if (fileId) {
+                        files.push({ id: fileId })
+                    }
+                }
+            } else {
+                if (fileId) {
+                    files.push({ id: fileId })
+                }
             }
         }
         return files

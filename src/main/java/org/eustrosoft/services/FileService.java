@@ -2,6 +2,7 @@ package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Participant;
@@ -108,13 +109,16 @@ public class FileService {
         repository.deleteById(id);
     }
 
-    public ResponseEntity<byte[]> downloadFile(Long id) {
+    public ResponseEntity<byte[]> downloadFile(Long id, String fileName) {
         try {
             FileProjection file = repository.findById(id, FileProjection.class).get();
             if (file.getIsPublic() == null || file.getIsActive() == null) {
                 throw new IllegalArgumentException("File is not public or inactive");
             }
-            if (file.getIsPublic() && file.getIsActive()) {
+            if (StringUtils.isEmpty(fileName) || !file.getFileName().equals(fileName)) {
+                throw new IllegalArgumentException("File name is not correct");
+            }
+            if (file.getIsActive()) {
                 return getFileResponse(id, file);
             }
             securityComponent.checkUserRightById(file::getParticipantId);

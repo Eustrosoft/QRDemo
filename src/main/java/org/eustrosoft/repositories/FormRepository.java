@@ -3,6 +3,8 @@ package org.eustrosoft.repositories;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.repositories.projections.FormSimpleProjection;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,4 +26,8 @@ public interface FormRepository extends CrudRepository<Form, Long> {
 
     @EntityGraph(value = "fieldsEntityGraph")
     <T> Iterable<T> findAllByParticipantId(Long participantId, Class<T> type);
+
+    @Modifying
+    @Query(value = "insert into form_file (form_id, file_id) values (?1, ?2)", nativeQuery = true)
+    void insertFile(Long id, Long fileId);
 }

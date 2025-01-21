@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class FilePublicController {
     private final FileService service;
 
-    @GetMapping("/{id}/download")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id) {
-        return service.downloadFile(id);
+    @GetMapping("/{id}/download/{fileName}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id, @PathVariable String fileName) {
+        return service.downloadFile(id, fileName);
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.dtos.FileDto;
 import org.eustrosoft.dtos.QRChangeDto;
 import org.eustrosoft.dtos.QRCreationDto;
@@ -73,6 +74,14 @@ public class QRController {
             FileUploadRequest fur
     ) throws IllegalAccessException, IOException {
         return mapper.toDto(service.uploadFile(id, fur));
+    }
+
+    @PutMapping("/{id}/files/choose")
+    public void chooseFile(
+            @PathVariable Long id,
+            @RequestBody FileChooseRequest fcr
+    ) throws IllegalAccessException, IOException {
+        service.chooseFile(id, fcr);
     }
 
     @PostMapping("/{id}/files/{fileId}/delete")
