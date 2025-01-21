@@ -484,6 +484,10 @@ th {
 .header__nav {
     margin-left: 60px;
     z-index: 5;
+    min-height: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .header__ul {

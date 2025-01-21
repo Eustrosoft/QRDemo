@@ -47,25 +47,12 @@ import { getSpan, MAIN_TEXT } from "./components/texts.js";
             setFiles(files)
         } else {
             if (mainBlock) {
-                setMainPage(mainBlock)
+                setLk(lk)
             }
         }
     }
 
 })(window, document, undefined);
-
-function setMainPage(parent) {
-    let mainPage = document.createElement('div')
-    mainPage.id = 'main_page'
-
-    mainPage.innerHTML = `
-        <h1> Данный сайт предназначен для ознакомления с функциональностью системы <span class="color-red">QXYZ</span> </h1>
-        <video src="videos/demonstration.mp4" controls> </video>
-        ${MAIN_TEXT}
-    `
-
-    parent.appendChild(mainPage)
-}
 
 export function initUserSettings() {
     let theme = localStorage.getItem(LOCAL_STORAGE_USER_THEME)

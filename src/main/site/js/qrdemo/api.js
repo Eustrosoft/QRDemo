@@ -3,7 +3,7 @@ import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
 export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
 export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
-export const QR_PRINTER_URL = `printer.html`
+export const QR_PRINTER_URL = `/printer/`
 
 export function qrApi() {
     const headers = {
