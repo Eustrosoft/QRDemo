@@ -13,6 +13,7 @@ import org.eustrosoft.entitites.enums.FormFieldType;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FormFieldDto extends EntityDto {
+    private String caption;
     private String placeholder;
     private Integer fieldOrder;
     private FormFieldType fieldType;

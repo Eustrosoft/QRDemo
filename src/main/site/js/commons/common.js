@@ -46,6 +46,10 @@ export function checkElementsNotNull(elements) {
     return !!elements;
 }
 
+export function getOrOther(value, defaultValue) {
+    return emptyOrUndefined(value) ? defaultValue : value;
+}
+
 export function notEmptyOrUndefined(value) {
     return !emptyOrUndefined(value);
 }

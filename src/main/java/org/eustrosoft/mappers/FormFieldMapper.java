@@ -23,6 +23,7 @@ public class FormFieldMapper extends EntityMapper {
         dto.setId(formField.getId());
         dto.setIsPublic(formField.getIsPublic());
         dto.setName(formField.getName());
+        dto.setCaption(formField.getCaption());
         dto.setIsStatic(formField.getIsStatic());
         dto.setFieldOrder(formField.getFieldOrder());
         dto.setFieldType(formField.getFieldType());
@@ -45,6 +46,7 @@ public class FormFieldMapper extends EntityMapper {
         }
         FormField formField = new FormField();
         formField.setName(dto.getName());
+        formField.setCaption(dto.getCaption());
         formField.setFieldType(dto.getFieldType());
         formField.setPlaceholder(dto.getPlaceholder());
         formField.setFieldOrder(dto.getFieldOrder());

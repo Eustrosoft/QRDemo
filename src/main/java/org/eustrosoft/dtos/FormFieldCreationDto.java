@@ -10,6 +10,7 @@ import org.eustrosoft.entitites.enums.FormFieldType;
 @AllArgsConstructor
 public class FormFieldCreationDto {
     private String name;
+    private String caption;
     private String placeholder;
     private Integer fieldOrder;
     private FormFieldType fieldType;

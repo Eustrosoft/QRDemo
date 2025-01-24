@@ -39,6 +39,9 @@ public class FormField implements Serializable {
     @MapsId("form_id")
     private Form form;
 
+    @Column(name = "caption")
+    private String caption;
+
     @Column(name = "participant_id")
     private Long participantId;
 
@@ -94,6 +97,7 @@ public class FormField implements Serializable {
         FormField clone = new FormField();
         clone.setId(this.getId());
         clone.setName(this.getName());
+        clone.setCaption(this.getCaption());
         clone.setFormId(this.getFormId());
         clone.setParticipantId(this.getParticipantId());
         clone.setFieldOrder(this.getFieldOrder());

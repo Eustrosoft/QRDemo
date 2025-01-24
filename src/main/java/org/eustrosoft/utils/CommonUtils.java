@@ -4,7 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -24,7 +28,6 @@ public final class CommonUtils {
         Map originalDataMap = mapper.readValue(originalData, Map.class);
         Map newDataMap = mapper.readValue(newData, Map.class);
         originalDataMap.putAll(newDataMap);
-
         return mapper.writeValueAsString(originalDataMap);
     }
 

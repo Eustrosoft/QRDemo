@@ -159,6 +159,9 @@ function getEditCardInfoHtml(qr) {
 
         let f = fields[field]
         let labelText = f?.name
+        if (notEmptyOrUndefined(f?.caption)) {
+            labelText = f?.caption
+        }
         let isPublic = notEmptyOrUndefined(f?.isPublic) ? f?.isPublic : true
         if (notEmptyOrUndefined(isPublic) && !isPublic) {
             labelText = labelText.concat(' *')
@@ -231,7 +234,6 @@ function getEditCardInfoHtml(qr) {
         null, true
     )
 
-
     let addFileButton = document.createElement('button')
     addFileButton.className = 'custom_button'
     addFileButton.innerText = '+'
@@ -272,6 +274,7 @@ function getEditCardInfoHtml(qr) {
     })
     let fileTr = getTr(addFileButton, filesHeaders.length + 1)
     tableFiles.appendChild(fileTr)
+    codeDiv.appendChild(getTextLabel('Файлы:'))
     codeDiv.appendChild(tableFiles)
 
     const showOnPhoneBtn = document.createElement('button');
@@ -303,6 +306,9 @@ function getViewCardInfoHtml(qr) {
     for (let index in fields) {
         const field = fields[index];
         let key = field?.name
+        if (notEmptyOrUndefined(field?.caption)) {
+            key = field?.caption
+        }
         let isStaticField = field?.isStatic
         let value
         if (isStaticField) {
@@ -348,11 +354,11 @@ function getViewCardInfoHtml(qr) {
         fileItems,
         'fileRow',
         'files_table',
-        'compact_table'
+        'compact_table',
+        null, true
     )
 
     if (fileItems.length > 0) {
-        cardDiv.appendChild(getTextLabel('Файлы:'))
         cardDiv.appendChild(tableFiles)
     }
 

@@ -168,15 +168,15 @@ function renderForm(parentDiv, objects, json) {
     parentDiv.innerHTML = ''
 
     let headers = [
-        new TableHead('Тип данных', '10%'), new TableHead('Название поля', '20%'),
+        new TableHead('Тип данных', '10%'), new TableHead('Название', '20%'),
         new TableHead('Значение', '20%'), new TableHead('Статическое', '9%'),
-        new TableHead('Публичное', '8%'), new TableHead('Поз.', '6%'),
-        new TableHead('Удалить', '8%')
+        new TableHead('Публичное', '8%'), new TableHead('Поз.', '6%'), 
+        new TableHead('FN', '8%'), new TableHead('Удалить', '8%')
     ]
     let items = []
     for (let index in objects) {
-        const formLine = objects[index];
-        const item = fieldToHtmlItems(formLine, index, fieldTypes);
+        const fieldLine = objects[index];
+        const item = fieldToHtmlItems(fieldLine, index, fieldTypes);
         items.push(item)
     }
 
@@ -186,7 +186,8 @@ function renderForm(parentDiv, objects, json) {
         items,
         'formFieldRow',
         'fields_table',
-        'compact_table'
+        'compact_table',
+        null, true
     )
     let addElementButton = document.createElement('button')
     addElementButton.className = 'custom_button'
@@ -371,7 +372,7 @@ function setStartActions() {
 
 export class Field {
 
-    constructor(id, name, placeholder, fieldType, isPublic, isStatic, fieldOrder = 0) {
+    constructor(id, caption, placeholder, fieldType, isPublic, isStatic, fieldOrder = 0, name) {
         this.id = Number(id)
         this.name = name
         this.placeholder = placeholder
@@ -379,17 +380,19 @@ export class Field {
         this.fieldOrder = parseInt(fieldOrder)
         this.isPublic = isPublic
         this.isStatic = isStatic
+        this.caption = caption
     }
 
     static getDefault(order = 0) {
         return new Field(
             0,
-            'Название',
+            '',
             '',
             'TEXT',
             true,
             true,
-            parseInt(order)
+            parseInt(order),
+            'FN' + order
         )
     }
 
@@ -404,12 +407,13 @@ export class Field {
             // TODO: not depend on element index
             const fieldId = formFields[i].children[0].firstElementChild.value
             const fieldType = formFields[i].children[0].children[1].value
-            const name = formFields[i].children[1].firstElementChild.value
+            const caption = formFields[i].children[1].firstElementChild.value
             const placeholder = formFields[i].children[2].firstElementChild.value
             const isStatic = formFields[i].children[3].firstElementChild.checked
             const isPublic = formFields[i].children[4].firstElementChild.checked
             const order = formFields[i].children[5].firstElementChild.value
-            fields.push(new Field(fieldId, name, placeholder, fieldType, isPublic, isStatic, order))
+            const name = formFields[i].children[6].firstElementChild.value
+            fields.push(new Field(fieldId, caption, placeholder, fieldType, isPublic, isStatic, order, name))
         }
         return fields
     }

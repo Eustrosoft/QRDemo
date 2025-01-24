@@ -5,7 +5,7 @@ import { getBigButton } from "./components/buttons.js";
 import { getModalWindow, showGenerateRandomPasswordModal } from "./components/modals.js";
 import { getInput, getSelect, getSingleInput, getSwitch } from "./components/inputs.js";
 import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
-import { notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
+import { getOrOther, notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getHr } from "./components/hrs.js";
@@ -209,7 +209,8 @@ function printSettingsTableAttribute(parent, existedQrTableSettings, settingsJso
     for (let col in attributesList) {
         let currentCol = attributesList[col]
         let columnName = document.createElement('label');
-        columnName.innerHTML = " - " + currentCol.name
+        let colName = notEmptyOrUndefined(currentCol?.name) ? currentCol.name : currentCol.fieldName
+        columnName.innerHTML = " - " + colName
         let columnEnable = document.createElement('input')
         columnEnable.type = 'checkbox'
         let removeAttrBtn = getBigButton('-')
@@ -291,13 +292,15 @@ function printSettingsTableAttribute(parent, existedQrTableSettings, settingsJso
                 attributeChooseDiv.appendChild(document.createElement('hr'))
                 for (let i = 0; i < json.length; i++) {
                     let name = json[i]?.name
+                    let caption = json[i]?.caption
                     let type = json[i]?.fieldType
+                    let textName = notEmptyOrUndefined(caption) ? caption : name
                     let addAttributeBtn = getBigButton('+')
-                    attributeChooseDiv.appendChild(getTextLabel(name))
+                    attributeChooseDiv.appendChild(getTextLabel(textName))
                     attributeChooseDiv.appendChild(addAttributeBtn)
                     attributeChooseDiv.appendChild(document.createElement('br'))
                     addAttributeBtn.addEventListener('click', () => {
-                        attributesList.push(new Column(type, name, name, false))
+                        attributesList.push(new Column(type, name, caption, false))
                         chooseAttributeModal.remove()
                         printSettingsTableAttribute(parent, existedQrTableSettings, settingsJson)
                     })
@@ -381,7 +384,9 @@ function getQRRow(data, settings) {
 
             if (isUpperCase(fieldType)) {
                 let dataAttr = data['data']?.[fieldName]
-                let fieldAttr = data['form']?.fields?.filter(field => fieldName === field['name']).map(field => field['placeholder'])
+                let fieldAttr = data['form']?.fields
+                    ?.filter(field => fieldName === field['name'])
+                    .map(field => field['placeholder'])
                 if (notEmptyOrUndefined(dataAttr)) {
                     td.innerHTML = dataAttr
                 } else if (notEmptyOrUndefined(fieldAttr)) {
@@ -470,7 +475,8 @@ function getTableHeader(tableSettings) {
     for (let ts in tableSettings) {
         if (tableSettings[ts].enable) {
             let header = document.createElement('th')
-            header.innerHTML = tableSettings[ts]?.name
+            let headerName = getOrOther(tableSettings[ts]?.name, tableSettings[ts]?.fieldName)
+            header.innerHTML = headerName
             tableHeader.append(header)
         }
     }

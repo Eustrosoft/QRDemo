@@ -1,9 +1,9 @@
 import { formatBytes } from "./utils.js";
-import { qrApi } from "./api.js";
+import { QR_DEMO_API, qrApi } from "./api.js";
 import { getInput } from "./components/inputs.js";
 import { getModalWindow } from "./components/modals.js";
 import { getBigButton } from "./components/buttons.js";
-import { notEmptyOrUndefined } from "../commons/common.js";
+import { copyToClipboard, notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { getTextLabel } from "./components/labels.js";
 
@@ -46,7 +46,7 @@ function printFilesList(parent, json) {
         const downloadBtnId = `file_download_btn_${json[i]?.id}`;
         const editBtnId = `file_edit_btn_${json[i]?.id}`;
         let tableRow = document.createElement('tr')
-        tableRow.id = `tr-file-id-${json[i]?.id}` 
+        tableRow.id = `tr-file-id-${json[i]?.id}`
 
         tableRow.innerHTML = `
                <td>${json[i]?.name}</td>
@@ -58,7 +58,7 @@ function printFilesList(parent, json) {
                <td>
                     <button id="${deleteBtnId}" class="big_button fs-18rem">Удалить</button>
                     <button id="${downloadBtnId}" class="big_button fs-18rem">Скачать</button>
-                    <button id="${editBtnId}" class="big_button fs-18rem">Редактировать</button>
+                    <button id="${editBtnId}" class="big_button fs-18rem">Открыть</button>
                </td>
         `
 
@@ -70,7 +70,7 @@ function printFilesList(parent, json) {
             qrApi().downloadFile(json[i]?.id, json[i]?.fileName)
         })
         document.getElementById(editBtnId).addEventListener('click', () => showEditFileModal(json[i]?.id))
-            
+
     }
     if (notEmptyOrUndefined(fileSelection)) {
         let desiredRow = document.getElementById(`tr-file-id-${fileSelection}`)
@@ -79,7 +79,7 @@ function printFilesList(parent, json) {
             block: 'center'
         })
         desiredRow.classList.add('blue_pulse')
-        setTimeout(function() {
+        setTimeout(function () {
             desiredRow.classList.remove('blue_pulse')
         }, 3_000);
     }
@@ -87,45 +87,61 @@ function printFilesList(parent, json) {
 
 export function showEditFileModal(id, reloadAfterEdit = true) {
     qrApi().getById(id)
-                .then(resp => resp.json())
-                .then(json => {
-                    let fileEditForm = document.createElement('div')
+        .then(resp => resp.json())
+        .then(json => {
+            let fileEditForm = document.createElement('div')
 
-                    let fileNameInput = getInput('Имя файла', 'text', true, 'file_edit_name', 'Введите имя', false, 'off', json?.name)
-                    let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_edit_description', 'Введите описание', false, 'off', json?.description)
-                    let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_edit_public', '', true, 'off', json?.isPublic)
-                    let isActiveInput = getInput('Доступный', 'checkbox', true, 'file_edit_active', '', true, 'off', json?.isActive)
-                    let nameInput = fileNameInput.getElementsByTagName('input')[0];
-                    nameInput.maxLength = '127'
-                    let descriptionInput = fileDescriptionInput.getElementsByTagName('input')[0];
-                    descriptionInput.maxLength = '511'
-                    let updateBtn = getBigButton('Обновить')
+            let fileNameInput = getInput('Имя файла', 'text', true, 'file_edit_name', 'Введите имя', false, 'off', json?.name)
+            let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_edit_description', 'Введите описание', false, 'off', json?.description)
+            let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_edit_public', '', true, 'off', json?.isPublic)
+            let isActiveInput = getInput('Доступный', 'checkbox', true, 'file_edit_active', '', true, 'off', json?.isActive)
+            let nameInput = fileNameInput.getElementsByTagName('input')[0];
+            nameInput.maxLength = '127'
+            let descriptionInput = fileDescriptionInput.getElementsByTagName('input')[0];
+            descriptionInput.maxLength = '511'
+            let updateBtn = getBigButton('Обновить')
+            let copyBtn = getBigButton('Скопировать ссылку')
 
-                    fileEditForm.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, updateBtn)
-                    let modal = getModalWindow('Редактирование файла', fileEditForm)
-                    modal.style.display = 'block'
+            fileEditForm.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, updateBtn, copyBtn)
+            let modal = getModalWindow('Редактирование файла', fileEditForm)
+            modal.style.display = 'block'
 
-                    updateBtn.addEventListener('click', () => {
-                        qrApi().updateFile(
-                            json?.id,
-                            {
-                                name: document.getElementById('file_edit_name')?.value,
-                                description: document.getElementById('file_edit_description')?.value,
-                                isPublic: document.getElementById('file_edit_public')?.checked,
-                                isActive: document.getElementById('file_edit_active')?.checked
-                            }
-                        ).then(resp => {
-                            if (resp.ok)
-                                return resp.json
-                            throw new Error('Неизвестная ошибка')
-                        }).then(json => {
-                            alert('Файл был обновлен')
-                            if (reloadAfterEdit) {
-                                window.location.reload()
-                            }
-                        }).catch(ex => alert('Неизвестная ошибка при обновлении файла'))
-                    })
-                })
+            updateBtn.addEventListener('click', () => {
+                qrApi().updateFile(
+                    json?.id,
+                    {
+                        name: document.getElementById('file_edit_name')?.value,
+                        description: document.getElementById('file_edit_description')?.value,
+                        isPublic: document.getElementById('file_edit_public')?.checked,
+                        isActive: document.getElementById('file_edit_active')?.checked
+                    }
+                ).then(resp => {
+                    if (resp.ok)
+                        return resp.json
+                    throw new Error('Неизвестная ошибка')
+                }).then(json => {
+                    alert('Файл был обновлен')
+                    if (reloadAfterEdit) {
+                        window.location.reload()
+                    }
+                }).catch(ex => alert('Неизвестная ошибка при обновлении файла'))
+            })
+
+            copyBtn.addEventListener('click', () => {
+                let linkRef = `${QR_DEMO_API}secured/files/${json?.id}/download/${json?.fileName}`
+                if (linkRef) {
+                    if (notEmptyOrUndefined(linkRef)) {
+                        copyToClipboard(linkRef)
+                        copyBtn.classList.add('green_pulse')
+                        setTimeout(() => {
+                            copyBtn.classList.remove('green_pulse')
+                        }, 1_000)
+                        return
+                    }
+                    alert('Нечего копировать')
+                }
+            })
+        })
 }
 
 export function deleteFile(id) {

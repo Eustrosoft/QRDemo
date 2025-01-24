@@ -21,19 +21,16 @@ ROOT:
 	mkdir -p  work/webapps/ROOT/js/qrdemo
 	mkdir -p  work/webapps/ROOT/js/qrdemo/components
 	mkdir -p  work/webapps/ROOT/js/qrdemo/domain
-#	mkdir -p  work/webapps/ROOT/public
-#	mkdir -p  work/webapps/ROOT/public/logos
 	mkdir -p  work/webapps/ROOT/logos
 	mkdir -p  work/webapps/ROOT/icons
 	mkdir -p  work/webapps/ROOT/videos
+
 	install -m 644 ../videos/demonstration.mp4 work/webapps/ROOT/videos/
 	mkdir -p  work/webapps/ROOT/styles
 	mkdir -p  work/webapps/ROOT/styles/qrdemo
-#	install -m 644 src/main/site/.gitignore work/webapps/ROOT/.gitignore
 	install -m 644 src/main/site/index.html work/webapps/ROOT/index.html
 	install -m 644 src/main/site/js/commons/common.js work/webapps/ROOT/js/commons/common.js
 	install -m 644 src/main/site/js/commons/dateUtils.js work/webapps/ROOT/js/commons/dateUtils.js
-#	install -m 644 src/main/site/js/commons/package.json work/webapps/ROOT/js/commons/package.json
 	install -m 644 src/main/site/js/package.json work/webapps/ROOT/js/package.json
 	install -m 644 src/main/site/js/qrdemo/components/buttons.js work/webapps/ROOT/js/qrdemo/components/buttons.js
 	install -m 644 src/main/site/js/qrdemo/components/inputs.js work/webapps/ROOT/js/qrdemo/components/inputs.js
@@ -59,7 +56,6 @@ ROOT:
 	install -m 644 src/main/site/js/qrdemo/package.json work/webapps/ROOT/js/qrdemo/package.json
 	install -m 644 src/main/site/js/qrdemo/utils.js work/webapps/ROOT/js/qrdemo/utils.js
 	install -m 644 src/main/site/js/qrdemo/files.js work/webapps/ROOT/js/qrdemo/files.js
-#	install -m 644 src/main/site/package-lock.json work/webapps/ROOT/package-lock.json
 	install -m 644 src/main/site/package.json work/webapps/ROOT/package.json
 	install -m 644 src/main/site/public/logos/logo.svg work/webapps/ROOT/logos/logo.svg
 	install -m 644 src/main/site/public/icons/file-upload-duotone.svg work/webapps/ROOT/icons/file-upload-duotone.svg
@@ -74,8 +70,8 @@ ROOT:
 	install -m 644 src/main/site/styles/global.css work/webapps/ROOT/styles/global.css
 	install -m 644 src/main/site/styles/qrdemo/style.css work/webapps/ROOT/styles/qrdemo/style.css
 	install -m 644 src/main/site/styles/vars.css work/webapps/ROOT/styles/vars.css
-#	install -m 644 src/main/site/vite.config.js work/webapps/ROOT/vite.config.js
 	install -m 644 src/main/site/printer.html work/webapps/ROOT/printer.html
-#
+
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/classes/application.yml work/webapps/qrCodeDemo/WEB-INF/classes/application.yml
+	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/web.xml work/webapps/qrCodeDemo/WEB-INF/web.xml
 	install -m 644 etc/prod/webapps/ROOT/js/qrdemo/api.js work/webapps/ROOT/js/qrdemo/api.js

@@ -10,7 +10,7 @@ import java.security.Principal;
 @RequestMapping("/v1/api")
 public class TestingController {
 
-    @GetMapping("/")
+    @GetMapping("/alive")
     public String alive() {
         return "Alive!";
     }

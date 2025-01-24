@@ -109,6 +109,7 @@ export function fieldToHtmlItems(field, index, fieldTypes = []) {
     const isStatic = field.isStatic
     const isPublic = field.isPublic
     const order = field.fieldOrder
+    const caption = field.caption
     const type = field.fieldType
     const id = field.id
 
@@ -117,11 +118,12 @@ export function fieldToHtmlItems(field, index, fieldTypes = []) {
     let items = [
         `<input name="id" type="hidden" value="${id}" id="field_id_${id}">
          <select name="type">${fieldTypesStr}</select>`,
-        `<input name="name" class="field_name" type="text" value="${escapeDQuotes(name)}">`,
+        `<input name="caption" class="field_caption" type="text" value="${escapeDQuotes(caption)}">`,
         `<input name="placeholder" type="text" value="${escapeDQuotes(placeholder)}">`,
         `<input name="isStatic" type="checkbox" ${isStatic ? 'checked' : ''}></input>`,
         `<input name="isPublic" type="checkbox" ${isPublic ? 'checked' : ''}></input>`,
         `<input name="fieldOrder" type="number" value="${order}">`,
+        `<input name="name" class="field_name" type="text" value="${escapeDQuotes(name)}">`,
         `<button class="big_button" id="delete_btn_${index}">X</button>`
     ]
 
