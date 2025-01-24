@@ -77,6 +77,7 @@ ROOT:
 	install -m 644 src/main/site/styles/vars.css work/webapps/ROOT/styles/vars.css
 	install -m 644 src/main/site/printer/index.html work/webapps/ROOT/printer/index.html
 	install -m 644 src/main/site/qr/index.html work/webapps/ROOT/qr/index.html
+	install -m 644 src/main/site/qr/index.jsp work/webapps/ROOT/qr/index.jsp
 	install -m 644 src/main/site/help/index.html work/webapps/ROOT/help/index.html
 
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/classes/application.yml work/webapps/qrCodeDemo/WEB-INF/classes/application.yml
