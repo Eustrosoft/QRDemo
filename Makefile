@@ -28,6 +28,10 @@ ROOT:
 	mkdir -p  work/webapps/ROOT/printer
 	mkdir -p  work/webapps/ROOT/qr
 	mkdir -p  work/webapps/ROOT/help
+	mkdir -p  work/webapps/ROOT/WEB-INF
+	mkdir -p  work/webapps/ROOT/WEB-INF/lib
+# Copy needed libraries for jsp
+	cp -r target/qrCodeDemo/WEB-INF/lib/jackson-* work/webapps/ROOT/WEB-INF/lib
 
 	install -m 644 ../videos/demonstration.mp4 work/webapps/ROOT/videos/
 	mkdir -p  work/webapps/ROOT/styles
@@ -79,7 +83,7 @@ ROOT:
 	install -m 644 src/main/site/qr/index.html work/webapps/ROOT/qr/index.html
 	install -m 644 src/main/site/qr/index.jsp work/webapps/ROOT/qr/index.jsp
 	install -m 644 src/main/site/help/index.html work/webapps/ROOT/help/index.html
+	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/web.xml work/webapps/ROOT/WEB-INF/web.xml
 
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/classes/application.yml work/webapps/qrCodeDemo/WEB-INF/classes/application.yml
-	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/web.xml work/webapps/qrCodeDemo/WEB-INF/web.xml
 	install -m 644 etc/prod/webapps/ROOT/js/qrdemo/api.js work/webapps/ROOT/js/qrdemo/api.js
