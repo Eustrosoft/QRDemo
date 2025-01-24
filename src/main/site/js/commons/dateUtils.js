@@ -1,4 +1,4 @@
-import { emptyOrUndefined } from "./common";
+import { emptyOrUndefined } from "./common.js";
 
 export function getDateTime(date) {
     if (emptyOrUndefined(date)) {
