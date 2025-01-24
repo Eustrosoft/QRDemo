@@ -24,11 +24,16 @@ ROOT:
 	mkdir -p  work/webapps/ROOT/logos
 	mkdir -p  work/webapps/ROOT/icons
 	mkdir -p  work/webapps/ROOT/videos
+	mkdir -p  work/webapps/ROOT/lk
+	mkdir -p  work/webapps/ROOT/printer
+	mkdir -p  work/webapps/ROOT/qr
+	mkdir -p  work/webapps/ROOT/help
 
 	install -m 644 ../videos/demonstration.mp4 work/webapps/ROOT/videos/
 	mkdir -p  work/webapps/ROOT/styles
 	mkdir -p  work/webapps/ROOT/styles/qrdemo
 	install -m 644 src/main/site/index.html work/webapps/ROOT/index.html
+	install -m 644 src/main/site/lk/index.html work/webapps/ROOT/lk/index.html
 	install -m 644 src/main/site/js/commons/common.js work/webapps/ROOT/js/commons/common.js
 	install -m 644 src/main/site/js/commons/dateUtils.js work/webapps/ROOT/js/commons/dateUtils.js
 	install -m 644 src/main/site/js/package.json work/webapps/ROOT/js/package.json
@@ -70,7 +75,9 @@ ROOT:
 	install -m 644 src/main/site/styles/global.css work/webapps/ROOT/styles/global.css
 	install -m 644 src/main/site/styles/qrdemo/style.css work/webapps/ROOT/styles/qrdemo/style.css
 	install -m 644 src/main/site/styles/vars.css work/webapps/ROOT/styles/vars.css
-	install -m 644 src/main/site/printer.html work/webapps/ROOT/printer.html
+	install -m 644 src/main/site/printer/index.html work/webapps/ROOT/printer/index.html
+	install -m 644 src/main/site/qr/index.html work/webapps/ROOT/qr/index.html
+	install -m 644 src/main/site/help/index.html work/webapps/ROOT/help/index.html
 
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/classes/application.yml work/webapps/qrCodeDemo/WEB-INF/classes/application.yml
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/web.xml work/webapps/qrCodeDemo/WEB-INF/web.xml
