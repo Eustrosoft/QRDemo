@@ -575,7 +575,6 @@
       QRDto qrDto = mapper.readValue(con.getInputStream(), QRDto.class);
       printQRData(qrDto);
     } catch (Exception e) {
-        w(e.getLocalizedMessage());
         printNoQRData();
     } finally {
 
