@@ -11,6 +11,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <link rel="icon" href="logos/logo.svg" type="image/x-icon" />
     <meta name="google" content="notranslate">
+    <script>
+        const urlParams = new URLSearchParams(window.location.search)
+        const q = urlParams.get('q')
+        if (q) {
+            window.location.href = '/qr/?q=' + q
+        }
+    </script>
 </head>
 
 <body class="light flex m-0 gap-05rem flex-direction-column">

@@ -458,6 +458,7 @@
  <head>
   <title><%= String.format(TITLE_FORMAT, titleText) %></title>
   <meta name="google" content="notranslate">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <style>
     *, :after, :before, header {
       padding: 0;
@@ -530,7 +531,6 @@
         overflow: hidden;
         word-break: break-word;
         overflow-wrap: break-word;
-        font-size: 1.4em;
     }
 
     .compact_table tr td:nth-of-type(even) {
@@ -558,6 +558,23 @@
             text-align: center;
         }
     }
+
+    @media only screen and (max-width: 1000px) {
+     table, td, th {
+        margin: 2px;
+        padding: 1px;
+        font-size: 1.1em;
+     }
+     header {
+        font-size: 2.0em;
+     }
+     h1 {
+        font-size: 1.3em;
+     }
+     .big_button {
+        width: 100%;
+     }
+  }
   </style>
 
  </head>
