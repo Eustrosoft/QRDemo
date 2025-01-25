@@ -493,11 +493,18 @@
       background-repeat: no-repeat;
     }
 
-     main {
-        max-width: 100vw;
-        display: block;
-        background-color: var(--bg-color, #fff);
-     }
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    main {
+      flex: 1;
+      max-width: 100vw;
+      display: block;
+      background-color: var(--bg-color, #fff);
+    }
 
     #main_block {
       padding: 8px;
@@ -614,10 +621,8 @@
     }
 
     footer {
-      position: absolute;
-      bottom: 0;
       width: 100%;
-      height: 50px;
+      min-height: 50px;
       background-color: var(--bg-secondary-color, #f8f8f8);
     }
 
@@ -670,7 +675,6 @@
  %>
   </div>
   </main>
-
   <footer>
     <div class="footer-inner">
               <nav>
