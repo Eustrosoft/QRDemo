@@ -119,7 +119,7 @@ export function qrApi() {
             return authFetch(req)
         },
         getQr: (q) => {
-            let url = `${QR_DEMO_API}secured/qrs/code?q=${q}`;
+            let url = `${QR_DEMO_API}secured/qrs/code?q=${q}`
 
             const req = new Request(
                 url,
@@ -145,7 +145,7 @@ export function qrApi() {
             return fetch(req)
         },
         saveQr: (data) => {
-            let url = `${QR_DEMO_API}secured/qrs`;
+            let url = `${QR_DEMO_API}secured/qrs`
 
             const req = new Request(
                 url,
@@ -159,18 +159,15 @@ export function qrApi() {
             return authFetch(req)
         },
         uploadFormFile: (id, fileRequest) => {
-            const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`;
+            const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`
             uploadSingleFile(url, fileRequest)
         },
         uploadQRFile: (id, fileRequest) => {
-            const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`;
+            const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`
             uploadSingleFile(url, fileRequest)
         },
-        getFileLink: (id, name) => {
-            return QR_DEMO_API + `unsecured/qrs/${id}/files/${name}`
-        },
-        getFileLinkV2: (id, fileId) => {
-            return QR_DEMO_API + `unsecured/qrs/${id}/files/v2/${fileId}`
+        getDownloadAllQRPublicFilesLink: (id) => {
+            return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
         },
         connectFileToQR: (id, fileId) => {
             let url = `${QR_DEMO_API}secured/qrs/${id}/files/choose`;
@@ -187,7 +184,7 @@ export function qrApi() {
             return authFetch(req)
         },
         connectFileToForm: (id, fileId) => {
-            let url = `${QR_DEMO_API}secured/forms/${id}/files/choose`;
+            let url = `${QR_DEMO_API}secured/forms/${id}/files/choose`
 
             const req = new Request(
                 url,
@@ -201,7 +198,7 @@ export function qrApi() {
             return authFetch(req)
         },
         getRanges: () => {
-            let url = `${QR_DEMO_API}secured/ranges`;
+            let url = `${QR_DEMO_API}secured/ranges`
 
             const req = new Request(
                 url,
@@ -214,7 +211,7 @@ export function qrApi() {
             return authFetch(req)
         },
         createQR: (name, description) => {
-            let url = `${QR_DEMO_API}secured/qrs`;
+            let url = `${QR_DEMO_API}secured/qrs`
 
             const req = new Request(
                 url,

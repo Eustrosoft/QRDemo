@@ -191,7 +191,7 @@ function getEditCardInfoHtml(qr) {
         for (let index in formFiles) {
             const file = formFiles[index];
             let actionCol = document.createElement('td')
-            let openBtn = getBigButton('Посмотреть')
+            let openBtn = getBigButton('Скачать')
             openBtn.addEventListener('click', () => {
                 qrApi().downloadFile(file?.id, file?.fileName)
             })
@@ -199,7 +199,7 @@ function getEditCardInfoHtml(qr) {
             editBtn.addEventListener('click', () => {
                 showEditFileModal(file?.id, true)
             })
-            actionCol.append(openBtn, editBtn)
+            actionCol.append(editBtn, openBtn)
             file['actions'] = actionCol
             fileItems.push(file)
         }
@@ -208,7 +208,7 @@ function getEditCardInfoHtml(qr) {
     for (let index in files) {
         const file = files[index];
         let actionCol = document.createElement('td')
-        let openBtn = getBigButton('Посмотреть')
+        let openBtn = getBigButton('Скачать')
         openBtn.addEventListener('click', () => {
             qrApi().downloadFile(file?.id, file?.fileName)
         })
@@ -220,7 +220,7 @@ function getEditCardInfoHtml(qr) {
         removeBtn.addEventListener('click', () => {
             removeBtn.parentElement.parentElement.remove()
         })
-        actionCol.append(openBtn, editBtn, removeBtn)
+        actionCol.append(editBtn, openBtn, removeBtn)
         file['actions'] = actionCol
         fileItems.push(file)
     }
@@ -359,9 +359,12 @@ function getViewCardInfoHtml(qr) {
     )
 
     if (fileItems.length > 0) {
+        let downloadAllHref = document.createElement('a');
+        downloadAllHref.href = qrApi().getDownloadAllQRPublicFilesLink(Number(qr?.code).toString(16))
+        downloadAllHref.innerHTML = 'Скачать всё'
+        cardDiv.appendChild(downloadAllHref)
         cardDiv.appendChild(tableFiles)
     }
-
     return cardDiv
 }
 

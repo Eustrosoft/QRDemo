@@ -56,9 +56,9 @@ function printFilesList(parent, json) {
                <td>${formatBytes(json[i]?.fileSize)}</td>
                <td>${json[i]?.isPublic}</td>
                <td>
-                    <button id="${deleteBtnId}" class="big_button fs-18rem">Удалить</button>
-                    <button id="${downloadBtnId}" class="big_button fs-18rem">Скачать</button>
                     <button id="${editBtnId}" class="big_button fs-18rem">Открыть</button>
+                    <button id="${downloadBtnId}" class="big_button fs-18rem">Скачать</button>
+                    <button id="${deleteBtnId}" class="big_button fs-18rem">Удалить</button>
                </td>
         `
 

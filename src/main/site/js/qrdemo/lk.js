@@ -427,7 +427,7 @@ function getQRRow(data, settings) {
         : settings?.defaultQrPrintText
 
     let td = document.createElement('td')
-    let editBtn = getBigButton('Редактировать', `edit_${q}`)
+    let editBtn = getBigButton('Открыть', `edit_${q}`)
     let printBtn = getBigButton('Распечатать QR-код', `print_${q}`)
     editBtn.addEventListener('click', () => {
         window.open(`?q=${q}&edit=true`, '_self')
@@ -515,7 +515,7 @@ function setupAdminPanel(div) {
         const passw1 = getInput('Пароль', 'password', true, 'create_participant_password_1', 'Введите пароль...', false, 'new-password')
         const passw2 = getInput('Повтор пароля', 'password', true, 'create_participant_password_2', 'Повторите пароль...', false, 'new-password')
         const email = getInput('Почта', 'email', true, 'create_participant_email', 'Введите электронную почту...')
-        const lei = getInput('LEI', 'text', false, 'create_participant_lei', 'LEI...')
+        const lei = getInput('ИНН', 'text', false, 'create_participant_lei', 'ИНН...')
         const address = getInput('Адрес', 'text', false, 'create_participant_address', 'Введите адрес...')
         const organization = getInput('Организация', 'text', false, 'create_participant_organization', 'Введите организацию...')
         const website = getInput('Вебсайт', 'url', false, 'create_participant_website', 'Введите вебсайт...')
@@ -579,7 +579,7 @@ function setUserPanel(parenDiv, participantId) {
         .then(json => {
             let username = get2TextLabels('Имя: ', json?.username)
             let email = get2TextLabels('Email: ', json?.email)
-            let lei = get2TextLabels('LEI: ', json?.lei)
+            let lei = get2TextLabels('ИНН: ', json?.lei)
             let address = get2TextLabels('Адрес: ', json?.address)
             let website = get2TextLabels('Вебсайт: ', json?.website)
             let organization = get2TextLabels('Организация: ', json?.organization)
@@ -696,7 +696,7 @@ function setUserPanel(parenDiv, participantId) {
                 let blockContent = document.createElement('div')
                 const usernameInp = getInput('Имя пользователя', 'text', true, 'change_participant_username', 'Введите имя пользователя...', false, 'off', json?.username)
                 const emailInp = getInput('Почта', 'email', true, 'change_participant_email', 'Введите электронную почту...', false, 'off', json?.email)
-                const leiInp = getInput('LEI', 'text', false, 'change_participant_lei', 'LEI...', false, 'off', json?.lei)
+                const leiInp = getInput('ИНН', 'text', false, 'change_participant_lei', 'ИНН...', false, 'off', json?.lei)
                 const addressInp = getInput('Адрес', 'text', false, 'change_participant_address', 'Введите адрес...', false, 'off', json?.address)
                 const organizationInp = getInput('Организация', 'text', false, 'change_participant_organization', 'Введите организацию...', false, 'off', json?.organization)
                 const websiteInp = getInput('Вебсайт', 'url', false, 'change_participant_website', 'Введите вебсайт...', false, 'off', json?.website)

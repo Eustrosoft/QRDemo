@@ -171,6 +171,9 @@ export function qrApi() {
         getFileLinkV2: (id, fileId) => {
             return QR_DEMO_API + `unsecured/qrs/${id}/files/v2/${fileId}`
         },
+        getDownloadAllQRPublicFilesLink: (id) => {
+            return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
+        },
         getRanges: () => {
             let url = `${QR_DEMO_API}secured/ranges`;
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import org.eustrosoft.configurations.QRRangeConfig;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.FileChooseRequest;
@@ -26,13 +27,23 @@ import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.utils.CommonUtils;
+import org.eustrosoft.utils.CompressUtils;
+import org.eustrosoft.utils.JdbcBlobProcessor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,10 +54,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static org.eustrosoft.Constants.EMPTY_JSON;
 import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
+import static org.eustrosoft.utils.CompressUtils.zipFile;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +74,7 @@ public class QRService {
     private final FormMapper formMapper;
     private final FileMapper fileMapper;
     private final FileService fileService;
+    private final JdbcBlobProcessor jdbcBlobProcessor;
 
     @Transactional(readOnly = true)
     public Optional<QR> get(Long id) throws IllegalAccessException {
@@ -94,6 +109,32 @@ public class QRService {
         }
         QRProjection gotQr = qr.get();
         return prepareDataBasedOnForm(gotQr);
+    }
+
+    @Transactional(readOnly = true)
+    public void downloadAllPublicFiles(Long code) throws IOException {
+        if (code == null) {
+            throw new IllegalArgumentException("Illegal code");
+        }
+        Optional<QRProjection> qr = qrRepository.findByCode(code, QRProjection.class);
+        if (!qr.isPresent()) {
+            throw new IllegalArgumentException("QR code not found");
+        }
+        QRProjection gotQr = qr.get();
+        List<FileProjection> publicFiles = new ArrayList<>();
+        List<FileProjection> qrFiles = gotQr.getFiles();
+        if (qrFiles != null && !qrFiles.isEmpty()) {
+            qrFiles.stream()
+                    .filter(f -> f.getIsPublic() && f.getIsActive())
+                    .forEach(publicFiles::add);
+        }
+        FormComplexProjection form = gotQr.getForm();
+        if (form != null && form.getFiles() != null && !form.getFiles().isEmpty()) {
+            form.getFiles().stream()
+                    .filter(f -> f.getIsPublic() && f.getIsActive())
+                    .forEach(publicFiles::add);
+        }
+        downloadFiles(code, publicFiles);
     }
 
     @Transactional(readOnly = true)
@@ -186,6 +227,44 @@ public class QRService {
         QRSimplestProjection qr = get(id, QRSimplestProjection.class).get();
         qrRepository.deleteFile(qr.getId(), fileId);
         return get(id, QRProjection.class).get();
+    }
+
+    private void downloadFiles(Long code, List<FileProjection> files) throws IOException {
+        if (files == null || files.isEmpty()) {
+            throw new IllegalArgumentException("No files provided");
+        }
+        Path tempDirPath = Files.createTempDirectory("QR-" + Long.toHexString(code) + " - ");
+        try {
+            HttpServletResponse resp = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+            resp.setHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
+            resp.setHeader(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    String.format(
+                            "attachment; filename*=UTF-8''archive.zip"
+                    )
+            );
+            for (FileProjection fp : files) {
+                if (fp.getIsPublic() && fp.getIsActive()) {
+                    try (FileOutputStream fos
+                                 = new FileOutputStream(new File(tempDirPath.toFile(), fp.getFileName()))) {
+                        jdbcBlobProcessor.puller(fp.getId())
+                                .accept(fos);
+                    }
+                }
+            }
+
+            ZipOutputStream zipOut = new ZipOutputStream(resp.getOutputStream());
+            zipFile(tempDirPath.toFile(), tempDirPath.toFile().getName(), zipOut);
+            zipOut.close();
+        } catch (Exception e) {
+            // ignore
+        } finally {
+            try {
+                FileUtils.deleteDirectory(tempDirPath.toFile());
+            } catch (Exception e) {
+                // ignore
+            }
+        }
     }
 
     public void annulForm(List<Long> ids) {

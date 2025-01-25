@@ -131,7 +131,7 @@ public class FileService {
     @SneakyThrows
     @Transactional(readOnly = true)
     private ResponseEntity<byte[]> getFileResponse(Long id, FileProjection file) {
-        byte[] fileData = repository.findById(id, FileBytesProjection.class).get().getFileData();
+        byte[] fileData = getFileData(id);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, file.getFileType());
         headers.add(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
@@ -147,5 +147,11 @@ public class FileService {
                 fileData, headers,
                 HttpStatus.OK
         );
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] getFileData(Long id) {
+        return repository.findById(id, FileBytesProjection.class)
+                .get().getFileData();
     }
 }
