@@ -191,11 +191,11 @@ function getEditCardInfoHtml(qr) {
         for (let index in formFiles) {
             const file = formFiles[index];
             let actionCol = document.createElement('td')
-            let openBtn = getBigButton('Открыть')
+            let openBtn = getBigButton('Посмотреть')
             openBtn.addEventListener('click', () => {
                 qrApi().downloadFile(file?.id, file?.fileName)
             })
-            let editBtn = getBigButton('Ред.')
+            let editBtn = getBigButton('Открыть')
             editBtn.addEventListener('click', () => {
                 showEditFileModal(file?.id, true)
             })
@@ -208,15 +208,15 @@ function getEditCardInfoHtml(qr) {
     for (let index in files) {
         const file = files[index];
         let actionCol = document.createElement('td')
-        let openBtn = getBigButton('Открыть')
+        let openBtn = getBigButton('Посмотреть')
         openBtn.addEventListener('click', () => {
             qrApi().downloadFile(file?.id, file?.fileName)
         })
-        let editBtn = getBigButton('Ред.')
+        let editBtn = getBigButton('Открыть')
         editBtn.addEventListener('click', () => {
             showEditFileModal(file?.id, true)
         })
-        let removeBtn = getBigButton('Убрать')
+        let removeBtn = getBigButton('Открепить')
         removeBtn.addEventListener('click', () => {
             removeBtn.parentElement.parentElement.remove()
         })

@@ -128,7 +128,7 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
             })
 
             copyBtn.addEventListener('click', () => {
-                let linkRef = `${QR_DEMO_API}secured/files/${json?.id}/download/${json?.fileName}`
+                let linkRef = `${QR_DEMO_API}unsecured/files/${json?.id}/download/${json?.fileName}`
                 if (linkRef) {
                     if (notEmptyOrUndefined(linkRef)) {
                         copyToClipboard(linkRef)
