@@ -29,9 +29,4 @@ public class TestingController {
     public String admin() {
         return "Admin path!";
     }
-
-    @GetMapping("/me")
-    public String getUserName(Principal principal) {
-        return principal.getName();
-    }
 }

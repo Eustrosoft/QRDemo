@@ -23,7 +23,7 @@ public class QrRangeMapper extends EntityMapper {
     }
 
     public List<QRRangeDto> toDtoList(Collection<QRRange> ranges) {
-        if (ranges == null) {
+        if (ranges == null || ranges.isEmpty()) {
             return Collections.emptyList();
         }
         return ranges.stream()

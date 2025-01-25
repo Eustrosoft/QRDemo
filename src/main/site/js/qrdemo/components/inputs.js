@@ -46,6 +46,32 @@ export function getInput(labelText, type, required = false, id = '', placeholder
     return htmlInputDiv
 }
 
+export function getTextArea(labelText, required, id, placeholder, inline = false, value = '') {
+    let htmlInputDiv = document.createElement('div');
+    if (inline) {
+        htmlInputDiv.style.display = 'flex'
+    }
+
+    if (notEmptyOrUndefined(labelText)) {
+        let htmlLabel = document.createElement('label');
+        let requiredStar = required ? ' *' : ''
+        htmlLabel.innerHTML = labelText + requiredStar
+        htmlInputDiv.appendChild(htmlLabel)
+        if (!inline) {
+            htmlInputDiv.appendChild(document.createElement('br'))
+        }
+    }
+    let textarea = document.createElement('textarea')
+    textarea.placeholder = placeholder
+    textarea.required = required
+    textarea.id = id
+    if (notEmptyOrUndefined(value)) {
+        textarea.value = value
+    }
+    htmlInputDiv.appendChild(textarea)
+    return htmlInputDiv
+}
+
 export function getSwitch(checked = false, xSize, ySize) {
     let label = document.createElement('label')
     label.className = 'switch'

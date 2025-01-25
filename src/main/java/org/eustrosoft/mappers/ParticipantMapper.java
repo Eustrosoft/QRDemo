@@ -64,6 +64,7 @@ public class ParticipantMapper extends EntityMapper {
 
         Participant participant = new Participant();
         participant.setUsername(dto.getUsername());
+        participant.setDescription(dto.getDescription());
         participant.setEmail(dto.getEmail());
         participant.setLei(dto.getLei());
         participant.setOrganization(dto.getOrganization());
@@ -80,7 +81,6 @@ public class ParticipantMapper extends EntityMapper {
         ParticipantDto participantDto = new ParticipantDto();
         participantDto.setId(participant.getId());
         participantDto.setUsername(participant.getUsername());
-        participantDto.setUsername(participantDto.getUsername());
         participantDto.setEmail(participant.getEmail());
         participantDto.setCreated(participant.getCreated());
         participantDto.setUpdated(participant.getUpdated());
@@ -89,9 +89,7 @@ public class ParticipantMapper extends EntityMapper {
         participantDto.setAddress(participant.getAddress());
         participantDto.setWebsite(participant.getWebsite());
         participantDto.setRoles(roleMapper.toListDto(participant.getRoles()));
-        if (hasNoAdminRoles(participant.getRoles())) {
-            participantDto.setRanges(qrRangeMapper.toDtoList(participant.getRanges()));
-        }
+        participantDto.setRanges(qrRangeMapper.toDtoList(participant.getRanges()));
         return participantDto;
     }
 
@@ -116,6 +114,7 @@ public class ParticipantMapper extends EntityMapper {
         ParticipantData pd = new ParticipantData();
         pd.setId(participant.getId());
         pd.setOrganization(participant.getOrganization());
+        pd.setDescription(participant.getDescription());
         pd.setLei(participant.getLei());
         pd.setAddress(participant.getAddress());
         pd.setWebsite(participant.getWebsite());
@@ -128,6 +127,7 @@ public class ParticipantMapper extends EntityMapper {
         Participant participant = new Participant();
         participant.setId(participantData.getId());
         participant.setOrganization(participantData.getOrganization());
+        participant.setDescription(participantData.getDescription());
         participant.setLei(participantData.getLei());
         participant.setAddress(participantData.getAddress());
         participant.setWebsite(participantData.getWebsite());

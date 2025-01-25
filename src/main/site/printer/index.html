@@ -35,6 +35,7 @@
     <div class="content-box">
         <span id="content-text"></span>
         <div id="mainBlock"><a class="qr_link" target="_"><img id="qr_image"></a></div>
+        <span id="content-text-down"></span>
     </div>
 </div>
 </body>
@@ -43,8 +44,16 @@
     const urlParams = new URLSearchParams(window.location.search)
     const q = urlParams.get('q')
     const text = urlParams.get('text')
+    const textDown = urlParams.get('textDown')
+
+    const linkStart = '{{'
+    const linkEnd = '}}'
+    const getLinkHref = (href) => {
+        return `<a href="${href}">${href}</a>`
+    };
 
     const contentText = document.getElementById('content-text')
+    const contentTextDown = document.getElementById('content-text-down')
 
     if (!q) {
         alert('Не предоставлен параметр q')
@@ -64,10 +73,27 @@
             qr_image.src = baseGenerateHref + q + '&color=%23000000&background=%23ffffff&x=165&fileType=SVG&correctionLevel=L&site=' + schema + baseQrHref
         }
         if (text != null && text != '') {
-            contentText.innerHTML = text
+            contentText.innerHTML = getProcessedText(text)
         } else {
-            contentText.innerHTML = defaultText
+            contentText.innerHTML = getProcessedText(defaultText)
         }
+        if (textDown != null && textDown != '') {
+            contentTextDown.innerHTML    = getProcessedText(textDown)
+        }
+    }
+
+    function getProcessedText(text) {
+        if (text == null || text == undefined || text == '') {
+            return
+        }
+        let processedText = text
+        let regex = /\{\{(.*?)\}\}/g;
+
+        var found;
+        while(found = regex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(found[1]))
+        };
+        return processedText
     }
 </script>
 </html>

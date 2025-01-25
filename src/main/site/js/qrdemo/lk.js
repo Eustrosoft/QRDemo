@@ -3,7 +3,7 @@ import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.j
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
 import { getModalWindow, showGenerateRandomPasswordModal } from "./components/modals.js";
-import { getInput, getSelect, getSingleInput, getSwitch } from "./components/inputs.js";
+import { getInput, getSelect, getSingleInput, getSwitch, getTextArea } from "./components/inputs.js";
 import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
 import { getOrOther, notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
@@ -94,21 +94,33 @@ function setSettings(div, settingsJson, userDetails) {
 
     let qrTableSettingsDiv
     let qrPrintTextDiv
-    let defaultQrPrintTextInput
+    let defaultQrPrintTextInputUp
+    let defaultQrPrintTextInputDown
 
     let existedDefaultQrPrintText = settingsJson?.settings?.defaultQrPrintText
+    let existedDefaultQrPrintTextDown = settingsJson?.settings?.defaultQrPrintTextDown
     let existedQrTableSettings = settingsJson?.settings?.qrTableColumns
     if (!admin) {
         qrPrintTextDiv = document.createElement('div')
-        let defaultQrPrintTextLabel = getTextLabel('Текст для печатной формы QR по умолчанию:')
-        defaultQrPrintTextInput = getSingleInput('text', false, 'qr_print_form_input', '')
-        defaultQrPrintTextInput.style.width = '100%'
-        defaultQrPrintTextInput.maxLength = 128
+        let defaultQrPrintTextLabelUp = getTextLabel('Текст для печатной формы QR (сверху):')
+        defaultQrPrintTextInputUp = getSingleInput('text', false, 'qr_print_form_input', '')
+        defaultQrPrintTextInputUp.style.width = '100%'
+        defaultQrPrintTextInputUp.maxLength = 128
         if (existedDefaultQrPrintText) {
-            defaultQrPrintTextInput.value = existedDefaultQrPrintText
+            defaultQrPrintTextInputUp.value = existedDefaultQrPrintText
         }
-        qrPrintTextDiv.appendChild(defaultQrPrintTextLabel)
-        qrPrintTextDiv.appendChild(defaultQrPrintTextInput)
+
+        let defaultQrPrintTextLabelDown = getTextLabel('Текст для печатной формы QR (снизу):')
+        defaultQrPrintTextInputDown = getSingleInput('text', false, 'qr_print_form_input_down', '')
+        defaultQrPrintTextInputDown.style.width = '100%'
+        defaultQrPrintTextInputDown.maxLength = 128
+        if (existedDefaultQrPrintTextDown) {
+            defaultQrPrintTextInputDown.value = existedDefaultQrPrintTextDown
+        }
+        qrPrintTextDiv.appendChild(defaultQrPrintTextLabelUp)
+        qrPrintTextDiv.appendChild(defaultQrPrintTextInputUp)
+        qrPrintTextDiv.appendChild(defaultQrPrintTextLabelDown)
+        qrPrintTextDiv.appendChild(defaultQrPrintTextInputDown)
 
         qrTableSettingsDiv = document.createElement('div')
         printSettingsTableAttribute(qrTableSettingsDiv, existedQrTableSettings, settingsJson)
@@ -142,7 +154,8 @@ function setSettings(div, settingsJson, userDetails) {
             new Settings(
                 languageSelect.value,
                 admin ? null : existedQrTableSettings == null ? QR_TABLE_COLUMNS : existedQrTableSettings,
-                defaultQrPrintTextInput?.value
+                defaultQrPrintTextInputUp?.value,
+                defaultQrPrintTextInputDown?.value
             )
         )
 
@@ -425,6 +438,9 @@ function getQRRow(data, settings) {
     let printFormText = settings?.defaultQrPrintText == undefined
         ? ''
         : settings?.defaultQrPrintText
+    let printFormTextDown = settings?.defaultQrPrintTextDown == undefined
+        ? ''
+        : settings?.defaultQrPrintTextDown
 
     let td = document.createElement('td')
     let editBtn = getBigButton('Открыть', `edit_${q}`)
@@ -433,7 +449,7 @@ function getQRRow(data, settings) {
         window.open(`?q=${q}&edit=true`, '_self')
     })
     printBtn.addEventListener('click', () => {
-        window.open(`${QR_PRINTER_URL}?q=${q}&text=${printFormText}`)
+        window.open(`${QR_PRINTER_URL}?q=${q}&text=${printFormText}&textDown=${printFormTextDown}`)
     })
 
     td.appendChild(editBtn)
@@ -584,6 +600,7 @@ function setUserPanel(parenDiv, participantId) {
             let website = get2TextLabels('Вебсайт: ', json?.website)
             let organization = get2TextLabels('Организация: ', json?.organization)
             let blocked = get2TextLabels('Заблокирован:', json?.banned ? ' Да' : ' Нет')
+            let description = get2TextLabels('Описание: ', json?.description)
             let changePasswordBtn = getBigButton('Изменить пароль', 'change_participant_password')
             let changeParticipantData = getBigButton('Изменить данные пользователя', 'change_participant_data')
             let participantActionsDiv = document.createElement('div')
@@ -700,6 +717,7 @@ function setUserPanel(parenDiv, participantId) {
                 const addressInp = getInput('Адрес', 'text', false, 'change_participant_address', 'Введите адрес...', false, 'off', json?.address)
                 const organizationInp = getInput('Организация', 'text', false, 'change_participant_organization', 'Введите организацию...', false, 'off', json?.organization)
                 const websiteInp = getInput('Вебсайт', 'url', false, 'change_participant_website', 'Введите вебсайт...', false, 'off', json?.website)
+                const descrInp = getTextArea('Описание', false, 'change_participant_description', 'Введите описание...', false, json?.description)
                 const changeDataBtn = getBigButton('Подтвердить')
                 blockContent.appendChild(usernameInp)
                 blockContent.appendChild(emailInp)
@@ -707,6 +725,7 @@ function setUserPanel(parenDiv, participantId) {
                 blockContent.appendChild(addressInp)
                 blockContent.appendChild(organizationInp)
                 blockContent.appendChild(websiteInp)
+                blockContent.appendChild(descrInp)
                 blockContent.appendChild(changeDataBtn)
 
                 let modal = getModalWindow('Смена данных пользователя', blockContent)
@@ -723,7 +742,8 @@ function setUserPanel(parenDiv, participantId) {
                                 lei: document.getElementById('change_participant_lei').value,
                                 address: document.getElementById('change_participant_address').value,
                                 organization: document.getElementById('change_participant_organization').value,
-                                website: document.getElementById('change_participant_website').value
+                                website: document.getElementById('change_participant_website').value,
+                                description: document.getElementById('change_participant_description').value
                             }
                         ).then(resp => {
                             if (resp.ok) {
@@ -788,6 +808,7 @@ function setUserPanel(parenDiv, participantId) {
             parenDiv.appendChild(address)
             parenDiv.appendChild(organization)
             parenDiv.appendChild(website)
+            parenDiv.appendChild(description)
             parenDiv.appendChild(participantActionsDiv)
             if (json?.banned) {
                 parenDiv.append(get2TextLabels('Причина блокировки: ', json?.bannedReason))

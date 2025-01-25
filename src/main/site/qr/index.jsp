@@ -100,11 +100,20 @@
 
   public static class FormFieldDto {
     private String name;
+    private String caption;
     private String placeholder;
     private Integer fieldOrder;
     private FormFieldType fieldType;
     private Boolean isStatic;
     private Boolean isPublic;
+
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
 
     public String getName() {
         return name;
@@ -269,6 +278,7 @@
     for (FormFieldDto field : fields) {
       startTr();
       String fieldName = field.getName();
+      String fieldCaption = field.getCaption();
       String fieldValue = "";
       Boolean isStatic = field.getIsStatic();
       if (isStatic != null && isStatic) {
@@ -281,7 +291,11 @@
         }
       }
       startTd();
-      w(text2html(fieldName));
+      if (fieldCaption == null || fieldCaption.isEmpty())  {
+        w(text2html(fieldName));
+      } else {
+        w(text2html(fieldCaption));
+      }
       endTd();
       startTd();
       w(text2html(fieldValue));
@@ -599,13 +613,38 @@
       }
     }
 
-    @media (min-width: 768px) {
-      .button-49,
-      .button-49:after {
-        width: 200px;
-        height: 86px;
-        line-height: 88px;
+    footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 50px;
+      background-color: var(--bg-secondary-color, #f8f8f8);
+    }
+
+    .footer-inner {
+      margin: 16px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      nav ul {
+        display: flex;
+        flex-direction: row;
       }
+    }
+
+    li {
+      list-style: none;
+
+      a {
+        text-decoration: none;
+      }
+    }
+
+    .gap-y-s8 {
+      row-gap: 0.5rem;
+      column-gap: 1rem;
     }
   </style>
  </head>
@@ -627,10 +666,21 @@
     }
    } else {
     printSearchForm();
-    // printTextOnPage("Используйте параметр 'q' для поиска карточки");
    }
  %>
   </div>
   </main>
+
+  <footer>
+    <div class="footer-inner">
+              <nav>
+                <ul class="gap-y-s8">
+                  <li><strong><a href='https://qrdemo.qxyz.ru'>QRDEMO</a></strong></li>
+                  <li><strong><a href='https://qr.qxyz.ru'>QXYZ</a></strong></li>
+                <ul>
+            </nav>
+          <div>© 2019-2025 Eustrosoft</div>
+    </div>
+  </footer>
 </body>
 </html>

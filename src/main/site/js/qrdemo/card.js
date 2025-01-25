@@ -277,18 +277,9 @@ function getEditCardInfoHtml(qr) {
     codeDiv.appendChild(getTextLabel('Файлы:'))
     codeDiv.appendChild(tableFiles)
 
-    const showOnPhoneBtn = document.createElement('button');
-    showOnPhoneBtn.innerHTML = 'Просмотр карточки'
-    showOnPhoneBtn.className = 'big_button'
-    showOnPhoneBtn.id = 'show_public_code_phone_btn'
-    showOnPhoneBtn.style = 'width: 100%'
+    const showOnPhoneBtn = getBigButton('Просмотр карточки', 'show_public_code_phone_btn');
+    const saveBtn = getBigButton('Сохранить', 'save_code_btn');
     codeDiv.append(showOnPhoneBtn)
-
-    const saveBtn = document.createElement('input');
-    saveBtn.value = 'Сохранить'
-    saveBtn.type = 'submit'
-    saveBtn.className = 'big_button'
-    saveBtn.id = 'save_code_btn'
     codeDiv.append(saveBtn)
 
     return codeDiv
