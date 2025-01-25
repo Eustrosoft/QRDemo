@@ -449,7 +449,7 @@ function getQRRow(data, settings) {
         window.open(`?q=${q}&edit=true`, '_self')
     })
     printBtn.addEventListener('click', () => {
-        window.open(`${QR_PRINTER_URL}?q=${q}&text=${printFormText}&textDown=${printFormTextDown}`)
+        window.open(`${QR_PRINTER_URL}?q=${q}&text=${encodeURIComponent(printFormText)}&textDown=${encodeURIComponent(printFormTextDown)}`)
     })
 
     td.appendChild(editBtn)
