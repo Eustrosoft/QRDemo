@@ -3,6 +3,7 @@ import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
 export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
 export const QR_PRINTER_URL = `/printer/`
+export const QR_PRINTER_URL = `/printer/`
 
 export function qrApi() {
     const headers = {
@@ -118,7 +119,7 @@ export function qrApi() {
             return authFetch(req)
         },
         getQr: (q) => {
-            let url = `${QR_DEMO_API}secured/qrs/code?q=${q}`;
+            let url = `${QR_DEMO_API}secured/qrs/code?q=${q}`
 
             const req = new Request(
                 url,
@@ -144,7 +145,7 @@ export function qrApi() {
             return fetch(req)
         },
         saveQr: (data) => {
-            let url = `${QR_DEMO_API}secured/qrs`;
+            let url = `${QR_DEMO_API}secured/qrs`
 
             const req = new Request(
                 url,
@@ -158,24 +159,46 @@ export function qrApi() {
             return authFetch(req)
         },
         uploadFormFile: (id, fileRequest) => {
-            const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`;
+            const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`
             uploadSingleFile(url, fileRequest)
         },
         uploadQRFile: (id, fileRequest) => {
-            const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`;
+            const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`
             uploadSingleFile(url, fileRequest)
-        },
-        getFileLink: (id, name) => {
-            return QR_DEMO_API + `unsecured/qrs/${id}/files/${name}`
-        },
-        getFileLinkV2: (id, fileId) => {
-            return QR_DEMO_API + `unsecured/qrs/${id}/files/v2/${fileId}`
         },
         getDownloadAllQRPublicFilesLink: (id) => {
             return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
         },
+        connectFileToQR: (id, fileId) => {
+            let url = `${QR_DEMO_API}secured/qrs/${id}/files/choose`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({id: fileId})
+                }
+            )
+            return authFetch(req)
+        },
+        connectFileToForm: (id, fileId) => {
+            let url = `${QR_DEMO_API}secured/forms/${id}/files/choose`
+
+            const req = new Request(
+                url,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({id: fileId})
+                }
+            )
+            return authFetch(req)
+        },
         getRanges: () => {
-            let url = `${QR_DEMO_API}secured/ranges`;
+            let url = `${QR_DEMO_API}secured/ranges`
 
             const req = new Request(
                 url,
@@ -188,7 +211,7 @@ export function qrApi() {
             return authFetch(req)
         },
         createQR: (name, description) => {
-            let url = `${QR_DEMO_API}secured/qrs`;
+            let url = `${QR_DEMO_API}secured/qrs`
 
             const req = new Request(
                 url,
@@ -240,43 +263,18 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        openFile: (id) => {
-            let url = `${QR_DEMO_API}secured/files/${id}/download`;
-
-            const req = new Request(
-                url,
-                {
-                    method: 'GET',
-                    headers: headers,
-                    credentials: 'include'
-                }
-            )
-            fetch(req)
-                .then(resp => resp.status === 200 ? resp.blob() : Promise.reject('Что-то пошло не так'))
-                .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.target = '_'
-                a.style.display = 'none';
-                a.href = url;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-            })
-                .catch(() => alert('oh no!'));
-        },
-        downloadFile: (id) => {
-            let url = `${QR_DEMO_API}secured/files/${id}/download`;
+        downloadFile: (id, fileName) => {
+            let url = `${QR_DEMO_API}secured/files/${id}/download/${fileName}`;
 
             var link = document.createElement('a')
-            link.target = '_'
+            link.target = '_blank'
             link.href = url
             document.body.appendChild(link)
             link.click()
             link.remove()
         },
-        downloadFileUnsecured: (id) => {
-            let url = `${QR_DEMO_API}unsecured/files/${id}/download`;
+        downloadFileUnsecured: (id, fileName) => {
+            let url = `${QR_DEMO_API}unsecured/files/${id}/download/${fileName}`;
 
             var link = document.createElement('a')
             link.target = '_'
