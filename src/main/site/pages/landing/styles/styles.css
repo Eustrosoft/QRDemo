@@ -47,12 +47,6 @@ p[white] {
   max-width: 1024px;
 }
 
-@media (max-width: 1024px) {
-  .block {
-    padding: 0 2rem;
-  }
-}
-
 header {
   display: flex;
   align-items: center;
@@ -219,6 +213,41 @@ header {
   margin: 0 -2.5rem;
 }
 
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-content {
+  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 4.75rem 0;
+}
+
+.footer-logo {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.footer-logo > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-content > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footer-content > div > div > img {
+  border-radius: 0.35rem;
+}
+
 .background {
   position: fixed;
   top: 0;
@@ -257,4 +286,46 @@ button[outlined] {
 
 button:hover {
   filter: saturate(90%);
+}
+
+@media (max-width: 1024px) {
+  .block {
+    margin: 0 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .key-advantages-content-cards,
+  .card-block-cards,
+  .footer-content {
+    flex-wrap: wrap;
+  }
+
+  .how-to-make-qr-content-cards,
+  .footer-content {
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .how-to-make-qr-content-cards > div:last-child {
+    grid-column: unset;
+    grid-row: unset;
+  }
+
+  .try-for-free-content,
+  .how-to-make-qr-content {
+    margin: 0;
+  }
+
+  .header-content > div > button {
+    display: none;
+  }
+}
+
+@media (max-width: 648px) {
+  .how-to-make-qr-content-cards,
+  .footer-content {
+    grid-template-rows: repeat(1, 1fr);
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
