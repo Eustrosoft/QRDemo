@@ -65,6 +65,7 @@ export function getTextArea(labelText, required, id, placeholder, inline = false
     textarea.placeholder = placeholder
     textarea.required = required
     textarea.id = id
+    textarea.rows = 4
     if (notEmptyOrUndefined(value)) {
         textarea.value = value
     }

@@ -277,3 +277,9 @@ video {
 .i-icon:hover {
     opacity: 0.5;
 }
+
+textarea {
+    resize: none;
+    font-size: 1.3rem;
+    color: var(--table-body-color);
+}

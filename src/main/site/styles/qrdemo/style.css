@@ -183,7 +183,12 @@ input {
         input[type='text'],
         input[type='password'],
         input[type='number'],
-        input[type='email'] {
+        input[type='email'],
+        input[type='url'] {
+            width: 98%;
+        }
+
+        textarea {
             width: 98%;
         }
 

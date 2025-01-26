@@ -1,7 +1,7 @@
 export function getTextLabel(text, className) {
     let label = document.createElement('label')
     label.className = className
-    label.innerHTML = text
+    label.innerText = text
     return label
 }
 
@@ -10,11 +10,11 @@ export function get2TextLabels(text, secondText, className) {
 
     let label = document.createElement('label')
     label.className = className
-    label.innerHTML = text
+    label.innerText = text
 
     let label2 = document.createElement('label')
     label2.className = className
-    label2.innerHTML = secondText
+    label2.innerText = secondText
 
     labelsDiv.appendChild(label)
     labelsDiv.appendChild(label2)

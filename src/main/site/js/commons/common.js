@@ -82,7 +82,7 @@ export function getMeFromLS() {
 }
 
 export function generateRandomPassword() {
-    const allowedPasswordCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@$%^&*()?;'
+    const allowedPasswordCharacters = 'abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ023456789@$%&'
     const allowedPassChatLength = allowedPasswordCharacters.length
 
     let pass = ''

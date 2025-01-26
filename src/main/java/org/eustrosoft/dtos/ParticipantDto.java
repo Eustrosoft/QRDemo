@@ -1,6 +1,5 @@
 package org.eustrosoft.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +12,6 @@ public class ParticipantDto extends UserDto {
     private String address;
     private String organization;
     private String website;
-    @JsonIgnore
     private String description;
 
     private List<QRRangeDto> ranges;
