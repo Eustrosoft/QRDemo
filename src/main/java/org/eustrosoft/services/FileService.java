@@ -3,6 +3,7 @@ package org.eustrosoft.services;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
+import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Participant;
@@ -82,14 +83,16 @@ public class FileService {
     }
 
     @SneakyThrows
-    public FileProjection changeFile(Long id, FileUploadRequest fur) {
+    public FileProjection changeFile(Long id, FileReUploadRequest fur) {
         FileProjection byId = findById(id);
         securityComponent.checkUserRightById(byId::getParticipantId);
         File entity = mapper.toEntity(fur);
-        entity.setId(id);
-        FileProjection saved = save(entity);
+        repository.updateFileData(
+                id, entity.getFileData(), entity.getFileName(), entity.getFileType(),
+                entity.getExtension(), entity.getChecksum(), entity.getFileSize()
+        );
         qrCacheControlService.evictFromQrsCacheByFileId(byId.getParticipantId(), id);
-        return saved;
+        return byId;
     }
 
     @SneakyThrows

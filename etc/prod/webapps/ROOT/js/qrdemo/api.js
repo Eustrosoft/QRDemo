@@ -1,3 +1,4 @@
+import { notEmptyOrUndefined } from "../commons/common.js";
 import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
 export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
@@ -284,6 +285,10 @@ export function qrApi() {
         },
         uploadFile: (fileRequest) => {
             let url = `${QR_DEMO_API}secured/files/upload`;
+            uploadSingleFile(url, fileRequest)
+        },
+        reuploadFile: (id, fileRequest) => {
+            let url = `${QR_DEMO_API}secured/files/${id}/re-upload`;
             uploadSingleFile(url, fileRequest)
         },
         updateFile: (id, data) => {

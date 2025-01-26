@@ -2,6 +2,7 @@ package org.eustrosoft.mappers;
 
 import lombok.SneakyThrows;
 import org.apache.commons.compress.utils.FileNameUtils;
+import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.FileChangeDto;
 import org.eustrosoft.dtos.FileDto;
@@ -12,7 +13,6 @@ import org.eustrosoft.utils.ChecksumUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -114,7 +114,7 @@ public class FileMapper extends EntityMapper {
             return null;
         }
         MultipartFile file = fur.getFile();
-        if (fur.getName() == null || file == null) {
+        if (file == null) {
             return null;
         }
         File entity = new File();
@@ -129,6 +129,26 @@ public class FileMapper extends EntityMapper {
         entity.setChecksum(String.valueOf(ChecksumUtils.getCRC32Checksum(bytes)));
         entity.setIsActive(fur.isActive());
         entity.setIsPublic(fur.isPublic());
+        entity.setFileType(file.getContentType());
+        return entity;
+    }
+
+    @SneakyThrows
+    public File toEntity(FileReUploadRequest fur) throws IOException {
+        if (fur == null) {
+            return null;
+        }
+        MultipartFile file = fur.getFile();
+        if (file == null) {
+            return null;
+        }
+        File entity = new File();
+        entity.setFileSize(file.getSize());
+        entity.setExtension(FileNameUtils.getExtension(file.getOriginalFilename()));
+        entity.setFileName(file.getOriginalFilename());
+        byte[] bytes = file.getBytes();
+        entity.setFileData(bytes);
+        entity.setChecksum(String.valueOf(ChecksumUtils.getCRC32Checksum(bytes)));
         entity.setFileType(file.getContentType());
         return entity;
     }

@@ -101,8 +101,9 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
             descriptionInput.maxLength = '511'
             let updateBtn = getBigButton('Обновить')
             let copyBtn = getBigButton('Скопировать ссылку')
+            let changeFileBtn = getBigButton('Заменить файл')
 
-            fileEditForm.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, updateBtn, copyBtn)
+            fileEditForm.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, updateBtn, copyBtn, changeFileBtn)
             let modal = getModalWindow('Редактирование файла', fileEditForm)
             modal.style.display = 'block'
 
@@ -140,6 +141,24 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                     }
                     alert('Нечего копировать')
                 }
+            })
+
+            changeFileBtn.addEventListener('click', () => {
+                let fileChangeDiv = document.createElement('div')
+                let fileInput = getInput('Файл', 'file', true, 'file_content', '', true)
+                let uploadBtn = getBigButton('Загрузить')
+                fileChangeDiv.append(fileInput, uploadBtn)
+                uploadBtn.addEventListener('click', () => {
+                    try {
+                        qrApi().reuploadFile(json?.id, { file: document.getElementById('file_content') })
+                        alert('Файл успешно загружен!')
+                        window.location.reload()
+                    } catch (e) {
+                        alert(e)
+                    }
+                })
+                let modal = getModalWindow('Замена файла', fileChangeDiv)
+                modal.style.display = 'block'
             })
         })
 }

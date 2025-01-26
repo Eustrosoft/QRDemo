@@ -1,6 +1,7 @@
 package org.eustrosoft.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.FileChangeDto;
 import org.eustrosoft.dtos.FileDto;
@@ -40,8 +41,8 @@ public class FileController {
         return mapper.toDto(service.uploadFile(fur));
     }
 
-    @PutMapping("/{id}/re-upload")
-    public FileDto changeFile(@PathVariable Long id, FileUploadRequest fur) throws IllegalAccessException {
+    @PostMapping("/{id}/re-upload")
+    public FileDto changeFile(@PathVariable Long id, FileReUploadRequest fur) throws IllegalAccessException {
         return mapper.toDto(service.changeFile(id, fur));
     }
 
