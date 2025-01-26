@@ -233,14 +233,15 @@ public class QRService {
         if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("No files provided");
         }
-        Path tempDirPath = Files.createTempDirectory("QR-" + Long.toHexString(code) + " - ");
+        String tempDirPrefix = "QR-" + Long.toHexString(code);
+        Path tempDirPath = Files.createTempDirectory(tempDirPrefix + " - ");
         try {
             HttpServletResponse resp = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
             resp.setHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
             resp.setHeader(
                     HttpHeaders.CONTENT_DISPOSITION,
                     String.format(
-                            "attachment; filename*=UTF-8''archive.zip"
+                            "attachment; filename*=UTF-8''" + tempDirPrefix + ".zip"
                     )
             );
             for (FileProjection fp : files) {
