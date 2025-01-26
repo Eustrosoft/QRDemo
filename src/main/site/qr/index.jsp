@@ -493,10 +493,14 @@
       background-repeat: no-repeat;
     }
 
+    html {
+      height: 100%;
+    }
+
     body {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100%;
     }
 
     main {
@@ -675,6 +679,7 @@
  %>
   </div>
   </main>
+
   <footer>
     <div class="footer-inner">
               <nav>
