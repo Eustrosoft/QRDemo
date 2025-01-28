@@ -3,7 +3,10 @@ import { notEmptyOrUndefined, notNullOrUndefined } from "../../commons/common.js
 export const DOWNRAISING_INDEX = 'downraisingIndex'
 export const UPRAISING_INDEX = 'upraisingIndex'
 
-export function getTable(headItems, items, itemRowClass = null, id = '', tableClass = null, rowClickCallback, isItemsDom = false) {
+export function getTable(
+    headItems, items, itemRowClass = null, id = '', 
+    tableClass = null, rowClickCallback, isItemsDom = false, domItemsIndexes = []
+) {
     let table = document.createElement('table')
     if (id != '') {
         table.id = id
@@ -33,9 +36,13 @@ export function getTable(headItems, items, itemRowClass = null, id = '', tableCl
         for (let rowItem in items[item]) {
             let td = document.createElement('td')
             if (isItemsDom) {
-                td.innerHTML = items[item][rowItem]    
+                td.innerHTML = items[item][rowItem]
             } else {
-                td.innerText = items[item][rowItem]
+                if (domItemsIndexes != null && domItemsIndexes.includes(item)) {
+                    td.innerHTML = items[item][rowItem]
+                } else {
+                    td.innerText = items[item][rowItem]
+                }
             }
             tr.appendChild(td)
         }

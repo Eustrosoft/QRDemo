@@ -64,7 +64,7 @@ public class AdminController {
     }
 
     @PostMapping("/participants")
-    public Participant addParticipant(@RequestBody RegistrationDto registrationDto) {
+    public Participant addParticipant(@RequestBody RegistrationDto registrationDto) throws IllegalAccessException {
         return adminService.addParticipant(participantMapper.fromRegistrationDto(registrationDto));
     }
 

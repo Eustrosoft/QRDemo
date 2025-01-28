@@ -21,6 +21,7 @@ import java.util.List;
 @Transactional
 public class AdminService {
     private final ParticipantService participantService;
+    private final FormService formService;
     private final RoleService roleService;
     private final QRRangeService qrRangeService;
 
@@ -39,8 +40,10 @@ public class AdminService {
         return participantService.findById(id).getQrs();
     }
 
-    public Participant addParticipant(Participant participant) {
-        return participantService.create(participant);
+    public Participant addParticipant(Participant participant) throws IllegalAccessException {
+        Participant createdParticipant = participantService.create(participant);
+        formService.createDefaultFormForParticipant(createdParticipant.getId());
+        return createdParticipant;
     }
 
     @Transactional(readOnly = true)

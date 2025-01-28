@@ -273,6 +273,19 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
     let modal = getModalWindow('Загрузка файла', fileUploadForm)
     modal.style.display = 'block'
 
+    let fileInpElem = document.getElementById('file_content')
+    let fileNameInpElem = document.getElementById('file_name')
+    if (fileInpElem && fileNameInpElem) {
+        fileInpElem.addEventListener('change', (e) => {
+            try {
+                fileNameInpElem.value = e.target.files[0].name
+                fileNameInpElem.select()
+            } catch (e) {
+                console.log(e)
+            }
+        })
+    }
+
     uploadFileBtn.addEventListener('click', () => {
         let fileName = document.getElementById('file_name')
         let file = document.getElementById('file_content')

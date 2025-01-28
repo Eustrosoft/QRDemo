@@ -1,6 +1,7 @@
 package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.repositories.ParticipantRepository;
@@ -16,14 +17,14 @@ public class ParticipantValidationService {
     @Transactional(readOnly = true)
     public void validateParticipantCreation(Participant participant) {
         if (Strings.isEmpty(participant.getUsername())
-                || Strings.isEmpty(participant.getEmail())
                 || Strings.isEmpty(participant.getPassword())) {
             throw new IllegalArgumentException("Required parameters missing!");
         }
         if (repository.findByUsername(participant.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already in use!");
         }
-        if (repository.findByEmail(participant.getEmail()).isPresent()) {
+        if (StringUtils.isNotBlank(participant.getEmail())
+                && repository.findByEmail(participant.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already in use!");
         }
     }

@@ -84,6 +84,11 @@ export function showGenerateRandomPasswordModal() {
 
     let modal = getModalWindow('Генерация случайного пароля', generatePasswordBlock)
     modal.style.display = 'block'
+    let rndPassInput = document.getElementById('random_password_input')
+    if (rndPassInput) {
+        const randomPassword = generateRandomPassword()
+        rndPassInput.value = randomPassword
+    }
 }
 
 export function showAboutModal() {

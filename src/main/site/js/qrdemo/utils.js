@@ -39,7 +39,7 @@ export const processFetchErrorToLogin = (error) => {
 
 export function getQRImage(code, x = 300) {
     return `
-        <a href="?q=${code}">
+        <a href="/qr?q=${code}">
             <img class="qr_line_image"
                  src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=${x}&fileType=SVG&correctionLevel=L"
                  alt="qrImage"
@@ -50,7 +50,7 @@ export function getQRImage(code, x = 300) {
 
 export function getQRImageDiv(code) {
     const link = document.createElement('a');
-    link.href = `?q=${code}`
+    link.href = `/qr?q=${code}`
     link.innerHTML = `
             <img class="qr_line_image"
                  src="https://qrgen.qxyz.ru/generate?q=${code}&color=%23000000&background=%23ffffff&x=300&fileType=SVG&correctionLevel=L"

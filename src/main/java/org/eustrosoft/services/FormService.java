@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
+import org.eustrosoft.configurations.DefaultTemplateConfig;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.entitites.File;
@@ -24,12 +25,14 @@ import org.eustrosoft.utils.CommonUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.eustrosoft.services.ParticipantService.isAdmin;
 import static org.eustrosoft.utils.CommonUtils.distinctByKey;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
 import static org.eustrosoft.utils.FileUtils.getFileIndex;
@@ -44,6 +47,7 @@ public class FormService {
     private final FileService fileService;
     private final QRCacheControlService qrCacheControlService;
     private final QRService qrService;
+    private final DefaultTemplateConfig defaultTemplateConfig;
 
     @Transactional(readOnly = true)
     public List<FormSimpleProjection> findAll() throws IllegalAccessException {
@@ -80,6 +84,34 @@ public class FormService {
             );
         }
         return repository.save(form);
+    }
+
+    public Form createDefaultForm() throws IllegalAccessException {
+        Participant current = participantService.getCurrentSimpleOrThrow();
+        Form defaultTemplate = defaultTemplateConfig.getDefaultTemplate();
+        List<FormField> defaultFormFields = defaultTemplate.getFields();
+        defaultTemplate.setFields(new ArrayList<>());
+        throwIfDuplicateFields(defaultFormFields);
+        Form createdForm = create(defaultTemplate);
+        createdForm.setFields(defaultFormFields);
+        populateFieldsWithFormAndParticipantIds(createdForm.getFields(), current.getId(), createdForm.getId());
+        return repository.save(createdForm);
+    }
+
+    public Form createDefaultFormForParticipant(Long participantId) throws IllegalAccessException {
+        Participant current = participantService.getCurrentOrThrow();
+        if (!isAdmin(current.getRoles())) {
+            throw new IllegalArgumentException("You can not create template as non admin user");
+        }
+        Form defaultTemplate = defaultTemplateConfig.getDefaultTemplate();
+        List<FormField> defaultFormFields = defaultTemplate.getFields();
+        defaultTemplate.setFields(new ArrayList<>());
+        defaultTemplate.setParticipantId(participantId);
+        throwIfDuplicateFields(defaultFormFields);
+        Form createdForm = repository.save(defaultTemplate);
+        createdForm.setFields(defaultFormFields);
+        populateFieldsWithFormAndParticipantIds(createdForm.getFields(), participantId, createdForm.getId());
+        return repository.save(createdForm);
     }
 
     public Form update(Form form) throws IllegalAccessException, JsonProcessingException {

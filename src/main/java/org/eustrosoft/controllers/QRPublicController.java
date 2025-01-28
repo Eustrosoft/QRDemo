@@ -26,8 +26,8 @@ public class QRPublicController {
         return service.getByCodePublic(Long.parseLong(q, 16));
     }
 
-    @GetMapping("/files/all/download")
-    public void downloadAllPublicFilesZip(@RequestParam("q") String q) throws IOException {
-        service.downloadAllPublicFiles(Long.parseLong(q, 16));
-    }
+//    @GetMapping("/files/all/download")
+//    public void downloadAllPublicFilesZip(@RequestParam("q") String q) throws IOException {
+//        service.downloadAllPublicFiles(Long.parseLong(q, 16));
+//    }
 }

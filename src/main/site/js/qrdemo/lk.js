@@ -418,7 +418,7 @@ function getQRRow(data, settings) {
                         break
                     }
                     case "qr_code": {
-                        td.innerHTML = `<a style='text-decoration:none;' target='_blank' href="?q=${q}">${q}</a>`;
+                        td.innerHTML = `<a style='text-decoration:none;' target='_blank' href="/qr?q=${q}">${q}</a>`;
                         break
                     }
                     case "qr_image": {
@@ -530,7 +530,7 @@ function setupAdminPanel(div) {
         const username = getInput('Имя пользователя', 'text', true, 'create_participant_username', 'Введите имя пользователя...', false, 'off')
         const passw1 = getInput('Пароль', 'password', true, 'create_participant_password_1', 'Введите пароль...', false, 'new-password')
         const passw2 = getInput('Повтор пароля', 'password', true, 'create_participant_password_2', 'Повторите пароль...', false, 'new-password')
-        const email = getInput('Почта', 'email', true, 'create_participant_email', 'Введите электронную почту...')
+        const email = getInput('Почта', 'email', false, 'create_participant_email', 'Введите электронную почту...')
         const lei = getInput('ИНН', 'text', false, 'create_participant_lei', 'ИНН...')
         const address = getInput('Адрес', 'text', false, 'create_participant_address', 'Введите адрес...')
         const organization = getInput('Организация', 'text', false, 'create_participant_organization', 'Введите организацию...')

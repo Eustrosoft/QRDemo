@@ -111,7 +111,6 @@ public class AuthorizationService {
     @Transactional(readOnly = true)
     public ResponseEntity<?> validateUser(RegistrationDto registrationDto) {
         if (Strings.isEmpty(registrationDto.getUsername())
-                || Strings.isEmpty(registrationDto.getEmail())
                 || Strings.isEmpty(registrationDto.getPassword())
                 || Strings.isEmpty(registrationDto.getConfirmPassword())) {
             return new ResponseEntity<>(
@@ -131,7 +130,8 @@ public class AuthorizationService {
                     HttpStatus.BAD_REQUEST
             );
         }
-        if (userService.getByEmail(registrationDto.getEmail()).isPresent()) {
+        if (StringUtils.isNotBlank(registrationDto.getEmail())
+                && userService.getByEmail(registrationDto.getEmail()).isPresent()) {
             return new ResponseEntity<>(
                     new Error(HttpStatus.BAD_REQUEST.value(), "Participant with this email already exists."),
                     HttpStatus.BAD_REQUEST

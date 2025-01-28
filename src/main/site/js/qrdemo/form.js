@@ -1,6 +1,6 @@
 import { emptyOrUndefined, fieldToHtmlItems, formatBytes, setQueryParamsAndRefresh } from "./utils.js";
 import { dictionaryApi, qrApi } from "./api.js";
-import { booleanToString, notEmptyOrUndefined } from "../commons/common.js";
+import { booleanToString, getOrOther, notEmptyOrUndefined } from "../commons/common.js";
 import { getTextLabel } from "./components/labels.js";
 import { getInput } from "./components/inputs.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
@@ -32,7 +32,7 @@ function init(formId) {
     basicCard.className = 'basic_card'
     mainBlock.appendChild(basicCard)
 
-    basicCard.innerHTML = getStartPage()
+    basicCard.appendChild(getStartPage())
     setStartActions()
 
     const urlParams = new URLSearchParams(window.location.search)
@@ -125,7 +125,7 @@ function printFormsList(parent, json) {
     parent.appendChild(tableForms)
 
     let tableHeaderRow = document.createElement('tr')
-    tableHeaderRow.innerHTML = `<th>Название</th><th>Описание</th><th>Создана</th><th>Обновлена</th><th>Действия</th>`
+    tableHeaderRow.innerHTML = `<th>Название</th><th>Описание</th><th>Создан</th><th>Обновлен</th><th>Действия</th>`
     tableForms.appendChild(tableHeaderRow)
 
     for (let i = 0; i < json.length; i++) {
@@ -134,8 +134,8 @@ function printFormsList(parent, json) {
         let tableRow = document.createElement('tr')
         tableRow.innerHTML =
             `<tr>
-                   <td>${json[i].name}</td>
-                   <td>${json[i].description}</td>
+                   <td>${getOrOther(json[i]?.name, '')}</td>
+                   <td>${getOrOther(json[i]?.description, '')}</td>
                    <td>${new Date(json[i].created).toLocaleString()}</td>
                    <td>${new Date(json[i].updated).toLocaleString()}</td>
                    <td>
@@ -353,20 +353,29 @@ export function addDeleteFileRowActions() {
 }
 
 function getStartPage() {
-    return `
-        <div class="account_card_buttons">
-            <button class="big_button" id="create_form_button">
-                    Создать новый шаблон
-            </button>
-        </div>
-    
-    `
+    let div = document.createElement('div');
+    div.className = 'account_card_buttons'
+    let createBtn = getBigButton('Создать новый шаблон', 'create_form_button')
+    let createDefaultBtn = getBigButton('Создать шаблон по-умолчанию', 'create_default_form_button')
+    div.append(createBtn, createDefaultBtn)
+    return div
 }
 
 function setStartActions() {
     document.getElementById('create_form_button')
         .addEventListener('click', () => {
             location.href = '?form=true&create=true'
+        })
+    document.getElementById('create_default_form_button')
+        .addEventListener('click', () => {
+            qrApi().saveDefaultForm()
+                .then(resp => {
+                    if (resp.ok) {
+                        return resp.json()
+                    }
+                    throw new Error("Неизвестная ошибка при создании шаблона");
+                }).then(json => location.reload())
+                .catch(ex => alert(ex))
         })
 }
 

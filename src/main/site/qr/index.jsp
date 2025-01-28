@@ -17,7 +17,7 @@
   private final static String TITLE_FORMAT = "Карточка %s";
   private final static String HREF_QR_FORMAT = "%s/v1/api/unsecured/qrs?q=%s";
   private final static String HREF_FILE_FORMAT = "%s/v1/api/unsecured/files/%d/download/%s";
-  private final static String HREF_FILES_FORMAT = "%s/v1/api/unsecured/qrs/files/all/download?q=%s";
+  // private final static String HREF_FILES_FORMAT = "%s/v1/api/unsecured/qrs/files/all/download?q=%s";
 
   private final static String NO_QR_DATA_TEXT = "Нет информации для этой карточки";
 
@@ -235,18 +235,21 @@
     NUMBER,
     FILE,
     MEDIA_FILE,
-    DATE
+    DATE,
+    URL,
+    PHONE,
+    EMAIL
   }
 
   private void printQRData(QRDto dto) throws IllegalArgumentException {
     FormDto form = dto.getForm();
-    if (form == null) {
-      throw new IllegalArgumentException("Не найдено шаблона");
-    }
     Map<String, String> data = dto.getData();
 
+    int printedLines = 0;
     // Attributes print
-    printAttributesTable(form, data);
+    if (form != null) {
+      printedLines = printAttributesTable(form, data);
+    }
 
     // Files print
     List<FileDto> files = new ArrayList();
@@ -254,14 +257,21 @@
     if (qrFiles != null) {
       files.addAll(qrFiles);
     }
-    List<FileDto> formFiles = form.getFiles();
-    if (formFiles != null) {
-      files.addAll(formFiles);
+    if (form != null) {
+      List<FileDto> formFiles = form.getFiles();
+      if (formFiles != null) {
+        files.addAll(formFiles);
+      }
     }
-    printFilesTable(dto.getCode(), files);
+    if (!files.isEmpty()) {
+      printFilesTable(dto.getCode(), files);
+    }
+    if (printedLines == 0 && files.isEmpty()) {
+      printNoQRData();
+    }
   }
 
-  private void printAttributesTable(FormDto form, Map<String, String> data)
+  private Integer printAttributesTable(FormDto form, Map<String, String> data)
       throws IllegalArgumentException {
     if (form == null) {
       throw new IllegalArgumentException("Не найдено шаблона");
@@ -274,11 +284,13 @@
         .sorted(Comparator.nullsFirst(Comparator.comparingInt(FormFieldDto::getFieldOrder)))
         .collect(Collectors.toList());
 
+    int printedLines = 0;
     startTable();
     for (FormFieldDto field : fields) {
       startTr();
       String fieldName = field.getName();
       String fieldCaption = field.getCaption();
+      FormFieldType fieldType = field.getFieldType();
       String fieldValue = "";
       Boolean isStatic = field.getIsStatic();
       if (isStatic != null && isStatic) {
@@ -290,26 +302,30 @@
           fieldValue = dataVal;
         }
       }
-      startTd();
-      if (fieldCaption == null || fieldCaption.isEmpty())  {
-        w(text2html(fieldName));
-      } else {
-        w(text2html(fieldCaption));
+      if ((fieldValue != null && !fieldValue.isEmpty()) || isStatic) {
+        startTd();
+        if (fieldCaption == null || fieldCaption.isEmpty())  {
+          w(text2html(fieldName));
+        } else {
+          w(text2html(fieldCaption));
+        }
+        endTd();
+        startTd();
+        w(formatByFieldType(fieldValue, fieldType));
+        endTd();
+        endTr();
+        printedLines++;
       }
-      endTd();
-      startTd();
-      w(text2html(fieldValue));
-      endTd();
-      endTr();
     }
     endTable();
+    return printedLines;
   }
 
   private void printFilesTable(Long code, List<FileDto> files) {
     if (files == null || files.isEmpty()) {
       return;
     }
-    a("Скачать всё", String.format(HREF_FILES_FORMAT, qrHref, Long.toHexString(code)));
+    // a("Скачать всё", String.format(HREF_FILES_FORMAT, qrHref, Long.toHexString(code)));
 
     startTable("files_table");
     for (FileDto file : files) {
@@ -464,6 +480,21 @@
       throw new IllegalArgumentException("Configure qr service url in configuration");
     }
    }
+
+   private String formatByFieldType(String value, FormFieldType fieldType) {
+      if (fieldType == null) {
+        return text2html(value);
+      }
+      if (FormFieldType.URL.equals(fieldType)) {
+        return String.format("<a href='%s' target='_blank'>%s</a>", text2value(value), text2html(value));
+      } else if (FormFieldType.PHONE.equals(fieldType)) {
+        return String.format("<a href='tel:%s' target='_blank'>%s</a>", text2value(value), text2html(value));
+      } else if (FormFieldType.EMAIL.equals(fieldType)) {
+        return String.format("<a href='mailto:%s' target='_blank'>%s</a>", text2value(value), text2html(value));
+      } else {
+        return text2html(value);
+      }
+   }
 %>
 <%
 
@@ -531,7 +562,7 @@
     .code_block {
       text-align: center;
       justify-content: center;
-      height: calc(100vh - 16px);
+      height: 100%;
       display: flex;
       flex-direction: column;
     }

@@ -51,6 +51,11 @@ public class FormsController {
         );
     }
 
+    @PostMapping("/default")
+    public FormDto createDefaultForm() throws IllegalAccessException, JsonProcessingException {
+        return formMapper.toDto(service.createDefaultForm());
+    }
+
     @PostMapping("/{id}/files/upload")
     public FileProjection uploadFile(
             @PathVariable Long id,

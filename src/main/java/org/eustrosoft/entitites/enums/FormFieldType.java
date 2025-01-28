@@ -5,5 +5,8 @@ public enum FormFieldType {
     NUMBER,
     FILE,
     MEDIA_FILE,
-    DATE
+    DATE,
+    URL,
+    PHONE,
+    EMAIL
 }

@@ -5,11 +5,12 @@ import { ActionColumn, getComplexTable, getTable, getTr, TableHead } from "./com
 import { getBigButton, getCustomButton } from "./components/buttons.js";
 import { downloadFileUnsecured, showEditFileModal, showUploadFileModal } from "./files.js";
 import { addDeleteFileRowActions, Field } from "./form.js";
-import { getTextLabel } from "./components/labels.js";
+import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { getSingleInput } from "./components/inputs.js";
 import { booleanToString, notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { formatDate } from "../commons/dateUtils.js";
+import { getLink } from "./components/link.js";
 
 const mainBlock = document.getElementById('main_block')
 let divCard = document.createElement('div')
@@ -135,6 +136,7 @@ function getEditCardInfoHtml(qr) {
             }
         })
 
+    codeDiv.append(get2TextLabels('QR Код: ', Number(qr?.code).toString(16)))
     codeDiv.append(formLabel)
     formSelectDiv.append(formChooseElement)
     formSelectDiv.append(formViewBtn)
@@ -144,7 +146,7 @@ function getEditCardInfoHtml(qr) {
         let formElement = document.getElementById('form_select')
         let formId = formElement.options[formElement.selectedIndex].id
         if (formId) {
-            window.open(`?form=true&id=${formId}`, '_')
+            window.open(`?form=true&id=${formId}`, '_blank')
         }
     })
 
@@ -167,7 +169,8 @@ function getEditCardInfoHtml(qr) {
             labelText = labelText.concat(' *')
         }
         let label = getTextLabel(labelText)
-        let input = getSingleInput(f?.fieldType, false, f?.id, f?.placeholder)
+        let placeholder = f?.isStatic ? f?.placeholder : '';
+        let input = getSingleInput(f?.fieldType, false, f?.id, placeholder)
         input.name = f?.name
         input.value = getDataFromForm(qr, f?.name)
         input.readOnly = edit === 'true' ? false : true
@@ -294,6 +297,7 @@ function getViewCardInfoHtml(qr) {
 
     let fieldsHeaders = []
     let fieldsItems = []
+    let domIndexes = []
     for (let index in fields) {
         const field = fields[index];
         let key = field?.name
@@ -301,6 +305,7 @@ function getViewCardInfoHtml(qr) {
             key = field?.caption
         }
         let isStaticField = field?.isStatic
+        let fieldType = field?.fieldType?.toLowerCase()
         let value
         if (isStaticField) {
             value = (data === null || data[field?.name] === '' || data[field?.name] === undefined)
@@ -310,17 +315,24 @@ function getViewCardInfoHtml(qr) {
             let dataVal = data?.[field?.name]
             value = dataVal === undefined ? '' : dataVal
         }
-        fieldsItems.push({
-            key: key,
-            value: value
-        })
+        if (notEmptyOrUndefined(value) || isStaticField) {
+            if (fieldType == 'url' || fieldType == 'email' || fieldType == 'phone') {
+                domIndexes.push(fieldsItems.length.toString())
+            }
+            value = postProcessValue(value, fieldType)
+            fieldsItems.push({
+                key: key,
+                value: value
+            })
+        }
     }
     let tableFields = getTable(
         fieldsHeaders,
         fieldsItems,
         'qrRows',
         'qrTable',
-        'compact_table'
+        'compact_table',
+        null, false, domIndexes
     )
 
     if (fieldsItems.length > 0) {
@@ -350,10 +362,6 @@ function getViewCardInfoHtml(qr) {
     )
 
     if (fileItems.length > 0) {
-        let downloadAllHref = document.createElement('a');
-        downloadAllHref.href = qrApi().getDownloadAllQRPublicFilesLink(Number(qr?.code).toString(16))
-        downloadAllHref.innerHTML = 'Скачать всё'
-        cardDiv.appendChild(downloadAllHref)
         cardDiv.appendChild(tableFiles)
     }
     return cardDiv
@@ -466,5 +474,17 @@ function addDownloadPublicFileRowActions() {
         if (fileId) {
             row.addEventListener('click', () => downloadFileUnsecured(fileId, null))
         }
+    }
+}
+
+function postProcessValue(value, fieldType) {
+    if (emptyOrUndefined(value) || emptyOrUndefined(fieldType)) {
+        return ''
+    }
+    switch (fieldType.toLowerCase()) {
+        case 'url': return getLink(value, value).outerHTML
+        case 'phone': return getLink(value, `tel:${value}`).outerHTML
+        case 'email': return getLink(value, `mailto:${value}`).outerHTML
+        default: return value
     }
 }

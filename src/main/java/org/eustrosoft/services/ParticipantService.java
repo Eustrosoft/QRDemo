@@ -302,7 +302,7 @@ public class ParticipantService {
         repository.updatePassword(participantId, passwordEncoder.encode(newPassword));
     }
 
-    public boolean isAdmin(Collection<Role> roles) {
+    public static boolean isAdmin(Collection<Role> roles) {
         if (CollectionUtils.isEmpty(roles)) {
             return false;
         }

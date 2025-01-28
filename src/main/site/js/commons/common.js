@@ -1,4 +1,6 @@
 
+export const RANDOM_PASSWORD_LENGTH = 12
+
 // Utils functions
 export function notNullOrUndefined(value) {
     return value !== null && value !== undefined
@@ -86,7 +88,7 @@ export function generateRandomPassword() {
     const allowedPassChatLength = allowedPasswordCharacters.length
 
     let pass = ''
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < RANDOM_PASSWORD_LENGTH; i++) {
         var arr = new Uint8Array(1);
         self.crypto.getRandomValues(arr)
         let indx = arr[0] % allowedPassChatLength | 0

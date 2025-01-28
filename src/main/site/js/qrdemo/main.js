@@ -212,6 +212,8 @@ function getHelpSection() {
         showContactModal()
     })
     helpSection.appendChild(contactLink)
+    let helpLink = getLink('Помощь', '/help/', '')
+    helpSection.appendChild(helpLink)
     return helpSection
 }
 
