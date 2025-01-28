@@ -39,6 +39,19 @@ export function qrApi() {
             )
             return authFetch(req)
         },
+        saveDefaultForm: () => {
+            let url = `${QR_DEMO_API}secured/forms/default`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
+        },
         updateForm: (form) => {
             let url = `${QR_DEMO_API}secured/forms/${form.id}`;
 
@@ -166,9 +179,9 @@ export function qrApi() {
             const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`
             uploadSingleFile(url, fileRequest)
         },
-        getDownloadAllQRPublicFilesLink: (id) => {
-            return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
-        },
+        // getDownloadAllQRPublicFilesLink: (id) => {
+        //     return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
+        // },
         connectFileToQR: (id, fileId) => {
             let url = `${QR_DEMO_API}secured/qrs/${id}/files/choose`;
 
