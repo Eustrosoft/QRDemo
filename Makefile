@@ -36,6 +36,10 @@ ROOT:
 	install -m 644 ../videos/demonstration.mp4 work/webapps/ROOT/videos/
 	mkdir -p  work/webapps/ROOT/styles
 	mkdir -p  work/webapps/ROOT/styles/qrdemo
+	mkdir -p  work/webapps/ROOT/styles/landing
+	mkdir -p  work/webapps/ROOT/assets
+	mkdir -p  work/webapps/ROOT/assets/fonts
+	mkdir -p  work/webapps/ROOT/assets/img
 	install -m 644 src/main/site/index.html work/webapps/ROOT/index.html
 	install -m 644 src/main/site/lk/index.html work/webapps/ROOT/lk/index.html
 	install -m 644 src/main/site/js/commons/common.js work/webapps/ROOT/js/commons/common.js
@@ -78,6 +82,15 @@ ROOT:
 	install -m 644 src/main/site/styles/dop.css work/webapps/ROOT/styles/dop.css
 	install -m 644 src/main/site/styles/global.css work/webapps/ROOT/styles/global.css
 	install -m 644 src/main/site/styles/qrdemo/style.css work/webapps/ROOT/styles/qrdemo/style.css
+	install -m 644 src/main/site/styles/landing/styles.css work/webapps/ROOT/styles/landing/styles.css
+	install -m 644 src/main/site/styles/landing/reset.css work/webapps/ROOT/styles/landing/reset.css
+	install -m 644 src/main/site/styles/landing/fonts.css work/webapps/ROOT/styles/landing/fonts.css
+	install -m 644 src/main/site/assets/fonts/Lato-Bold.ttf work/webapps/ROOT/assets/fonts/Lato-Bold.fft
+	install -m 644 src/main/site/assets/fonts/Lato-Regular.ttf work/webapps/ROOT/assets/fonts/Lato-Regular.fft
+	install -m 644 src/main/site/assets/img/background.jpeg work/webapps/ROOT/assets/img/background.jpeg
+	install -m 644 src/main/site/assets/img/logo.jpg work/webapps/ROOT/assets/img/logo.jpg
+	install -m 644 src/main/site/assets/img/section-1-background.jpg work/webapps/ROOT/assets/img/section-1-background.jpg
+	install -m 644 src/main/site/assets/img/section-2-background.jpg work/webapps/ROOT/assets/img/section-2-background.jpg
 	install -m 644 src/main/site/styles/vars.css work/webapps/ROOT/styles/vars.css
 	install -m 644 src/main/site/printer/index.html work/webapps/ROOT/printer/index.html
 	install -m 644 src/main/site/qr/index.html work/webapps/ROOT/qr/index.html
