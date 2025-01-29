@@ -1,4 +1,4 @@
-import { emptyOrUndefined, getQRImage, hasAdminRole, isUpperCase, longToHex, processFetchErrorToLogin, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, getQRImage, hasAdminRole, isUpperCase, toLoginIfNotAuthorized } from "./utils.js";
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";

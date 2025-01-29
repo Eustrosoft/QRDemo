@@ -32,7 +32,7 @@ export function toLoginIfNotAuthorized() {
 
 export const processFetchErrorToLogin = (error) => {
     if (error !== undefined) {
-        alert('Login to start using system!')
+        // alert('Login to start using system!')
     }
     window.location.href = '?login=true'
 }

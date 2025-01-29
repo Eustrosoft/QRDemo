@@ -6,5 +6,5 @@ values
 ('INPUT_EMAIL', 'INPUT_TYPE', 'EMAIL', 'Email');
 INSERT INTO settings(key, value)
 values
-('spring.datasource.max-active', '5'),
-('spring.datasource.hikari.maximum-pool-size', '5')
+('spring.datasource.max-active', '1'),
+('spring.datasource.hikari.maximum-pool-size', '1')
