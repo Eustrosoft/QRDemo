@@ -316,10 +316,6 @@ button:hover {
   .how-to-make-qr-content {
     margin: 0;
   }
-
-  .header-content > div > button {
-    display: none;
-  }
 }
 
 @media (max-width: 648px) {

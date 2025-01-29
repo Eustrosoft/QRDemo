@@ -1,56 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <title>QRDemo</title>
-    <link href="../styles/qrdemo/style.css" type="text/css" rel="stylesheet" />
-    <link href="../styles/vars.css" type="text/css" rel="stylesheet" />
-    <link href="../styles/dop.css" type="text/css" rel="stylesheet" />
-    <link href="../styles/global.css" type="text/css" rel="stylesheet" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <script type="module" src="../js/qrdemo/main.js"></script>
-    <link rel="icon" href="logos/logo.svg" type="image/x-icon" />
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
     <meta name="google" content="notranslate">
+    <style>
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content:center;
+            align-items: center;
+        }
+        .content-box {
+            max-width: 300px;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            text-align: center;
+        }
+        .up {
+            height:10px;
+        }
+        span {
+            text-align: center;
+        }
+    </style>
+    <link href="logos/logo.svg"
+          rel="icon"
+          type="image/x-icon"/>
 </head>
-
-<body class="light flex m-0 gap-05rem flex-direction-column">
-    <header class="header">
-        <div class="container">
-            <div class="header__body">
-                <div class="header__logo">
-                    <a href="/">
-                        <span class="fs-8rem">QXYZ</span>
-                    </a>
-                </div>
-    
-                <nav class="header__nav">
-                    <ul class="header__ul">
-                        <li class="header__ul__item">
-                            <a href="?lk=true">
-                                Карточки
-                            </a>
-                        </li>
-                        <li class="header__ul__item">
-                            <a>
-                                <div id="avatar__dropdown" class="dropdown">
-                                    <img class="header__ul__item__avatar" alt="Avatar image" src="../icons/lk-icon.svg"/>
-                                    <div id="avatar__dropdown__content" class="dropdown__content">
-                                    </div>
-                                </div>    
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <div class="flex flex-auto flex-direction-column" id="main_block">
-
-        </div>
-    </main>
+<body>
+<div class="up"></div>
+<div class="content">
+    <div class="content-box">
+        <span id="content-text"></span>
+        <div id="mainBlock"><a class="qr_link" target="_"><img id="qr_image"></a></div>
+        <span id="content-text-down"></span>
+    </div>
+</div>
 </body>
+<script>
+    const defaultText = 'Сканируйте для дополнительной информации:'
+    const urlParams = new URLSearchParams(window.location.search)
+    const q = urlParams.get('q')
+    const text = urlParams.get('text')
+    const textDown = urlParams.get('textDown')
 
+    const schema = 'https://'
+    const baseQrHref = 'qr.qxyz.ru'
+    const queryQ = '/?q='
+
+    const linkStart = '{{'
+    const linkEnd = '}}'
+    const getLinkHref = (href) => {
+        return `<a href="${href}">${href}</a>`
+    };
+
+    const contentText = document.getElementById('content-text')
+    const contentTextDown = document.getElementById('content-text-down')
+
+    if (!q) {
+        alert('Не предоставлен параметр q')
+    } else {
+        let qr_links = document.getElementsByClassName('qr_link')
+        for (let i in qr_links) {
+            qr_links[i].href = schema + baseQrHref + queryQ + q
+        }
+
+        const baseGenerateHref = 'https://qrgen.qxyz.ru/generate?q='
+        let qr_image = document.getElementById('qr_image')
+        if (qr_image) {
+            qr_image.src = baseGenerateHref + q + '&color=%23000000&background=%23ffffff&x=165&fileType=SVG&correctionLevel=L&site=' + schema + baseQrHref
+        }
+        if (text != null && text != '') {
+            contentText.innerHTML = getProcessedText(text)
+        } else {
+            contentText.innerHTML = getProcessedText(defaultText)
+        }
+        if (textDown != null && textDown != '') {
+            contentTextDown.innerHTML    = getProcessedText(textDown)
+        }
+    }
+
+    function getProcessedText(text) {
+        if (text == null || text == undefined || text == '') {
+            return
+        }
+        let processedText = text
+        let hrefRegex = /\{\{(.*?)\}\}/g;
+        let qrRegex = /\{\{(qr-link)\}\}/g;
+
+        var found;
+
+        while(found = qrRegex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(`${schema}${baseQrHref}${queryQ}${q}`))
+        };
+        while(found = hrefRegex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(found[1]))
+        };
+        return processedText
+    }
+</script>
 </html>

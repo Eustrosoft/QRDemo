@@ -133,7 +133,7 @@ export function showContactModal() {
     contactBlock.appendChild(getHr())
 
     let contactEmailParagraph = getParagraph(`По всем вопросам пишите на e-mail: `, 'fs-14rem fw-400 fs-italic margin-10')
-    let emailSpan = getSpan('denis2211@yandex.ru', 'contact_address')
+    let emailSpan = getSpan('qrdemo@eustrosoft.org', 'contact_address')
 
     emailSpan.addEventListener('click', (e) => {
         window.open(`mailto:${e.target.innerText}`);
@@ -142,7 +142,7 @@ export function showContactModal() {
     contactEmailParagraph.appendChild(emailSpan)
 
     let contactPhoneParagraph = getParagraph(`Или звоните на номер: `, 'fs-14rem fw-400 fs-italic margin-10')
-    let phoneSpan = getSpan('+7(916)666-24-90', 'contact_address')
+    let phoneSpan = getSpan('+7(995)116-60-01', 'contact_address')
 
     phoneSpan.addEventListener('click', (e) => {
         window.open(`tel:${e.target.innerText}`);

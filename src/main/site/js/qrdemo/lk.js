@@ -102,6 +102,7 @@ function setSettings(div, settingsJson, userDetails) {
     let existedQrTableSettings = settingsJson?.settings?.qrTableColumns
     if (!admin) {
         qrPrintTextDiv = document.createElement('div')
+        let hint = getTextLabel('Подстановки: {{qr-code}} - номер текущей карточки, {{qr-link}} - ссылка на текущую карточку')
         let defaultQrPrintTextLabelUp = getTextLabel('Текст для печатной формы QR (сверху):')
         defaultQrPrintTextInputUp = getSingleInput('text', false, 'qr_print_form_input', '')
         defaultQrPrintTextInputUp.style.width = '100%'
@@ -117,6 +118,8 @@ function setSettings(div, settingsJson, userDetails) {
         if (existedDefaultQrPrintTextDown) {
             defaultQrPrintTextInputDown.value = existedDefaultQrPrintTextDown
         }
+        qrPrintTextDiv.appendChild(hint)
+        qrPrintTextDiv.appendChild(document.createElement('br'))
         qrPrintTextDiv.appendChild(defaultQrPrintTextLabelUp)
         qrPrintTextDiv.appendChild(defaultQrPrintTextInputUp)
         qrPrintTextDiv.appendChild(defaultQrPrintTextLabelDown)

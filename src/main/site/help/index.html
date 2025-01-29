@@ -9,7 +9,6 @@
     <link href="../styles/dop.css" type="text/css" rel="stylesheet" />
     <link href="../styles/global.css" type="text/css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <script type="module" src="../js/qrdemo/main.js"></script>
     <link rel="icon" href="logos/logo.svg" type="image/x-icon" />
     <meta name="google" content="notranslate">
 </head>
@@ -30,14 +29,9 @@
                             <a href="/lk/">
                                 Карточки
                             </a>
-                        </li>
-                        <li class="header__ul__item">
-                            <a>
-                                <div id="avatar__dropdown" class="dropdown">
-                                    <img class="header__ul__item__avatar" alt="Avatar image" src="../icons/lk-icon.svg"/>
-                                    <div id="avatar__dropdown__content" class="dropdown__content">
-                                    </div>
-                                </div>    
+                            <span>⠀</span>
+                            <a href="/">
+                                Главная
                             </a>
                         </li>
                     </ul>
@@ -47,8 +41,14 @@
     </header>
 
     <main>
-        <div class="flex flex-auto flex-direction-column" id="main_block">
-
+        <div id="main_page">
+            <div class="flex flex-auto flex-direction-column" id="main_block">
+                <h1> Данный сайт предназначен для ознакомления с функциональностью системы 
+                <span class="color-red">QXYZ</span> </h1>
+                <video width="1920" height="1080" controls poster="logos/logo.svg">
+                    <source src="videos/demonstration.mp4" type="video/mp4">
+                </video>
+            </div>
         </div>
     </main>
 </body>

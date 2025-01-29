@@ -49,11 +49,16 @@
     const schema = 'https://'
     const baseQrHref = 'qr.qxyz.ru'
     const queryQ = '/?q='
+    const queryQCompact = '?q='
 
     const linkStart = '{{'
     const linkEnd = '}}'
     const getLinkHref = (href) => {
         return `<a href="${href}">${href}</a>`
+    };
+
+    const getLinkHrefCompact = (href, text) => {
+        return `<a href="${href}">${text}</a>`
     };
 
     const contentText = document.getElementById('content-text')
@@ -88,12 +93,16 @@
         }
         let processedText = text
         let hrefRegex = /\{\{(.*?)\}\}/g;
-        let qrRegex = /\{\{(qr\.code)\}\}/g;
+        let qrLinkRegex = /\{\{(qr-link)\}\}/g;
+        let qrCodeRegex = /\{\{(qr-code)\}\}/g;
 
         var found;
 
-        while(found = qrRegex.exec(text)) {
-            processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(`${schema}${baseQrHref}${queryQ}${q}`))
+        while(found = qrLinkRegex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, getLinkHrefCompact(`${schema}${baseQrHref}${queryQ}${q}`, `${baseQrHref}${queryQCompact}${q}`))
+        };
+        while(found = qrCodeRegex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, q)
         };
         while(found = hrefRegex.exec(text)) {
             processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(found[1]))

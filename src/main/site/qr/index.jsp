@@ -26,9 +26,6 @@
   public final static String[] VALUE_CHARACTERS = { "<",">","&","\"","'" };
   public final static String[] VALUE_CHARACTERS_SUBST = {"&lt;","&gt;","&amp;","&quot;","&#039;"};
 
-  JspWriter out;
-  String qrHref = null;
-
   public static class QRDto {
     private Long code;
     private Map<String, String> data;
@@ -241,6 +238,16 @@
     EMAIL
   }
 
+
+public static class WebApp {
+  private JspWriter out = null;
+  private String qrHref = null;
+
+  public WebApp(JspWriter out, String qrHref) {
+    this.out = out;
+    this.qrHref = qrHref;
+  }
+
   private void printQRData(QRDto dto) throws IllegalArgumentException {
     FormDto form = dto.getForm();
     Map<String, String> data = dto.getData();
@@ -266,12 +273,13 @@
     if (!files.isEmpty()) {
       printFilesTable(dto.getCode(), files);
     }
+    // Print if no data found as files/attributes
     if (printedLines == 0 && files.isEmpty()) {
       printNoQRData();
     }
   }
 
-  private Integer printAttributesTable(FormDto form, Map<String, String> data)
+  private int printAttributesTable(FormDto form, Map<String, String> data)
       throws IllegalArgumentException {
     if (form == null) {
       throw new IllegalArgumentException("Не найдено шаблона");
@@ -466,21 +474,6 @@
     return sb.toString();
   }
 
-  private ObjectMapper getObjectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    return mapper;
-  }
-
-  public void inits(ServletConfig config) throws ServletException {
-    super.init(config);
-
-    String value = config.getInitParameter(CONFIG_PARAM_QR_SERVICE);
-    if (value == null || value.isEmpty()) {
-      throw new IllegalArgumentException("Configure qr service url in configuration");
-    }
-   }
-
    private String formatByFieldType(String value, FormFieldType fieldType) {
       if (fieldType == null) {
         return text2html(value);
@@ -495,6 +488,22 @@
         return text2html(value);
       }
    }
+}
+
+  private ObjectMapper getObjectMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    return mapper;
+  }
+
+  public void inits(ServletConfig config) throws ServletException {
+    super.init(config);
+
+    String value = config.getInitParameter(CONFIG_PARAM_QR_SERVICE);
+    if (value == null || value.isEmpty()) {
+      throw new IllegalArgumentException("Configure qr service url in configuration");
+    }
+  }
 %>
 <%
 
@@ -504,8 +513,8 @@
  response.setHeader("Pragma","no-cache");
  response.setDateHeader("Expires",expire_time);
  request.setCharacterEncoding("UTF-8");
- this.out = out;
- qrHref = getServletContext().getInitParameter(CONFIG_PARAM_QR_SERVICE);;
+ String qrHref = getServletContext().getInitParameter(CONFIG_PARAM_QR_SERVICE);
+ WebApp app = new WebApp(out, qrHref);
  String q = request.getParameter("q");
  String titleText = q == null ? "[empty]" : q;
 
@@ -700,12 +709,14 @@
       con = url.openConnection();
       ObjectMapper mapper = getObjectMapper();
       QRDto qrDto = mapper.readValue(con.getInputStream(), QRDto.class);
-      printQRData(qrDto);
+      app.printQRData(qrDto);
     } catch (Exception e) {
-      printNoQRData();
+      app.printNoQRData();
     }
+    out.println("<br><br>");
+    out.println("<div>qr:<a href='https://qr.qxyz.ru/?q=" + q + "'>" + q + "</a></div>");
    } else {
-    printSearchForm();
+    app.printSearchForm();
    }
  %>
   </div>

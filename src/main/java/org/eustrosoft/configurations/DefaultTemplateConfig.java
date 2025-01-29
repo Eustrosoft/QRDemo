@@ -27,7 +27,7 @@ public class DefaultTemplateConfig {
         List<FormField> ff = new ArrayList<>();
         ff.add(getFormField("cnum", "№ Договора", true, false, FormFieldType.TEXT, 1));
         ff.add(getFormField("cdate", "Дата договора", true, false, FormFieldType.DATE, 2));
-        ff.add(getFormField("price_gpl", "Цена", true, false, FormFieldType.TEXT, 3));
+        ff.add(getFormField("price_gpl", "Цена", true, false, FormFieldType.NUMBER, 3));
         ff.add(getFormField("prodtype", "Тип продукта", true, false, FormFieldType.TEXT, 4));
         ff.add(getFormField("prodmodel", "Модель продукта", true, false, FormFieldType.TEXT, 5));
         ff.add(getFormField("pmrevision", "Ревизия модели", true, false, FormFieldType.TEXT, 6));
@@ -38,9 +38,9 @@ public class DefaultTemplateConfig {
         ff.add(getFormField("sendate", "Дата отправки клиенту", true, false, FormFieldType.DATE, 11));
         ff.add(getFormField("wstart", "Дата начала гарантии", true, false, FormFieldType.DATE, 12));
         ff.add(getFormField("wend", "Дата окончания гарантии", true, false, FormFieldType.DATE, 13));
-        ff.add(getFormField("gis_long", "Долгота", true, false, FormFieldType.TEXT, 14));
-        ff.add(getFormField("gis_lat", "Широта", true, false, FormFieldType.TEXT, 15));
-        ff.add(getFormField("gis_alt", "Высота (м)", true, false, FormFieldType.TEXT, 16));
+        ff.add(getFormField("gis_long", "Долгота", true, false, FormFieldType.NUMBER, 14));
+        ff.add(getFormField("gis_lat", "Широта", true, false, FormFieldType.NUMBER, 15));
+        ff.add(getFormField("gis_alt", "Высота (м)", true, false, FormFieldType.NUMBER, 16));
         ff.add(getFormField("comment", "Комментарий", true, false, FormFieldType.TEXT, 17));
         return ff;
     }

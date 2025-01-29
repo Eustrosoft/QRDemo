@@ -4,3 +4,7 @@ values
 ('INPUT_URL', 'INPUT_TYPE', 'URL', 'Ссылка'),
 ('INPUT_PHONE_NUMBER', 'INPUT_TYPE', 'PHONE', 'Номер телефона'),
 ('INPUT_EMAIL', 'INPUT_TYPE', 'EMAIL', 'Email');
+INSERT INTO settings(key, value)
+values
+('spring.datasource.max-active', '5'),
+('spring.datasource.hikari.maximum-pool-size', '5')
