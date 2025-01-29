@@ -142,7 +142,7 @@ export function showContactModal() {
     contactEmailParagraph.appendChild(emailSpan)
 
     let contactPhoneParagraph = getParagraph(`Или звоните на номер: `, 'fs-14rem fw-400 fs-italic margin-10')
-    let phoneSpan = getSpan('+7(995)116-60-01', 'contact_address')
+    let phoneSpan = getSpan('+7(995)116-16-01', 'contact_address')
 
     phoneSpan.addEventListener('click', (e) => {
         window.open(`tel:${e.target.innerText}`);

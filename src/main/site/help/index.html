@@ -1,56 +1,73 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <title>QRDemo</title>
-    <link href="../styles/qrdemo/style.css" type="text/css" rel="stylesheet" />
-    <link href="../styles/vars.css" type="text/css" rel="stylesheet" />
-    <link href="../styles/dop.css" type="text/css" rel="stylesheet" />
-    <link href="../styles/global.css" type="text/css" rel="stylesheet" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <link rel="icon" href="logos/logo.svg" type="image/x-icon" />
+    <title>QR коды для бизнеса</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="../styles/landing/fonts.css" type="text/css" rel="stylesheet" />
+    <link href="../styles/landing/reset.css" type="text/css" rel="stylesheet" />
+    <link href="../styles/landing/styles.css" type="text/css" rel="stylesheet" />
     <meta name="google" content="notranslate">
-</head>
-
-<body class="light flex m-0 gap-05rem flex-direction-column">
-    <header class="header">
-        <div class="container">
-            <div class="header__body">
-                <div class="header__logo">
-                    <a href="/">
-                        <span class="fs-8rem">QXYZ</span>
-                    </a>
-                </div>
-    
-                <nav class="header__nav">
-                    <ul class="header__ul">
-                        <li class="header__ul__item">
-                            <a href="/lk/">
-                                Карточки
-                            </a>
-                            <span>⠀</span>
-                            <a href="/">
-                                Главная
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+  </head>
+  <body>
+    <div class="background"></div>
+    <header>
+      <div class="block">
+        <div class="header-content">
+          <div>
+            <img src="../assets/img/logo.jpg" alt="logo" width="55" />
+            <span>QR коды для бизнеса</span>
+          </div>
+          <div>
+            <button filled><a href="/lk/">Войти</a></button>
+          </div>
         </div>
+      </div>
     </header>
-
     <main>
-        <div id="main_page">
-            <div class="flex flex-auto flex-direction-column" id="main_block">
-                <h1> Данный сайт предназначен для ознакомления с функциональностью системы 
-                <span class="color-red">QXYZ</span> </h1>
-                <video width="1920" height="1080" controls poster="logos/logo.svg">
-                    <source src="videos/demonstration.mp4" type="video/mp4">
-                </video>
-            </div>
+      <section id="qr-is-key">
+        <div class="qr-is-key-background"></div>
+        <div class="block">
+          <div class="qr-is-key-content">
+            <h1 white>
+              Посмотрите обучающий ролик:
+            </h1>
+            <video width="1200" height="800" controls poster="../logos/logo.svg">
+                <source src="../videos/demonstration.mp4" type="video/mp4">
+            </video>
+          </div>
         </div>
+      </section>
     </main>
-</body>
-
+    <footer>
+      <div class="block">
+        <div class="footer-content">
+          <div>
+            <div class="footer-logo">
+              <img src="../assets/img/logo.jpg" alt="logo" width="55" />
+              <div>
+                <h3>QR DEMO</h3>
+                <p>QR-коды для всех</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3>QR DEMO</h3>
+            <a href="/lk/">Вход</a>
+          </div>
+          <div>
+            <h3>Сервисы</h3>
+            <a href="https://qxyz.ru" target="_blank">QXYZ</a>
+            <a href="https://qrdemo.qxyz.ru" target="_blank">QRDEMO</a>
+          </div>
+          <div>
+            <h3>Контакты</h3>
+            <a href="mailto:qrdemo@eustrosoft.org">qrdemo@eustrosoft.org</a>
+            <a href="tel:+7(995)116-16-01">+7(995)116-16-01</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>
