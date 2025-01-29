@@ -12,7 +12,7 @@
     <request-character-encoding>UTF-8</request-character-encoding>
     <context-param>
         <param-name>QR_SERVICE_HREF</param-name>
-        <param-value>http://localhost/qrCodeDemo</param-value>
+        <param-value>http://qrdemo-svc/qrCodeDemo</param-value>
     </context-param>
 
     <welcome-file-list>
