@@ -46,6 +46,10 @@
     const text = urlParams.get('text')
     const textDown = urlParams.get('textDown')
 
+    const schema = 'https://'
+    const baseQrHref = 'qr.qxyz.ru'
+    const queryQ = '/?q='
+
     const linkStart = '{{'
     const linkEnd = '}}'
     const getLinkHref = (href) => {
@@ -58,10 +62,6 @@
     if (!q) {
         alert('Не предоставлен параметр q')
     } else {
-        const schema = 'http://'
-        const baseQrHref = 'qr.qxyz.ru'
-        const queryQ = '/?q='
-
         let qr_links = document.getElementsByClassName('qr_link')
         for (let i in qr_links) {
             qr_links[i].href = schema + baseQrHref + queryQ + q
@@ -87,10 +87,15 @@
             return
         }
         let processedText = text
-        let regex = /\{\{(.*?)\}\}/g;
+        let hrefRegex = /\{\{(.*?)\}\}/g;
+        let qrRegex = /\{\{(qr\.code)\}\}/g;
 
         var found;
-        while(found = regex.exec(text)) {
+
+        while(found = qrRegex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(`${schema}${baseQrHref}${queryQ}${q}`))
+        };
+        while(found = hrefRegex.exec(text)) {
             processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(found[1]))
         };
         return processedText
