@@ -42,10 +42,15 @@ a:visited {
 
 a:hover {
   text-decoration: none;
-  opacity: 0.6;
 }
 
 ::placeholder {
   font: inherit;
   color: inherit;
+}
+
+video {
+  width: 100% !important;
+  max-height: 500px;
+  height: 40%;
 }

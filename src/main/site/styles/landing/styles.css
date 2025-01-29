@@ -70,6 +70,16 @@ header {
   border-radius: 0.35rem;
 }
 
+.header-content > a > div {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.header-content > a > div > img {
+  border-radius: 0.35rem;
+}
+
 #qr-is-key {
   position: relative;
   display: flex;
@@ -226,13 +236,19 @@ footer {
   padding: 4.75rem 0;
 }
 
-.footer-logo {
+.footer-logo > a {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
 }
 
 .footer-logo > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-logo > a > div {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -324,4 +340,8 @@ button:hover {
     grid-template-rows: repeat(1, 1fr);
     grid-template-columns: repeat(1, 1fr);
   }
+}
+
+.hoverable-a:hover {
+  opacity: 0.7;
 }
