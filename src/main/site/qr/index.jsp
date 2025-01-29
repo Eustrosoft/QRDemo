@@ -16,7 +16,7 @@
 
   private final static String TITLE_FORMAT = "Карточка %s";
   private final static String HREF_QR_FORMAT = "%s/v1/api/unsecured/qrs?q=%s";
-  private final static String HREF_FILE_FORMAT = "%s/v1/api/unsecured/files/%d/download/%s";
+  private final static String HREF_FILE_FORMAT = "/qrCodeDemo/v1/api/unsecured/files/%d/download/%s";
   // private final static String HREF_FILES_FORMAT = "%s/v1/api/unsecured/qrs/files/all/download?q=%s";
 
   private final static String NO_QR_DATA_TEXT = "Нет информации для этой карточки";
@@ -345,7 +345,7 @@ public static class WebApp {
         name = fileName;
       }
       startTd();
-      printFileDiv(text2html(name), String.format(HREF_FILE_FORMAT, qrHref, id, text2html(fileName)));
+      printFileDiv(text2html(name), String.format(HREF_FILE_FORMAT, id, text2html(fileName)));
       endTd();
       endTr();
     }
@@ -514,7 +514,8 @@ public static class WebApp {
  response.setDateHeader("Expires",expire_time);
  request.setCharacterEncoding("UTF-8");
  String qrHref = getServletContext().getInitParameter(CONFIG_PARAM_QR_SERVICE);
- WebApp app = new WebApp(out, qrHref);
+ String thisSiteHref = request.getServerName();
+ WebApp app = new WebApp(out, thisSiteHref);
  String q = request.getParameter("q");
  String titleText = q == null ? "[empty]" : q;
 
