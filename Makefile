@@ -1,6 +1,6 @@
 TIME_STAMP_BLA_BLA=`date "+%Y-%m-%d-%H.%M.%S"`
 YANDEX_METRIKA_TEXT=`cat etc/prod/metrika/metrika.html`
-YANDEX_METRIKA_SUBS=`<yandex\.metrika\/>`
+YANDEX_METRIKA_SUBS=<yandex\.metrika\/>
 
 usage:
 	@echo "make build|ROOT|qrCodeDemo|clean|all"
