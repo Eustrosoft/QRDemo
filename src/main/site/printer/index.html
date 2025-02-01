@@ -25,7 +25,7 @@
             text-align: center;
         }
     </style>
-    <link href="/logos/logo.svg"
+    <link href="/timestamped_assets/logos/logo.svg"
           rel="icon"
           type="image/x-icon"/>
 </head>
@@ -40,7 +40,6 @@
 </div>
 </body>
 <script>
-    const defaultText = 'Сканируйте для дополнительной информации:'
     const urlParams = new URLSearchParams(window.location.search)
     const q = urlParams.get('q')
     const text = urlParams.get('text')
@@ -79,8 +78,6 @@
         }
         if (text != null && text != '') {
             contentText.innerHTML = getProcessedText(text)
-        } else {
-            contentText.innerHTML = getProcessedText(defaultText)
         }
         if (textDown != null && textDown != '') {
             contentTextDown.innerHTML    = getProcessedText(textDown)
