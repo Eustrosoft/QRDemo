@@ -41,6 +41,7 @@ ROOT:
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/fonts
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/img
+	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/logos
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/commons
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components
