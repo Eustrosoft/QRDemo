@@ -67,14 +67,13 @@ ROOT:
 	install -m 644 src/main/site/qr/index.jsp work/webapps/ROOT/qr/index.jsp
 	install -m 644 src/main/site/site.webmanifest work/webapps/ROOT/site.webmanifest
 #
-#	install -m 644 src/main/site/package.json work/webapps/ROOT/package.json
-	install -m 644 src/main/site/timestamped_assets/logos/logo.svg work/webapps/ROOT/logos/logo.svg
-	install -m 644 src/main/site/timestamped_assets/icons/file-upload-duotone.svg work/webapps/ROOT/icons/file-upload-duotone.svg
-	install -m 644 src/main/site/timestamped_assets/icons/icons8-file.svg work/webapps/ROOT/icons/icons8-file.svg
-	install -m 644 src/main/site/timestamped_assets/icons/placeholder.svg work/webapps/ROOT/icons/placeholder.svg
-	install -m 644 src/main/site/timestamped_assets/icons/lk-icon.svg work/webapps/ROOT/icons/lk-icon.svg
-	install -m 644 src/main/site/timestamped_assets/icons/lk-icon-black.svg work/webapps/ROOT/icons/lk-icon-black.svg
-	install -m 644 src/main/site/timestamped_assets/icons/y-icon.svg work/webapps/ROOT/icons/y-icon.svg
+	install -m 644 src/main/site/timestamped_assets/logos/logo.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/logos/logo.svg
+	install -m 644 src/main/site/timestamped_assets/icons/file-upload-duotone.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/file-upload-duotone.svg
+	install -m 644 src/main/site/timestamped_assets/icons/icons8-file.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/icons8-file.svg
+	install -m 644 src/main/site/timestamped_assets/icons/placeholder.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/placeholder.svg
+	install -m 644 src/main/site/timestamped_assets/icons/lk-icon.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/lk-icon.svg
+	install -m 644 src/main/site/timestamped_assets/icons/lk-icon-black.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/lk-icon-black.svg
+	install -m 644 src/main/site/timestamped_assets/icons/y-icon.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/y-icon.svg
 #
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/web.xml work/webapps/ROOT/WEB-INF/web.xml
 
