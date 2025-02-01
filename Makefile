@@ -1,6 +1,6 @@
 TIME_STAMP_BLA_BLA=`date "+%Y-%m-%d-%H.%M.%S"`
 YANDEX_METRIKA_TEXT=`cat etc/prod/metrika/metrika.html`
-YANDEX_METRIKA_SUBS=`<yandex.metrika/>`
+YANDEX_METRIKA_SUBS=`<yandex\.metrika\/>`
 
 usage:
 	@echo "make build|ROOT|qrCodeDemo|clean|all"
@@ -59,8 +59,8 @@ ROOT:
 
 #Metrica
 	install -m 644 etc/prod/metrika/yandex_0f9e1cec15665a62.html work/webapps/ROOT/yandex_0f9e1cec15665a62.html
-	cat work/webapps/ROOT/index.html | sed "s/${YANDEX_METRIKA_SUBS}/${YANDEX_METRIKA_TEXT}/g" > work/webapps/ROOT/index.html
-	cat work/webapps/ROOT/help/index.html | sed "s/${YANDEX_METRIKA_SUBS}/${YANDEX_METRIKA_TEXT}/g" > work/webapps/ROOT/help/index.html
+	sed -e "/${YANDEX_METRIKA_SUBS}/r etc/prod/metrika/metrika.html" -e "s/${YANDEX_METRIKA_SUBS}//g" work/webapps/ROOT/index.html > work/webapps/ROOT/index.html
+	sed -e "/${YANDEX_METRIKA_SUBS}/r etc/prod/metrika/metrika.html" -e "s/${YANDEX_METRIKA_SUBS}//g" work/webapps/ROOT/help/index.html > work/webapps/ROOT/help/index.html
 
 #
 	install -m 644 src/main/site/robots.txt work/webapps/ROOT/robots.txt
