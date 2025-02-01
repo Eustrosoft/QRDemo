@@ -59,8 +59,8 @@ ROOT:
 
 #Metrica
 	install -m 644 etc/prod/metrika/yandex_0f9e1cec15665a62.html work/webapps/ROOT/yandex_0f9e1cec15665a62.html
-	sed -e -i '' "/${YANDEX_METRIKA_SUBS}/r etc/prod/metrika/metrika.html" -e "s/${YANDEX_METRIKA_SUBS}//g" work/webapps/ROOT/index.html
-	sed -e -i '' "/${YANDEX_METRIKA_SUBS}/r etc/prod/metrika/metrika.html" -e "s/${YANDEX_METRIKA_SUBS}//g" work/webapps/ROOT/help/index.html
+	sed -i '' -e "/${YANDEX_METRIKA_SUBS}/r etc/prod/metrika/metrika.html" -e "s/${YANDEX_METRIKA_SUBS}//g" work/webapps/ROOT/index.html
+	sed -i '' -e "/${YANDEX_METRIKA_SUBS}/r etc/prod/metrika/metrika.html" -e "s/${YANDEX_METRIKA_SUBS}//g" work/webapps/ROOT/help/index.html
 
 #
 	install -m 644 src/main/site/robots.txt work/webapps/ROOT/robots.txt
