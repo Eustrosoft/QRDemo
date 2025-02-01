@@ -1,4 +1,7 @@
 TIME_STAMP_BLA_BLA=`date "+%Y-%m-%d-%H.%M.%S"`
+YANDEX_METRIKA_TEXT=`cat etc/prod/metrika/metrika.html`
+YANDEX_METRIKA_SUBS=`<yandex.metrika/>`
+
 usage:
 	@echo "make build|ROOT|qrCodeDemo|clean|all"
 clean:
@@ -48,10 +51,17 @@ ROOT:
 	install -m 644 src/main/site/printer/index.html work/webapps/ROOT/printer/index.html
 	install -m 644 src/main/site/help/index.html work/webapps/ROOT/help/index.html
 
+# substitutions and pasting yandex metrika was added
 	cat src/main/site/index.html | sed "s/TIME_STAMP_BLA_BLA/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/index.html
 	cat src/main/site/lk/index.html | sed "s/TIME_STAMP_BLA_BLA/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/lk/index.html
-	cat src/main/site/printer/index.html | sed "s/TIME_STAMP_BLA_BLA/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/printer/index.html
 	cat src/main/site/help/index.html | sed "s/TIME_STAMP_BLA_BLA/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/help/index.html
+	cat src/main/site/printer/index.html | sed "s/TIME_STAMP_BLA_BLA/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/printer/index.html
+
+#Metrica
+	install -m 644 etc/prod/metrika/yandex_0f9e1cec15665a62.html work/webapps/ROOT/yandex_0f9e1cec15665a62.html
+	cat work/webapps/ROOT/index.html | sed "s/${YANDEX_METRIKA_SUBS}/${YANDEX_METRIKA_TEXT}/g" > work/webapps/ROOT/index.html
+	cat work/webapps/ROOT/help/index.html | sed "s/${YANDEX_METRIKA_SUBS}/${YANDEX_METRIKA_TEXT}/g" > work/webapps/ROOT/help/index.html
+
 #
 	install -m 644 src/main/site/robots.txt work/webapps/ROOT/robots.txt
 	install -m 644 src/main/site/qr/index.jsp work/webapps/ROOT/qr/index.jsp
@@ -69,8 +79,7 @@ ROOT:
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/web.xml work/webapps/ROOT/WEB-INF/web.xml
 
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/classes/application.yml work/webapps/qrCodeDemo/WEB-INF/classes/application.yml
-#Metrica
-	install -m 644 src/main/site/yandex_0f9e1cec15665a62.html work/webapps/ROOT/yandex_0f9e1cec15665a62.html
+
 # install into ROOT/${TIME_STAMP_BLA_BLA}
 	install -m 644 etc/prod/webapps/ROOT/js/qrdemo/api.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/api.js
 	install -m 644 src/main/site/js/commons/common.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/commons/common.js
