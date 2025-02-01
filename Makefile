@@ -20,9 +20,6 @@ qrCodeDemo:
 	cp -r dev/db work/
 ROOT:
 	mkdir -p  work/webapps/ROOT/
-	mkdir -p  work/webapps/ROOT/js
-	mkdir -p  work/webapps/ROOT/logos
-	mkdir -p  work/webapps/ROOT/icons
 	mkdir -p  work/webapps/ROOT/videos
 	mkdir -p  work/webapps/ROOT/lk
 	mkdir -p  work/webapps/ROOT/printer
