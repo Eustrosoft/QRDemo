@@ -1,4 +1,4 @@
-TIME_STAMP_BLA_BLA=`date "+%Y-%m-%d-%H.%M.%S"`
+TIME_STAMP_BLA_BLA=`date "+%Y-%m-%d-%H.%M"`
 YANDEX_METRIKA_TEXT=`cat etc/prod/metrika/metrika.html`
 YANDEX_METRIKA_SUBS=<yandex\.metrika\/>
 
