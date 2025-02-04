@@ -1,220 +1,315 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>QR коды для бизнеса</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="/timestamped_assets/styles/landing/fonts.css" type="text/css" rel="stylesheet" />
-  <link href="/timestamped_assets/styles/landing/reset.css" type="text/css" rel="stylesheet" />
-  <link href="/timestamped_assets/styles/landing/styles.css" type="text/css" rel="stylesheet" />
-  <meta name="google" content="notranslate">
-  <script>
-    const urlParams = new URLSearchParams(window.location.search)
-    const q = urlParams.get('q')
-    if (q) {
-      window.location.href = '/qr/?q=' + q
-    }
-  </script>
-</head>
-<body>
-<div><yandex.metrika/></div>
-<div class="background"></div>
-  <header>
-    <div class="block">
-      <div class="header-content">
-        <a href="/">
+  <head>
+    <meta charset="UTF-8" />
+    <title>QR коды для бизнеса</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="/timestamped_assets/styles/landing/fonts.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="/timestamped_assets/styles/landing/reset.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="/timestamped_assets/styles/landing/styles.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <meta name="google" content="notranslate" />
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const q = urlParams.get("q");
+      if (q) {
+        window.location.href = "/qr/?q=" + q;
+      }
+    </script>
+  </head>
+  <body>
+    <div><yandex.metrika /></div>
+    <div class="background"></div>
+    <header>
+      <div class="block">
+        <div class="header-content">
+          <a href="/">
+            <div>
+              <img
+                src="/timestamped_assets/assets/img/logo.jpg"
+                alt="logo"
+                width="55"
+              />
+              <span>QR коды для бизнеса</span>
+            </div>
+          </a>
           <div>
-            <img src="/timestamped_assets/assets/img/logo.jpg" alt="logo" width="55" />
-            <span>QR коды для бизнеса</span>
-          </div>
-        </a>
-        <div>
-          <a href="/lk/"><button filled>Войти</button></a>
-        </div>
-      </div>
-    </div>
-  </header>
-  <main>
-    <section id="qr-is-key">
-      <div class="qr-is-key-background"></div>
-      <div class="block">
-        <div class="qr-is-key-content">
-          <h1 white>
-            QR-код – ключ к данным: упростите доступ к информации!
-          </h1>
-          <p white>
-            Создавайте карточки товаров и предоставляйте клиентам всю
-            необходимую информацию в одном месте
-          </p>
-          <div>
-            <a href="/lk/"><button filled>Создать QR-код</button></a>
-            <a href="/help/"><button filled>Обучающее видео</button></a>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="qr-is">
-      <div class="block">
-        <div class="card-block">
-          <h1>QR карточки это</h1>
-          <div class="card-block-cards">
-            <div>
-              <h2>Удобство для клиентов</h2>
-              <p>
-                Клиенты получают доступ к полному комплекту документации и
-                информации по продукту, просто сканируя QR-код
-              </p>
-            </div>
-            <div>
-              <h2>Прозрачность для поставщика</h2>
-              <p>
-                Поставщики могут легко управлять контентом карточек,
-                предоставляя клиентам актуальную информацию о товаре
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="key-advantages">
-      <div class="key-advantages-background"></div>
-      <div class="block">
-        <div class="key-advantages-content">
-          <h1>Ключевые преимущества</h1>
-          <div class="key-advantages-content-cards">
-            <div>
-              <h2>Упрощенная документация</h2>
-              <p>
-                Все инструкции, сертификаты и другая документация доступны в
-                электронном виде, что избавляет от необходимости носить с
-                собой громоздкие бумажные материалы
-              </p>
-            </div>
-            <div>
-              <h2>Многоязычная поддержка</h2>
-              <p>
-                Создайте QR-коды с информацией на разных языках, чтобы
-                обеспечить доступ к ней для клиентов по всему миру
-              </p>
-            </div>
-            <div>
-              <h2>Интеграция с CRM-системами</h2>
-              <p>
-                QR-коды можно интегрировать с CRM-системами, чтобы
-                отслеживать, как часто сканируются ваши QR-коды, и какие
-                документы наиболее популярны
-              </p>
+            <svg
+              class="menu-toggle"
+              id="menuToggle"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 10 10"
+              stroke="black"
+              stroke-width=".6"
+              fill="rgba(0,0,0,0)"
+              stroke-linecap="round"
+            >
+              <path d="M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7">
+                <animate
+                  dur="0.2s"
+                  attributeName="d"
+                  values="M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7;M3,3L5,5L7,3M5,5L5,5M3,7L5,5L7,7"
+                  fill="freeze"
+                  begin="start.begin"
+                />
+                <animate
+                  dur="0.2s"
+                  attributeName="d"
+                  values="M3,3L5,5L7,3M5,5L5,5M3,7L5,5L7,7;M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7"
+                  fill="freeze"
+                  begin="reverse.begin"
+                />
+              </path>
+              <rect width="10" height="10" stroke="none">
+                <animate
+                  dur="2s"
+                  id="reverse"
+                  attributeName="width"
+                  begin="click"
+                />
+              </rect>
+              <rect width="10" height="10" stroke="none">
+                <animate
+                  dur="0.001s"
+                  id="start"
+                  attributeName="width"
+                  values="10;0"
+                  fill="freeze"
+                  begin="click"
+                />
+                <animate
+                  dur="0.001s"
+                  attributeName="width"
+                  values="0;10"
+                  fill="freeze"
+                  begin="reverse.begin"
+                />
+              </rect>
+            </svg>
+            <div class="menu" id="menu">
+              <a href="/lk/"><button filled>Войти</button></a>
             </div>
           </div>
         </div>
       </div>
-    </section>
-    <section id="how-to-make-qr">
-      <div class="block">
-        <div class="how-to-make-qr-content">
-          <h1>Как создавать QR-коды</h1>
-          <div class="how-to-make-qr-content-cards">
-            <div>
-              <h3>1. Создайте карточку продукта</h3>
-              <p>
-                Заполните необходимые поля, такие как название продукта, описание, характеристики и другую релевантную информацию.
-                <b>Приложите PDF файлы с инструкциями и сертификатами.</b>
-              </p>
-            </div>
-            <div>
-              <h3>2. Получите QR-код</h3>
-              <p>
-                Генерируется уникальный QR-код, который содержит ссылку на
-                созданную карточку продукта
-              </p>
-            </div>
-            <div>
-              <h3>3. Нанесите QR-код на ваш продукт</h3>
-              <p>
-                Нанесите QR-код на ваш продукт или изделие, чтобы пользователь в любой момент мог его остканировать и перейти на карточку,
-                где получить актуальную информацию, последнюю версию инструкций и драйверов, узнать о
-                гарантийном и пост-гарантийном обслуживании.
-              </p>
+    </header>
+    <main>
+      <section id="qr-is-key">
+        <div class="qr-is-key-background"></div>
+        <div class="block">
+          <div class="qr-is-key-content">
+            <h1 white>
+              QR-код – ключ к данным: упростите доступ к информации!
+            </h1>
+            <p white>
+              Создавайте карточки товаров и предоставляйте клиентам всю
+              необходимую информацию в одном месте
+            </p>
+            <div class="qr-is-key-content-buttons">
+              <a href="/lk/"><button filled>Создать QR-код</button></a>
+              <a href="/help/"><button filled>Обучающее видео</button></a>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-    <section id="main-ideas">
-      <div class="block">
-        <div class="card-block">
-          <h1>Основные идеи</h1>
-          <div class="card-block-cards">
-            <div>
-              <h2>Безопасность данных</h2>
-              <p>
-                Информация в карточке доступна только обладателям QR-кода,
-                есть возможность настройки параметров доступа
-              </p>
-            </div>
-            <div>
-              <h2>Простота использования</h2>
-              <p>
-                Сервис интуитивно понятен и прост в использовании, даже для
-                пользователей без опыта работы с QR-кодами
-              </p>
-            </div>
-            <div>
-              <h2>Мобильность</h2>
-              <p>
-                Клиенты могут получить доступ к информации с помощью любого
-                устройства с камерой, в любое время и в любом месте
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="try-for-free">
-      <div class="block">
-        <div class="try-for-free-content">
-          <h1>Попробуйте сервис бесплатно!</h1>
-          <p>
-            Создайте свой первый QR-код и убедитесь, как просто это может
-            быть. Система крайне проста в использовании и предлагает множество
-            функций, которые помогут вам улучшить взаимодействие с клиентами
-          </p>
-        </div>
-      </div>
-    </section>
-  </main>
-  <footer>
-    <div class="block">
-      <div class="footer-content">
-        <div>
-          <div class="footer-logo">
-            <a href="/">
-              <img src="/timestamped_assets/assets/img/logo.jpg" alt="logo" width="55" />
+      </section>
+      <section id="qr-is">
+        <div class="block">
+          <div class="card-block">
+            <h1>QR карточки это</h1>
+            <div class="card-block-cards">
               <div>
-                <h3>QR DEMO</h3>
-                <p>QR-коды для всех</p>
+                <h2>Удобство для клиентов</h2>
+                <p>
+                  Клиенты получают доступ к полному комплекту документации и
+                  информации по продукту, просто сканируя QR-код
+                </p>
               </div>
+              <div>
+                <h2>Прозрачность для поставщика</h2>
+                <p>
+                  Поставщики могут легко управлять контентом карточек,
+                  предоставляя клиентам актуальную информацию о товаре
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="key-advantages">
+        <div class="key-advantages-background"></div>
+        <div class="block">
+          <div class="key-advantages-content">
+            <h1>Ключевые преимущества</h1>
+            <div class="key-advantages-content-cards">
+              <div>
+                <h2>Упрощенная документация</h2>
+                <p>
+                  Все инструкции, сертификаты и другая документация доступны в
+                  электронном виде, что избавляет от необходимости носить с
+                  собой громоздкие бумажные материалы
+                </p>
+              </div>
+              <div>
+                <h2>Многоязычная поддержка</h2>
+                <p>
+                  Создайте QR-коды с информацией на разных языках, чтобы
+                  обеспечить доступ к ней для клиентов по всему миру
+                </p>
+              </div>
+              <div>
+                <h2>Интеграция с CRM-системами</h2>
+                <p>
+                  QR-коды можно интегрировать с CRM-системами, чтобы
+                  отслеживать, как часто сканируются ваши QR-коды, и какие
+                  документы наиболее популярны
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="how-to-make-qr">
+        <div class="block">
+          <div class="how-to-make-qr-content">
+            <h1>Как создавать QR-коды</h1>
+            <div class="how-to-make-qr-content-cards">
+              <div>
+                <h3>1. Создайте карточку продукта</h3>
+                <p>
+                  Заполните необходимые поля, такие как название продукта,
+                  описание, характеристики и другую релевантную информацию.
+                  <b>Приложите PDF файлы с инструкциями и сертификатами.</b>
+                </p>
+              </div>
+              <div>
+                <h3>2. Получите QR-код</h3>
+                <p>
+                  Генерируется уникальный QR-код, который содержит ссылку на
+                  созданную карточку продукта
+                </p>
+              </div>
+              <div>
+                <h3>3. Нанесите QR-код на ваш продукт</h3>
+                <p>
+                  Нанесите QR-код на ваш продукт или изделие, чтобы пользователь
+                  в любой момент мог его остканировать и перейти на карточку,
+                  где получить актуальную информацию, последнюю версию
+                  инструкций и драйверов, узнать о гарантийном и
+                  пост-гарантийном обслуживании.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="main-ideas">
+        <div class="block">
+          <div class="card-block">
+            <h1>Основные идеи</h1>
+            <div class="card-block-cards">
+              <div>
+                <h2>Безопасность данных</h2>
+                <p>
+                  Информация в карточке доступна только обладателям QR-кода,
+                  есть возможность настройки параметров доступа
+                </p>
+              </div>
+              <div>
+                <h2>Простота использования</h2>
+                <p>
+                  Сервис интуитивно понятен и прост в использовании, даже для
+                  пользователей без опыта работы с QR-кодами
+                </p>
+              </div>
+              <div>
+                <h2>Мобильность</h2>
+                <p>
+                  Клиенты могут получить доступ к информации с помощью любого
+                  устройства с камерой, в любое время и в любом месте
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="try-for-free">
+        <div class="block">
+          <div class="try-for-free-content">
+            <h1>Начните бесплатно!</h1>
+            <p>
+              Создайте свой первый QR-код и убедитесь, как просто это может
+              быть. Система крайне проста в использовании и предлагает множество
+              функций, которые помогут вам улучшить взаимодействие с клиентами
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="block">
+        <div class="footer-content">
+          <div>
+            <div class="footer-logo">
+              <a href="/">
+                <img
+                  src="/timestamped_assets/assets/img/logo.jpg"
+                  alt="logo"
+                  width="55"
+                />
+                <div>
+                  <h3>QR DEMO</h3>
+                  <p>QR-коды для всех</p>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3>QR DEMO</h3>
+            <a class="hoverable-a" href="/help/">Обучающее видео</a>
+            <a class="hoverable-a" href="/lk/">Вход</a>
+          </div>
+          <div>
+            <h3>Сервисы</h3>
+            <a class="hoverable-a" href="https://qxyz.ru" target="_blank">
+              QXYZ
+            </a>
+            <a
+              class="hoverable-a"
+              href="https://qrdemo.qxyz.ru"
+              target="_blank"
+            >
+              QRDEMO
+            </a>
+          </div>
+          <div>
+            <h3>Контакты</h3>
+            <a class="hoverable-a" href="mailto:qrdemo@eustrosoft.org">
+              qrdemo@eustrosoft.org
+            </a>
+            <a class="hoverable-a" href="tel:+7(995)116-16-01">
+              +7(995)116-16-01
             </a>
           </div>
         </div>
-        <div>
-          <h3>QR DEMO</h3>
-          <a class="hoverable-a" href="/help/">Обучающее видео</a>
-          <a class="hoverable-a" href="/lk/">Вход</a>
-        </div>
-        <div>
-          <h3>Сервисы</h3>
-          <a class="hoverable-a" href="https://qxyz.ru" target="_blank">QXYZ</a>
-          <a class="hoverable-a" href="https://qrdemo.qxyz.ru" target="_blank">QRDEMO</a>
-        </div>
-        <div>
-          <h3>Контакты</h3>
-          <a class="hoverable-a" href="mailto:qrdemo@eustrosoft.org">qrdemo@eustrosoft.org</a>
-          <a class="hoverable-a" href="tel:+7(995)116-16-01">+7(995)116-16-01</a>
-        </div>
       </div>
-    </div>
-  </footer>
-</body>
-
+    </footer>
+    <script>
+      document
+        .getElementById("menuToggle")
+        .addEventListener("click", function () {
+          document.getElementById("menu").classList.toggle("show");
+        });
+    </script>
+  </body>
 </html>
