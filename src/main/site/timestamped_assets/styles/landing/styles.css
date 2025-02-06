@@ -66,17 +66,14 @@ header {
   align-items: center;
 }
 
-.header-content > div > img {
-  border-radius: 0.35rem;
-}
-
 .header-content > a > div {
   display: flex;
   gap: 1rem;
   align-items: center;
 }
 
-.header-content > a > div > img {
+.header-content > a > div > img,
+.footer-content > div > div > a > img {
   border-radius: 0.35rem;
 }
 
@@ -105,8 +102,9 @@ header {
   padding: 4.75rem 0;
 }
 
-.qr-is-key-content > * {
-  width: fit-content;
+.qr-is-key-content > .qr-is-key-content-buttons {
+  display: flex;
+  gap: 1rem;
 }
 
 #qr-is,
@@ -260,10 +258,6 @@ footer {
   gap: 1rem;
 }
 
-.footer-content > div > div > img {
-  border-radius: 0.35rem;
-}
-
 .background {
   position: fixed;
   top: 0;
@@ -301,7 +295,56 @@ button[outlined] {
 }
 
 button:hover {
-  filter: saturate(90%);
+  filter: brightness(110%);
+}
+
+.menu {
+  display: flex;
+  gap: 15px;
+}
+
+@media (max-width: 425px) {
+  header {
+    position: relative;
+  }
+
+  .menu {
+    max-height: 0;
+    overflow: hidden;
+    flex-direction: column;
+    z-index: 1;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    transition: max-height 0.4s ease-out;
+  }
+
+  .menu > a > button {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .menu.show {
+    max-height: 50px;
+  }
+
+  .menu-toggle {
+    display: block;
+    cursor: pointer;
+    width: 2.5rem;
+    stroke: black;
+  }
+
+  .qr-is-key-content > .qr-is-key-content-buttons {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 425px) {
+  .menu-toggle {
+    display: none;
+  }
 }
 
 @media (max-width: 1024px) {
