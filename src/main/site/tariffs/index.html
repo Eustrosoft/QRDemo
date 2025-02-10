@@ -5,155 +5,250 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Тарифы</title>
     <link
-      href="/timestamped_assets/styles/landing/fonts.css"
+      href="../timestamped_assets/styles/landing/fonts.css"
       type="text/css"
       rel="stylesheet"
     />
     <link
-      href="/timestamped_assets/styles/landing/reset.css"
+      href="../timestamped_assets/styles/landing/reset.css"
       type="text/css"
       rel="stylesheet"
     />
     <link
-      href="/timestamped_assets/styles/landing/styles.css"
+      href="../timestamped_assets/styles/landing/styles.css"
       type="text/css"
       rel="stylesheet"
     />
-    <style>
-      body {
-        background-color: #5e4ce6;
-      }
-      .tariffs {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-        padding: 4rem 2rem;
-      }
-      .tariff-card {
-        background-color: #e9e6fa;
-        padding: 2rem;
-        border-radius: 8px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        height: 100%;
-        text-align: left;
-        gap: 0.5rem;
-      }
-
-      .tariff-card h2,
-      .tariff-card h3 {
-        margin-top: 0;
-      }
-      .tariff-card hr {
-        border: none;
-        border-top: 1px solid #ccc;
-        margin: 0.5rem 0;
-      }
-      .tariff-card button {
-        margin-top: auto;
-      }
-      .tariff-card ul {
-        padding: 0 1rem;
-      }
-    </style>
+    <link
+      href="../timestamped_assets/styles/landing/vars.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="../timestamped_assets/styles/landing/header-footer.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="../timestamped_assets/styles/landing/tariffs.css"
+      type="text/css"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <div class="tariffs">
-      <div class="tariff-card">
-        <h2>Бесплатный</h2>
-        <p>Идеально для тестирования</p>
-        <hr />
-        <h2>0 ₽ / 16 месяцев</h2>
-        <h3>Преимущества</h3>
-        <ul>
-          <li>Преимущество 1</li>
-          <li>Преимущество 2</li>
-          <li>Преимущество 3</li>
-        </ul>
-        <h3>Включает в себя</h3>
-        <ul>
-          <li>16 QR-кодов</li>
-          <li>16 шаблонов</li>
-          <li>16 файлов (до 16 МБ)</li>
-        </ul>
-        <button filled>Выбрать Бесплатный</button>
+    <div><yandex.metrika /></div>
+    <div class="background"></div>
+    <header>
+      <div class="block">
+        <div class="header-content">
+          <a href="/">
+            <div>
+              <img
+                src="../timestamped_assets/assets/img/logo.jpg"
+                alt="logo"
+                width="55"
+              />
+              <span>QR коды для бизнеса</span>
+            </div>
+          </a>
+          <div>
+            <svg
+              class="menu-toggle"
+              id="menuToggle"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 10 10"
+              stroke="black"
+              stroke-width=".6"
+              fill="rgba(0,0,0,0)"
+              stroke-linecap="round"
+            >
+              <path d="M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7">
+                <animate
+                  dur="0.2s"
+                  attributeName="d"
+                  values="M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7;M3,3L5,5L7,3M5,5L5,5M3,7L5,5L7,7"
+                  fill="freeze"
+                  begin="start.begin"
+                />
+                <animate
+                  dur="0.2s"
+                  attributeName="d"
+                  values="M3,3L5,5L7,3M5,5L5,5M3,7L5,5L7,7;M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7"
+                  fill="freeze"
+                  begin="reverse.begin"
+                />
+              </path>
+              <rect width="10" height="10" stroke="none">
+                <animate
+                  dur="2s"
+                  id="reverse"
+                  attributeName="width"
+                  begin="click"
+                />
+              </rect>
+              <rect width="10" height="10" stroke="none">
+                <animate
+                  dur="0.001s"
+                  id="start"
+                  attributeName="width"
+                  values="10;0"
+                  fill="freeze"
+                  begin="click"
+                />
+                <animate
+                  dur="0.001s"
+                  attributeName="width"
+                  values="0;10"
+                  fill="freeze"
+                  begin="reverse.begin"
+                />
+              </rect>
+            </svg>
+            <div class="menu" id="menu">
+              <a href="/lk/"><button filled>Войти</button></a>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="tariff-card">
-        <h2>Подтвержденный бесплатный</h2>
-        <p>Для организаций</p>
-        <hr />
-        <h2>Гарантийное письмо / договор</h2>
-        <h3>Преимущества</h3>
-        <ul>
-          <li>Преимущество 1</li>
-          <li>Преимущество 2</li>
-          <li>Преимущество 3</li>
-        </ul>
-        <h3>Включает в себя</h3>
-        <ul>
-          <li>Все возможности Бесплатного тарифа</li>
-        </ul>
-        <button filled>Выбрать Подтвержденный бесплатный</button>
+    </header>
+    <main>
+      <section id="tariffs">
+        <div class="block">
+          <div class="tariffs-content">
+            <div class="tariff-card">
+              <h2>Бесплатный</h2>
+              <p>Идеально для тестирования</p>
+              <hr />
+              <h2>0 ₽ / 16 месяцев</h2>
+              <h3>Преимущества</h3>
+              <ul>
+                <li>Преимущество 1</li>
+                <li>Преимущество 2</li>
+                <li>Преимущество 3</li>
+              </ul>
+              <h3>Включает в себя</h3>
+              <ul>
+                <li>16 QR-кодов</li>
+                <li>16 шаблонов</li>
+                <li>16 файлов (до 16 МБ)</li>
+              </ul>
+              <button filled>Выбрать Бесплатный</button>
+            </div>
+            <div class="tariff-card">
+              <h2>Подтвержденный бесплатный</h2>
+              <p>Для организаций</p>
+              <hr />
+              <h2>Гарантийное письмо / договор</h2>
+              <h3>Преимущества</h3>
+              <ul>
+                <li>Преимущество 1</li>
+                <li>Преимущество 2</li>
+                <li>Преимущество 3</li>
+              </ul>
+              <h3>Включает в себя</h3>
+              <ul>
+                <li>Все возможности Бесплатного тарифа</li>
+              </ul>
+              <button filled>Выбрать Подтвержденный бесплатный</button>
+            </div>
+            <div class="tariff-card">
+              <h2>Коммерческий</h2>
+              <p>Лучшее решение для бизнеса</p>
+              <hr />
+              <h2>10 ₽ / за QR-код</h2>
+              <h2>3 000 ₽ / месяц</h2>
+              <h3>Преимущества</h3>
+              <ul>
+                <li>Преимущество 1</li>
+                <li>Преимущество 2</li>
+                <li>Преимущество 3</li>
+              </ul>
+              <h3>Включает в себя</h3>
+              <ul>
+                <li>Все возможности Подтвержденного бесплатного тарифа</li>
+                <li>Расширенные функции и поддержка</li>
+              </ul>
+              <button filled>Выбрать Коммерческий</button>
+            </div>
+            <div class="tariff-card">
+              <h2>Редирект</h2>
+              <p>Оптимизация маршрутизации</p>
+              <hr />
+              <h2>1 310,72 ₽ / за диапазон 4096</h2>
+              <h2>1 310,72 коп / год</h2>
+              <h3>Преимущества</h3>
+              <ul>
+                <li>Преимущество 1</li>
+                <li>Преимущество 2</li>
+                <li>Преимущество 3</li>
+              </ul>
+              <h3>Включает в себя</h3>
+              <ul>
+                <li>Все возможности Коммерческого тарифа</li>
+                <li>Управляемые редиректы</li>
+                <li>Экономия на больших объемах</li>
+              </ul>
+              <button filled>Выбрать Редирект</button>
+            </div>
+            <div class="tariff-card">
+              <h2>Индивидуальный</h2>
+              <p>Персональные условия</p>
+              <hr />
+              <h2>По договоренности</h2>
+              <h3>Преимущества</h3>
+              <ul>
+                <li>Преимущество 1</li>
+                <li>Преимущество 2</li>
+                <li>Преимущество 3</li>
+              </ul>
+              <h3>Включает в себя</h3>
+              <ul>
+                <li>Все возможности Редирект тарифа</li>
+                <li>Персональные условия</li>
+                <li>Оптимизация под ваши задачи</li>
+              </ul>
+              <button filled>Связаться</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="block">
+        <div class="footer-content">
+          <div>
+            <div class="footer-logo">
+              <a href="/">
+                <img
+                  src="../timestamped_assets/assets/img/logo.jpg"
+                  alt="logo"
+                  width="55"
+                />
+                <div>
+                  <h3>QR DEMO</h3>
+                  <p>QR-коды для всех</p>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3>QR DEMO</h3>
+            <a href="/help/">Обучающее видео</a>
+            <a href="/lk/">Вход</a>
+          </div>
+          <div>
+            <h3>Сервисы</h3>
+            <a href="https://qxyz.ru" target="_blank"> QXYZ </a>
+            <a href="https://qrdemo.qxyz.ru" target="_blank"> QRDEMO </a>
+          </div>
+          <div>
+            <h3>Контакты</h3>
+            <a href="mailto:qrdemo@eustrosoft.org"> qrdemo@eustrosoft.org </a>
+            <a href="tel:+7(995)116-16-01"> +7(995)116-16-01 </a>
+          </div>
+        </div>
       </div>
-      <div class="tariff-card">
-        <h2>Коммерческий</h2>
-        <p>Лучшее решение для бизнеса</p>
-        <hr />
-        <h2>10 ₽ / за QR-код</h2>
-        <h2>3 000 ₽ / месяц</h2>
-        <h3>Преимущества</h3>
-        <ul>
-          <li>Преимущество 1</li>
-          <li>Преимущество 2</li>
-          <li>Преимущество 3</li>
-        </ul>
-        <h3>Включает в себя</h3>
-        <ul>
-          <li>Все возможности Подтвержденного бесплатного тарифа</li>
-          <li>Расширенные функции и поддержка</li>
-        </ul>
-        <button filled>Выбрать Коммерческий</button>
-      </div>
-      <div class="tariff-card">
-        <h2>Редирект</h2>
-        <p>Оптимизация маршрутизации</p>
-        <hr />
-        <h2>1 310,72 ₽ / за диапазон 4096</h2>
-        <h2>1 310,72 коп / год</h2>
-        <h3>Преимущества</h3>
-        <ul>
-          <li>Преимущество 1</li>
-          <li>Преимущество 2</li>
-          <li>Преимущество 3</li>
-        </ul>
-        <h3>Включает в себя</h3>
-        <ul>
-          <li>Все возможности Коммерческого тарифа</li>
-          <li>Управляемые редиректы</li>
-          <li>Экономия на больших объемах</li>
-        </ul>
-        <button filled>Выбрать Редирект</button>
-      </div>
-      <div class="tariff-card">
-        <h2>Индивидуальный</h2>
-        <p>Персональные условия</p>
-        <hr />
-        <h2>По договоренности</h2>
-        <h3>Преимущества</h3>
-        <ul>
-          <li>Преимущество 1</li>
-          <li>Преимущество 2</li>
-          <li>Преимущество 3</li>
-        </ul>
-        <h3>Включает в себя</h3>
-        <ul>
-          <li>Все возможности Редирект тарифа</li>
-          <li>Персональные условия</li>
-          <li>Оптимизация под ваши задачи</li>
-        </ul>
-        <button filled>Связаться</button>
-      </div>
-    </div>
+    </footer>
+    <script src="../timestamped_assets/js/commons/header.js"></script>
   </body>
 </html>

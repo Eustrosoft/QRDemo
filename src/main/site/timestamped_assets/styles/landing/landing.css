@@ -89,9 +89,9 @@
   flex-direction: column;
   gap: 1.5rem;
   padding: 18px;
-  background-color: #e9e6faff;
+  background-color: var(--secondary-color);
   border-radius: 10px;
-  border: 1px solid #bdb8dfff;
+  border: 1px solid var(--tetriary-color);
 }
 
 #how-to-make-qr,
@@ -99,7 +99,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #5e4ce6;
+  background: var(--primary-color);
   padding: 8rem 8rem;
 }
 
