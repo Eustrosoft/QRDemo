@@ -1,0 +1,75 @@
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../../assets/img/background.jpeg");
+  background-size: cover;
+  opacity: 0.5;
+  z-index: -1;
+}
+
+#tariffs {
+  background-color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tariffs-content {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  padding: 4rem 0;
+}
+
+.tariff-card {
+  background-color: var(--secondary-color);
+  padding: 2rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.tariff-card h2,
+.tariff-card h3 {
+  margin-top: 0;
+}
+
+.tariff-card hr {
+  border: none;
+  border-top: 1px solid var(--tetriary-color);
+  margin: 0.5rem 0;
+}
+
+.tariff-card button {
+  margin-top: auto;
+}
+
+.tariff-card ul {
+  padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+  .tariffs-content {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+}
+
+@media (max-width: 425px) {
+  .menu > a > button {
+    color: var(--primary-color);
+    background: var(--secondary-color);
+  }
+}
+
+@media (max-width: 375px) {
+  .tariffs-content {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}

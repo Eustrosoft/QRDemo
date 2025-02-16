@@ -7,10 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:css": "postcss *.css --use autoprefixer -d build/"
+    "build:css": "find . -name \"*.css\" | xargs npx postcss --use autoprefixer -d build/ --no-map"
   },
   "devDependencies": {
-    "vite": "^5.4.1",
-    "prettier": "^3.4.2"
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.4.2",
+    "vite": "^5.4.1"
   }
 }
