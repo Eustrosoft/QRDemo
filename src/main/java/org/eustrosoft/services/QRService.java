@@ -35,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -168,10 +169,11 @@ public class QRService {
         } else {
             checkUsedQr(current.getRanges(), current.getQrs(), qr.getCode());
         }
-        Long code = qr.getCode();
-        if (code < qrRangeConfig.getRangeStart() || code > qrRangeConfig.getRangeEnd()) {
-            throw new IllegalArgumentException("Code has illegal character");
-        }
+        // TODO: removed due to availability to set qr range out of range
+        // Long code = qr.getCode();
+//        if (code < qrRangeConfig.getRangeStart() || code > qrRangeConfig.getRangeEnd()) {
+//            throw new IllegalArgumentException("Code has illegal character");
+//        }
         qr.setParticipantId(current.getId());
         return qrRepository.save(qr);
     }
@@ -292,21 +294,15 @@ public class QRService {
         }
     }
 
-    private Long getNextAvailableQR(Collection<QRRange> ranges, Collection<QR> used) throws IllegalArgumentException {
+    private Long getNextAvailableQR(List<QRRange> ranges, List<QR> used) throws IllegalArgumentException {
         checkRanges(ranges);
-        Long nextAvailableQR = null;
-        List<Long> usedQRs = new ArrayList<>(used.stream().map(QR::getCode).collect(Collectors.toList()));
-        for (QRRange range : ranges) {
-            for (long i = range.getFrom(); i <= range.getTo(); i++) {
-                if (usedQRs.contains(i)) {
-                    continue;
-                }
-                nextAvailableQR = i;
-                break;
-            }
-            if (nextAvailableQR != null) {
-                break;
-            }
+        ranges.sort(QRRange::compareTo);
+        Long nextAvailableQR;
+        Optional<Long> max = used.stream().map(QR::getCode).max(Long::compare);
+        if (max.isPresent()) {
+            nextAvailableQR = max.get() + 1;
+        } else {
+            nextAvailableQR = ranges.get(0).getFrom();
         }
         if (nextAvailableQR == null) {
             throw new IllegalArgumentException("Next qr value not found");
@@ -315,7 +311,7 @@ public class QRService {
     }
 
     private static void checkRanges(Collection<QRRange> ranges) {
-        if (ranges == null || ranges.isEmpty()) {
+        if (CollectionUtils.isEmpty(ranges)) {
             throw new IllegalArgumentException("Ranges are empty");
         }
     }
