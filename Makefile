@@ -48,6 +48,8 @@ ROOT:
 	install -m 644 src/main/site/index.html work/webapps/ROOT/index.html
 	install -m 644 src/main/site/lk/index.html work/webapps/ROOT/lk/index.html
 	install -m 644 src/main/site/printer/index.html work/webapps/ROOT/printer/index.html
+	install -m 644 src/main/site/tariffs/index.html work/webapps/ROOT/tariffs/index.html
+	install -m 644 src/main/site/signup/index.html work/webapps/ROOT/signup/index.html
 	install -m 644 src/main/site/help/index.html work/webapps/ROOT/help/index.html
 
 # substitutions
