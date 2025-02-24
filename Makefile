@@ -24,6 +24,8 @@ ROOT:
 	mkdir -p  work/webapps/ROOT/lk
 	mkdir -p  work/webapps/ROOT/printer
 	mkdir -p  work/webapps/ROOT/qr
+	mkdir -p  work/webapps/ROOT/tariffs
+	mkdir -p  work/webapps/ROOT/signup
 	mkdir -p  work/webapps/ROOT/help
 	mkdir -p  work/webapps/ROOT/WEB-INF
 	mkdir -p  work/webapps/ROOT/WEB-INF/lib
