@@ -119,6 +119,11 @@ ROOT:
 	install -m 644 src/main/site/timestamped_assets/styles/landing/styles.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/styles.css
 	install -m 644 src/main/site/timestamped_assets/styles/landing/reset.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/reset.css
 	install -m 644 src/main/site/timestamped_assets/styles/landing/fonts.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/fonts.css
+	install -m 644 src/main/site/timestamped_assets/styles/landing/header-footer.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/header-footer.css
+	install -m 644 src/main/site/timestamped_assets/styles/landing/help.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/help.css
+	install -m 644 src/main/site/timestamped_assets/styles/landing/signup.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/signup.css
+	install -m 644 src/main/site/timestamped_assets/styles/landing/tariffs.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/tariffs.css
+	install -m 644 src/main/site/timestamped_assets/styles/landing/vars.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/vars.css
 	install -m 644 src/main/site/timestamped_assets/assets/fonts/Lato-Bold.ttf work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/fonts/Lato-Bold.fft
 	install -m 644 src/main/site/timestamped_assets/assets/fonts/Lato-Regular.ttf work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/fonts/Lato-Regular.fft
 	install -m 644 src/main/site/timestamped_assets/assets/img/background.jpeg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/img/background.jpeg
