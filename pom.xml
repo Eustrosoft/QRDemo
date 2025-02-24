@@ -12,7 +12,7 @@
 
     <groupId>org.eustrosoft</groupId>
     <artifactId>QRCodeDemo</artifactId>
-    <version>0.1.9</version>
+    <version>0.2.0</version>
     <name>QRCodeDemo</name>
     <description>QRCodeDemo</description>
     <packaging>war</packaging>

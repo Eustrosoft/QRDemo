@@ -100,6 +100,7 @@ ROOT:
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/form.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/form.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/lk.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/lk.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/card.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/card.js
+	install -m 644 src/main/site/timestamped_assets/js/qrdemo/notifications.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/notifications.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/localStorage.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/localStorage.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/main.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/main.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/version.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/version.js
