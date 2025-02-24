@@ -821,9 +821,9 @@ function setUserPanel(parenDiv, participantId) {
 
             let rangesLabel = getTextLabel('Диапазоны: ')
             let rangesHeader = [
-                new TableHead('ID', '10%'), new TableHead('От', '20%'),
-                new TableHead('До', '20%'), new TableHead('Создан', '20%'),
-                new TableHead('Описание', '20%'),
+                new TableHead('ID', '10%'), new TableHead('От', '10%'),
+                new TableHead('До', '10%'), new TableHead('Создан', '20%'),
+                new TableHead('Название', '20%'), new TableHead('Описание', '20%'),
             ]
             let rangesBody = []
             for (let i in json?.ranges) {
@@ -834,6 +834,7 @@ function setUserPanel(parenDiv, participantId) {
                         from: Number(range?.from).toString(16),
                         to: Number(range?.to).toString(16),
                         created: range?.created,
+                        name: range?.name,
                         description: range?.description
                     }
                 )
