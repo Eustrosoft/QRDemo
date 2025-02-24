@@ -1,6 +1,7 @@
 package org.eustrosoft.repositories;
 
 import org.eustrosoft.entitites.QRRange;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,7 @@ public interface QRRangeRepository extends CrudRepository<QRRange, Long> {
     Optional<QRRange> findByTo(Long to);
 
     Optional<QRRange> findByFromOrTo(Long from, Long to);
+
+    @Procedure(value = "qrdemo.next_qrange")
+    Long nextQRange(String name);
 }

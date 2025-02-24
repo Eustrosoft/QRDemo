@@ -90,9 +90,9 @@ public class AdminController {
         adminService.deleteParticipant(id);
     }
 
-    @PutMapping("/participants/ranges/add")
-    public Participant addRangeToParticipant(Participant participant, QRRange range) {
-        return adminService.addRangeToParticipant(participant, range);
+    @PutMapping("/participants/{id}/ranges/add")
+    public Participant addRangeToParticipant(@PathVariable Long id, @RequestBody QRRange range) {
+        return adminService.addRangeToParticipant(id, range);
     }
 
     @PostMapping("/participants/ranges/revoke")

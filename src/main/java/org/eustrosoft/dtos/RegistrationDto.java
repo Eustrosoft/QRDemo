@@ -3,6 +3,7 @@ package org.eustrosoft.dtos;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.eustrosoft.entitites.QRRange;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class RegistrationDto {
     private String address;
     private String website;
     private List<RoleDto> roles;
+    private List<QRRange> ranges;
 
     public RegistrationDto(String username, String password, String confirmPassword, String email) {
         this.username = username;

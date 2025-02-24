@@ -1,6 +1,7 @@
 package org.eustrosoft.mappers;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.dtos.ParticipantChangeDto;
 import org.eustrosoft.dtos.ParticipantDto;
 import org.eustrosoft.dtos.RegistrationDto;
@@ -46,7 +47,7 @@ public class ParticipantMapper extends EntityMapper {
         Participant participant = new Participant();
         participant.setUsername(registrationDto.getUsername());
         participant.setPassword(registrationDto.getPassword());
-        participant.setEmail(registrationDto.getEmail());
+        participant.setEmail(StringUtils.getIfBlank(registrationDto.getEmail(), () -> null));
         participant.setLei(registrationDto.getLei());
         participant.setOrganization(registrationDto.getOrganization());
         participant.setAddress(registrationDto.getAddress());

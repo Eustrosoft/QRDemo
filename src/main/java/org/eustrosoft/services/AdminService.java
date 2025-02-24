@@ -55,8 +55,8 @@ public class AdminService {
         participantService.delete(id);
     }
 
-    public Participant addRangeToParticipant(Participant participant, QRRange range) {
-        return participantService.addRangeToParticipant(participant, range);
+    public Participant addRangeToParticipant(Long id, QRRange range) {
+        return participantService.addRangeToParticipant(new Participant(id), range);
     }
 
     public Participant revokeRangeFromParticipant(Participant participant, QRRange range) {

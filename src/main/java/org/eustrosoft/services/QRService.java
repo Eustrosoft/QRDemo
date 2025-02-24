@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.configurations.QRRangeConfig;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.FileChooseRequest;
@@ -27,7 +28,6 @@ import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.utils.CommonUtils;
-import org.eustrosoft.utils.CompressUtils;
 import org.eustrosoft.utils.JdbcBlobProcessor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -55,7 +55,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static org.eustrosoft.Constants.EMPTY_JSON;
@@ -141,7 +140,7 @@ public class QRService {
     @Transactional(readOnly = true)
     public List<QRSimpleProjection> findAllMine() throws IllegalAccessException {
         return CommonUtils.iterableToList(
-                qrRepository.findAllByParticipantIdOrderByCodeDesc(
+                qrRepository.findAllByParticipantIdOrderByCreatedDesc(
                         participantService.getCurrentSimpleOrThrow().getId()
                 )
         );
@@ -165,17 +164,22 @@ public class QRService {
     public QR create(QR qr) throws IllegalAccessException, IllegalArgumentException {
         Participant current = participantService.getCurrentOrThrow();
         if (qr.getCode() == null) {
-            qr.setCode(getNextAvailableQR(current.getRanges(), current.getQrs()));
+            if (qr.getRange() != null) {
+                boolean isUserRange = current.getRanges()
+                        .stream().anyMatch(r -> r.getId().equals(qr.getRange().getId()));
+                if (!isUserRange) {
+                    throw new IllegalAccessException("You can not create in this range");
+                }
+                qr.setCode(getNextAvailableQR(Collections.singletonList(qr.getRange())));
+            } else {
+                qr.setCode(getNextAvailableQR(current.getRanges()));
+            }
         } else {
             checkUsedQr(current.getRanges(), current.getQrs(), qr.getCode());
         }
-        // TODO: removed due to availability to set qr range out of range
-        // Long code = qr.getCode();
-//        if (code < qrRangeConfig.getRangeStart() || code > qrRangeConfig.getRangeEnd()) {
-//            throw new IllegalArgumentException("Code has illegal character");
-//        }
         qr.setParticipantId(current.getId());
-        return qrRepository.save(qr);
+        QR savedQr = qrRepository.save(qr);
+        return savedQr;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -288,21 +292,24 @@ public class QRService {
             }
         }
         for (QRRange range : ranges) {
-            if (qr > range.getTo() || qr < range.getFrom()) {
+            if (qr >= range.getTo() || qr <= range.getFrom()) {
                 throw new IllegalArgumentException("Illegal range for qr");
             }
         }
     }
 
-    private Long getNextAvailableQR(List<QRRange> ranges, List<QR> used) throws IllegalArgumentException {
+    private Long getNextAvailableQR(List<QRRange> ranges) throws IllegalArgumentException {
         checkRanges(ranges);
-        ranges.sort(QRRange::compareTo);
-        Long nextAvailableQR;
-        Optional<Long> max = used.stream().map(QR::getCode).max(Long::compare);
-        if (max.isPresent()) {
-            nextAvailableQR = max.get() + 1;
+        Long nextAvailableQR = null;
+        if (ranges.size() > 1) {
+            for (QRRange range : ranges) {
+                nextAvailableQR = qrRepository.nextQR(range.getId());
+                if (nextAvailableQR != null) {
+                    break;
+                }
+            }
         } else {
-            nextAvailableQR = ranges.get(0).getFrom();
+            nextAvailableQR = qrRepository.nextQR(ranges.get(0).getId());
         }
         if (nextAvailableQR == null) {
             throw new IllegalArgumentException("Next qr value not found");

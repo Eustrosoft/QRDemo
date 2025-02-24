@@ -1,7 +1,9 @@
 import { copyToClipboard, generateRandomPassword, notEmptyOrUndefined } from "../../commons/common.js"
 import { qrApi } from "../api.js"
+import { notify } from "../notifications.js"
+import { longToHex } from "../utils.js"
 import { APP_VERSION } from "../version.js"
-import { getCustomButton } from "./buttons.js"
+import { getBigButton, getCustomButton } from "./buttons.js"
 import { getHr } from "./hrs.js"
 import { getInput } from "./inputs.js"
 import { getTextLabel } from "./labels.js"
@@ -155,5 +157,91 @@ export function showContactModal() {
     contactBlock.appendChild(contactPhoneParagraph)
 
     let modal = getModalWindow('Связаться с нами', contactBlock)
+    modal.style.display = 'block'
+}
+
+export function showCreateQrModal(renderQRsTableCallback, div, settings) {
+    const createQrModal = document.createElement('div')
+
+    let nameBlock = getInput('Название', 'text', false, 'create_qr_name', 'Введите имя для карточки...', false)
+    let descriptionBlock = getInput('Описание', 'text', false, 'create_qr_description', 'Введите описание для карточки...', false)
+
+    let formLabel = document.createElement('label')
+    formLabel.innerHTML = 'Шаблон:'
+
+    let formChooseElement = document.createElement('select')
+    formChooseElement.id = 'form_select'
+
+    const opt = document.createElement('option')
+    opt.value = ''
+    opt.id = ''
+    opt.innerHTML = ''
+    formChooseElement.append(opt)
+
+    qrApi().getAllForms().then(resp => resp.json())
+        .then(json => {
+            for (let i = 0; i < json.length; i++) {
+                const opt = document.createElement('option')
+                opt.value = json[i].name
+                opt.id = json[i].id
+                opt.innerHTML = json[i].name
+                formChooseElement.append(opt)
+            }
+        })
+
+    let rangeLabel = document.createElement('label')
+    rangeLabel.innerHTML = 'Диапазон:'
+
+    let rangeSelect = document.createElement('select')
+    rangeSelect.id = 'range_select'
+
+    const opt2 = document.createElement('option')
+    opt2.value = ''
+    opt2.id = ''
+    opt2.innerHTML = ''
+    rangeSelect.append(opt2)
+
+    qrApi().getRanges().then(resp => resp.json())
+        .then(json => {
+            for (let i = 0; i < json.length; i++) {
+                const opt = document.createElement('option')
+                opt.value = json[i].id
+                opt.id = json[i].id
+                opt.innerHTML = longToHex(json[i]?.from) + ' - ' + longToHex(json[i]?.to)
+                rangeSelect.append(opt)
+            }
+        })
+
+    let createBtn = getBigButton('Создать')
+    createBtn.addEventListener('click', () => {
+        let formElement = document.getElementById('form_select')
+        let formId = formElement.options[formElement.selectedIndex].id
+        let rangeElement = document.getElementById('range_select')
+        let rangeId = rangeElement.options[rangeElement.selectedIndex].id
+
+        qrApi().createQR(
+            {
+                name: document.getElementById('create_qr_name')?.value,
+                description: document.getElementById('create_qr_description')?.value,
+                rangeId: rangeId,
+                formId: formId,
+            }
+        )
+        .then(resp => {
+            if (resp.ok) {
+                notify('Карточка была создана!')
+                renderQRsTableCallback(div, settings)
+            } else if (resp.status === 500) {
+                alert("Вы достигли лимита карточек")
+            } else {
+                alert('Ошибка при создании карточки')
+            }
+            document.activeElement.blur()
+        })
+        .catch(ex => alert(ex))
+    })
+
+    createQrModal.append(nameBlock, descriptionBlock, formLabel, formChooseElement, rangeLabel, rangeSelect, createBtn)
+    let modal = getModalWindow('Создание карточки', createQrModal)
     modal.style.display = 'block'
 }

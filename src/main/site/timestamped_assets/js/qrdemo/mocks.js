@@ -78,3 +78,54 @@ export var formMock = {
         SpecificField3: 'File123.txt'
     }
 }
+
+export var requestsMock = [
+    {
+        "address": "234",
+        "name": null,
+        "id": 20,
+        "description": null,
+        "active": true,
+        "username": "RubeusHagrid",
+        "organization": "ООО \"Хогвартс\"",
+        "updated": "2025-01-17T23:14:21.155+00:00",
+        "participantId": null,
+        "created": "2024-12-14T12:09:04.140+00:00",
+        "email": "HagridRubeus@hogwarts.edu",
+        "banned": false,
+        "lei": "123",
+        "website": "https://hogwarts.edu"
+    },
+    {
+        "address": "234",
+        "name": null,
+        "id": 20,
+        "description": null,
+        "active": true,
+        "username": "Germiona",
+        "organization": "ООО \"Хогвартс\"",
+        "updated": "2025-01-17T23:14:21.155+00:00",
+        "participantId": null,
+        "created": "2024-12-14T12:09:04.140+00:00",
+        "email": "germiona@hogwarts.edu",
+        "banned": false,
+        "lei": "123",
+        "website": "https://hogwarts.edu"
+    },
+    {
+        "address": "234",
+        "name": null,
+        "id": 20,
+        "description": null,
+        "active": true,
+        "username": "GarryPotter",
+        "organization": "ООО \"Хогвартс\"",
+        "updated": "2025-01-17T23:14:21.155+00:00",
+        "participantId": null,
+        "created": "2024-12-14T12:09:04.140+00:00",
+        "email": "potter_good_boy@hogwarts.edu",
+        "banned": false,
+        "lei": "123",
+        "website": "https://hogwarts.edu"
+    }
+]

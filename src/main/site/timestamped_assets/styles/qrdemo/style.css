@@ -268,7 +268,7 @@ select {
     font-size: 2em;
 }
 
-#form_select {
+#form_select, #range_select {
     width: 97%;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -743,7 +743,8 @@ tr.participantRow {
     cursor: pointer;
 }
 
-.blue_pulse, .blue_pulse > td {
+.blue_pulse,
+.blue_pulse>td {
     --pulse-color: #809dda;
     animation: pulse_action 2s linear;
 }
@@ -764,6 +765,13 @@ tr.participantRow {
     }
 }
 
+.form_field_div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
 /* */
 
 .nav_menu {
@@ -775,3 +783,51 @@ tr.participantRow {
     display: block;
     content: url('/icons/qr-light.svg');
 }
+
+/* notifications */
+
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 999999;
+    background: rgba(0, 0, 0, 0);
+}
+
+.notification {
+    background: var(--bg-color);
+    color: var(--font-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--alpha-02);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.notification .close-btn {
+    background: none;
+    border: none;
+    color: var(--font-color);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.notification.show {
+    opacity: 3;
+    transform: translateX(0);
+}
+
+.notification.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* end notifications */

@@ -13,8 +13,11 @@ import java.util.List;
 public class QRCreationDto {
     private String name;
     private String description;
-    private Long code;
     private JsonNode data;
-    private FormDto form;
-    private List<FileDto> files;
+    private List<Long> filesIds;
+    private Long formId;
+
+    // Range or code needed for creating, or will be used default range
+    private Long code;
+    private Long rangeId;
 }

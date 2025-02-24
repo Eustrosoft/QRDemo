@@ -3,8 +3,10 @@ package org.eustrosoft.services;
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.configurations.QRRangeConfig;
 import org.eustrosoft.entitites.Participant;
+import org.eustrosoft.entitites.QR;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.repositories.QRRangeRepository;
+import org.eustrosoft.repositories.QRRepository;
 import org.eustrosoft.utils.CommonUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static org.eustrosoft.Constants.QRDEMO;
 
 @Service
 @Transactional
@@ -46,20 +50,14 @@ public class QRRangeService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public QRRange generateNextRange() throws IllegalArgumentException {
-        List<QRRange> freeRanges = getFreeRanges();
-        if (freeRanges == null || freeRanges.isEmpty()) {
-            throw new IllegalArgumentException("No free ranges found");
-        }
         QRRange foundRange = null;
-        for (QRRange qrRange : freeRanges) {
-            long codesSize = qrRange.getTo() - qrRange.getFrom();
-            if (codesSize < qrRangeConfig.getCodesForRange()) {
-                continue;
-            } else {
-                foundRange = new QRRange();
-                foundRange.setFrom(qrRange.getFrom());
-                foundRange.setTo(qrRange.getFrom() + qrRangeConfig.getCodesForRange());
-            }
+        Long rangeStart = repository.nextQRange(QRDEMO);
+        if (rangeStart == null) {
+            throw new IllegalArgumentException("No free ranges found");
+        } else {
+            foundRange = new QRRange();
+            foundRange.setFrom(rangeStart);
+            foundRange.setTo(rangeStart + qrRangeConfig.getCodesForRange());
         }
         if (foundRange == null) {
             throw new IllegalArgumentException("No free ranges found");
@@ -73,11 +71,12 @@ public class QRRangeService {
         if (codes != qrRangeConfig.getCodesForRange()) {
             throw new IllegalArgumentException("Not 16 codes for range");
         }
-        List<QRRange> existed = findAll();
-        boolean canCreate = canCreateQRRange(existed, qrRange);
-        if (!canCreate) {
-            throw new IllegalArgumentException("Used qr codes are in range");
-        }
+//        List<QRRange> existed = findAll();
+        // TODO: added ability to create any range
+//        boolean canCreate = canCreateQRRange(existed, qrRange);
+//        if (!canCreate) {
+//            throw new IllegalArgumentException("Used qr codes are in range");
+//        }
         return repository.save(qrRange);
     }
 
@@ -91,31 +90,10 @@ public class QRRangeService {
 
     public List<QRRange> getFreeRanges() {
         List<QRRange> ranges = findAll();
-
-        List<Long> usedQrs = new ArrayList<>();
-        for (QRRange range : ranges) {
-            usedQrs.addAll(getQrsInRange(range));
-        }
         List<QRRange> unusedRanges = new ArrayList<>();
-        long unused = 0L;
+        long rangeToUse = 0L;
         for (long i = qrRangeConfig.getRangeStart(); i <= qrRangeConfig.getRangeEnd(); i++) {
-            if (!usedQrs.contains(i)) {
-                unused++;
-            } else {
-                if (unused != 0L) {
-                    QRRange unusedRange = new QRRange();
-                    unusedRange.setFrom(i - unused + 1);
-                    unusedRange.setTo(i);
-                    unusedRanges.add(unusedRange);
-                }
-                unused = 0L;
-            }
-            if (unused != 0L && i == qrRangeConfig.getRangeEnd()) {
-                QRRange unusedRange = new QRRange();
-                unusedRange.setFrom(i - unused + 1);
-                unusedRange.setTo(i);
-                unusedRanges.add(unusedRange);
-            }
+
         }
         return unusedRanges;
     }

@@ -5,6 +5,7 @@ import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,4 +40,9 @@ public interface QRRepository extends JpaRepository<QR, Long> {
     // TODO: optimize a bit. Makes a single unneeded query
     // @Query(value = "select q from QR q left outer join fetch Form f on q.form=f where q.participantId = ?1 order by q.code desc")
     Iterable<QRSimpleProjection> findAllByParticipantIdOrderByCodeDesc(Long participantId);
+
+    Iterable<QRSimpleProjection> findAllByParticipantIdOrderByCreatedDesc(Long participantId);
+
+    @Procedure(value = "qrdemo.next_qr")
+    Long nextQR(Long rangeId);
 }

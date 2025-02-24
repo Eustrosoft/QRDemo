@@ -1,5 +1,6 @@
 package org.eustrosoft.entitites;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,6 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -30,8 +32,11 @@ public class QR extends DbEntity {
     @Column(name = "data")
     private String data;
 
+    @Column(name = "form_id")
+    private Long formId;
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "form_id")
+    @JoinColumn(name = "form_id", insertable = false, updatable = false)
     private Form form;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -41,4 +46,8 @@ public class QR extends DbEntity {
             inverseJoinColumns = {@JoinColumn(name = "file_id")}
     )
     private List<File> files;
+
+    @Transient
+    @JsonIgnore
+    private QRRange range;
 }

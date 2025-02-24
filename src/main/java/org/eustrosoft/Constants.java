@@ -10,4 +10,7 @@ public class Constants {
 
     // Other
     public static final String EMPTY_JSON = "{}";
+
+    // Sequence names
+    public static final String QRDEMO = "QRDEMO"; // range key
 }

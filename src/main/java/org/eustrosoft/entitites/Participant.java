@@ -2,6 +2,7 @@ package org.eustrosoft.entitites;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.eustrosoft.repositories.projections.ParticipantSettingsProjection;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -22,6 +23,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "participant", schema = "qrdemo")
+@NoArgsConstructor
 public class Participant extends DbEntity implements ParticipantSettingsProjection {
     public static final String TYPE = "PT";
 
@@ -76,5 +78,9 @@ public class Participant extends DbEntity implements ParticipantSettingsProjecti
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "participant_id")
     private List<QR> qrs;
+
+    public Participant(Long id) {
+        super(id);
+    }
 }
 

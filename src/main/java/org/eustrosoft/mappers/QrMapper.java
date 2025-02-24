@@ -2,10 +2,14 @@ package org.eustrosoft.mappers;
 
 import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.dtos.QRChangeDto;
 import org.eustrosoft.dtos.QRCreationDto;
 import org.eustrosoft.dtos.QRDto;
+import org.eustrosoft.entitites.File;
+import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.QR;
+import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.repositories.projections.QRProjection;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
@@ -69,9 +73,13 @@ public class QrMapper extends EntityMapper {
         if (dto.getData() != null) {
             qr.setData(dto.getData().toString());
         }
-        if (dto.getFiles() != null) {
-            qr.setFiles(fileMapper.toListEntityFromDtos(dto.getFiles()));
+        if (dto.getFilesIds() != null) {
+            qr.setFiles(fileMapper.toListEntitiesFromIdsList(dto.getFilesIds(), File.class));
         }
+        if (dto.getFormId() != null) {
+            qr.setFormId(dto.getFormId());
+        }
+        qr.setRange(toEntityFromId(dto.getRangeId(), QRRange.class));
         return qr;
     }
 
@@ -81,14 +89,14 @@ public class QrMapper extends EntityMapper {
         qr.setName(dto.getName());
         qr.setDescription(dto.getDescription());
         qr.setCode(dto.getCode());
-        if (dto.getForm() != null && dto.getForm().getId() != null) {
-            qr.setForm(formMapper.fromDto(dto.getForm()));
+        if (dto.getFormId() != null) {
+            qr.setForm(formMapper.toEntityFromId(dto.getFormId(), Form.class));
         }
         if (dto.getData() != null) {
             qr.setData(dto.getData().toString());
         }
-        if (dto.getFiles() != null) {
-            qr.setFiles(fileMapper.toListEntityFromDtos(dto.getFiles()));
+        if (dto.getFilesIds() != null) {
+            qr.setFiles(fileMapper.toListEntitiesFromIdsList(dto.getFilesIds(), File.class));
         }
         return qr;
     }

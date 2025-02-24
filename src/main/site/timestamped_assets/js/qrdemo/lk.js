@@ -2,8 +2,8 @@ import { emptyOrUndefined, getQRImage, hasAdminRole, isUpperCase, toLoginIfNotAu
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
-import { getModalWindow, showGenerateRandomPasswordModal } from "./components/modals.js";
-import { getInput, getSelect, getSingleInput, getSwitch, getTextArea } from "./components/inputs.js";
+import { getModalWindow, showCreateQrModal, showGenerateRandomPasswordModal } from "./components/modals.js";
+import { getInput, getSelect, getSingleInput, getTextArea } from "./components/inputs.js";
 import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
 import { getOrOther, notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
@@ -12,6 +12,8 @@ import { getHr } from "./components/hrs.js";
 import { Loader } from "./components/loader.js";
 import { DOWNRAISING_INDEX, getComplexTable, getTable, TableHead } from "./components/tables.js";
 import { getNavigationMenu } from "./components/blocks.js";
+import { requestsMock } from "./mocks.js";
+import { notify } from "./notifications.js";
 
 const mainBlock = document.getElementById('main_block')
 let divLk = document.createElement('div')
@@ -342,7 +344,20 @@ function setupQrsPart(div, settings) {
     if (emptyOrUndefined(settings)) {
         settings = new ParticipantSettings(new Settings('RU', QR_TABLE_COLUMNS))
     }
+    renderQRsTable(div, settings)
+}
+
+function renderQRsTable(div, settings) {
+    const existed = document.getElementById('div_qrs_part')
+    if (existed) {
+        existed.remove()
+    }
+
+    let qrsTable = document.createElement('table')
+    qrsTable.classList = 'qrs_table compact_table'
+
     let divQrsPart = document.createElement('div')
+    divQrsPart.id = 'div_qrs_part'
     divQrsPart.className = 'basic_card'
 
     let buttonsDiv = document.createElement('div')
@@ -350,26 +365,11 @@ function setupQrsPart(div, settings) {
 
     let createQrBtn = getBigButton('Создать карточку', 'qrs_create_part')
     createQrBtn.addEventListener('click', (e) => {
-        qrApi().createQR('', '')
-            .then(resp => {
-                if (resp.ok) {
-                    alert('Карточка была создана!')
-                    location.reload()
-                } else if (resp.status === 500) {
-                    alert("Вы достигли лимита карточек")
-                } else {
-                    alert('Ошибка при создании карточки')
-                }
-                document.activeElement.blur()
-            })
-            .catch(ex => alert(ex))
+        showCreateQrModal(renderQRsTable, div, settings)
     })
 
     buttonsDiv.appendChild(createQrBtn)
     divQrsPart.appendChild(buttonsDiv)
-
-    let qrsTable = document.createElement('table')
-    qrsTable.classList = 'qrs_table compact_table'
 
     qrApi().getQrs()
         .then(resp => resp.json())
@@ -515,15 +515,19 @@ function setupAdminPanel(div) {
 
     let createParticipantButton = getBigButton('Создать пользователя')
 
-    buttonsDiv.appendChild(createParticipantButton)
-
     let getParticipantsButton = getBigButton('Список пользователей')
+
+    let requestsButton = getBigButton('Заявки')
 
     let viewDiv = document.createElement('div')
     viewDiv.id = 'admin_panel'
 
     getParticipantsButton.addEventListener('click', () => {
         setUsersPanel(viewDiv)
+    })
+
+    requestsButton.addEventListener('click', () => {
+        setRequestsPanel(viewDiv)
     })
 
     createParticipantButton.addEventListener('click', () => {
@@ -538,6 +542,7 @@ function setupAdminPanel(div) {
         const address = getInput('Адрес', 'text', false, 'create_participant_address', 'Введите адрес...')
         const organization = getInput('Организация', 'text', false, 'create_participant_organization', 'Введите организацию...')
         const website = getInput('Вебсайт', 'url', false, 'create_participant_website', 'Введите вебсайт...')
+        const tariff = getSelect('Тариф', 'tariff', ['DEMO', 'CONFIRMED', 'COMMERCIAL', 'REDIRECT', 'INDIVIDUAL'], 'DEMO')
         let swtch = getSelect('Роль', 'role', ['ROLE_USER', 'ROLE_ADMIN'], 'ROLE_USER')
         const saveBtn = getBigButton('Создать пользователя')
         saveBtn.style = 'margin-top: 8px;'
@@ -575,13 +580,15 @@ function setupAdminPanel(div) {
             .then(json => {
                 roles = json
                 swtch = getSelect('Роль', 'role', roles.map((role => role.name)), USER_ROLES.USER)
-                innerDiv.append(username, passw1, passw2, email, lei, address, organization, website, swtch, saveBtn, passGenerateBtn)
+                innerDiv.append(username, passw1, passw2, email, lei, address, organization, website, swtch, tariff, saveBtn, passGenerateBtn)
                 const modal = getModalWindow('Создание нового пользователя', innerDiv);
                 modal.style.display = 'block'
             })
     })
 
+    buttonsDiv.appendChild(createParticipantButton)
     buttonsDiv.appendChild(getParticipantsButton)
+    buttonsDiv.appendChild(requestsButton)
 
     adminDiv.append(buttonsDiv)
 
@@ -607,8 +614,10 @@ function setUserPanel(parenDiv, participantId) {
             let changePasswordBtn = getBigButton('Изменить пароль', 'change_participant_password')
             let changeParticipantData = getBigButton('Изменить данные пользователя', 'change_participant_data')
             let participantActionsDiv = document.createElement('div')
+            let addRangeBtn = getBigButton('Добавить диапазон', 'add_range_btn')
             participantActionsDiv.appendChild(changeParticipantData)
             participantActionsDiv.appendChild(changePasswordBtn)
+            participantActionsDiv.appendChild(addRangeBtn)
             if (json.banned !== undefined) {
                 let btnText = json.banned ? 'Разблокировать' : 'Заблокировать'
                 let blockingBtn = getBigButton(btnText, 'block_user_btn')
@@ -765,10 +774,56 @@ function setUserPanel(parenDiv, participantId) {
                 })
             })
 
+            addRangeBtn.addEventListener('click', () => {
+                let blockContent = document.createElement('div')
+                const nameInput = getInput('Название', 'text', false, 'range_name_input', '', false, 'off')
+                const descriptionInput = getInput('Описание', 'text', false, 'range_description_input', '', false, 'off')
+                const fromInput = getInput('От (16-чный)', 'text', true, 'from_range_input', '', false, 'off')
+                const toInput = getInput('До (16-чный)', 'text', true, 'to_range_input', '', false, 'off')
+                const changeDataBtn = getBigButton('Подтвердить')
+                blockContent.appendChild(nameInput)
+                blockContent.appendChild(descriptionInput)
+                blockContent.appendChild(fromInput)
+                blockContent.appendChild(toInput)
+                blockContent.appendChild(changeDataBtn)
+
+                changeDataBtn.addEventListener('click', () => {
+                    let name = document.getElementById('range_name_input')?.value
+                    let description = document.getElementById('range_description_input')?.value
+                    let from = document.getElementById('from_range_input')?.value
+                    let to = document.getElementById('to_range_input')?.value
+
+                    if (emptyOrUndefined(from) || emptyOrUndefined(to)) {
+                        notify('!Введите ОТ и ДО!')
+                    } else {
+                        adminApi().addRangeToParticipant(
+                            participantId,
+                            {
+                                name: name, description: description, 
+                                from: parseInt(from, 16), to: parseInt(to, 16)
+                            }
+                        ).then(resp => {
+                            if (resp.ok) {
+                                notify('Диапазон был выделен')
+                                setUserPanel(parenDiv, participantId)
+                                modal.remove()
+                                return
+                            } else {
+                                notify('Ошибка при выделении диапазона')
+                            }
+                        })
+                    }
+                })
+
+                let modal = getModalWindow('Добавление диапазона пользователю', blockContent)
+                modal.style.display = 'block'
+            })
+
             let rangesLabel = getTextLabel('Диапазоны: ')
             let rangesHeader = [
                 new TableHead('ID', '10%'), new TableHead('От', '20%'),
-                new TableHead('До', '20%'), new TableHead('Создан', '20%')
+                new TableHead('До', '20%'), new TableHead('Создан', '20%'),
+                new TableHead('Описание', '20%'),
             ]
             let rangesBody = []
             for (let i in json?.ranges) {
@@ -778,7 +833,8 @@ function setUserPanel(parenDiv, participantId) {
                         id: range?.id,
                         from: Number(range?.from).toString(16),
                         to: Number(range?.to).toString(16),
-                        created: range?.created
+                        created: range?.created,
+                        description: range?.description
                     }
                 )
             }
@@ -877,6 +933,46 @@ function setUsersPanel(parentDiv) {
             parentDiv.append(table)
         })
         .catch(ex => alert(ex))
+}
+
+function setRequestsPanel(parentDiv) {
+    parentDiv.innerHTML = ''
+
+    let headers = [
+        new TableHead('№', '3%', DOWNRAISING_INDEX),
+        new TableHead('Имя', '10%', 'username'),
+        new TableHead('Почта', '10%', 'email'),
+        new TableHead('Организация', '10%', 'organization'),
+        new TableHead('Создана', '10%', 'created', getDateCallback)
+    ]
+
+    let table = getComplexTable(
+        headers,
+        requestsMock,
+        'participantRow',
+        'participantsTable',
+        'compact_table',
+        'id',
+        (e) => {
+            let pId = e.currentTarget.getAttribute('key')
+            let selection = document.getSelection()
+            if (selection.type !== "Range") {
+                // setUserPanel(parentDiv, pId)
+            }
+        }
+    )
+    parentDiv.append(table)
+
+    // adminApi().getParticipants()
+    //     .then(resp => {
+    //         if (!resp.ok)
+    //             throw new Error('Ошибка при получении участников')
+    //         return resp.json()
+    //     })
+    //     .then(json => {
+
+    //     })
+    //     .catch(ex => alert(ex))
 }
 
 function getRangesCallback(ranges) {

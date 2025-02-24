@@ -6,6 +6,9 @@ import org.eustrosoft.entitites.DbEntity;
 import org.eustrosoft.repositories.projections.EntityProjection;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class EntityMapper {
 
@@ -78,6 +81,28 @@ public class EntityMapper {
         entity.setDescription(projection.getDescription());
         entity.setParticipantId(projection.getParticipantId());
         return entity;
+    }
+
+    @SneakyThrows
+    public <T extends DbEntity> T toEntityFromId(Long id, Class<T> clazz) {
+        if (id == null) {
+            return null;
+        }
+        T entity = clazz.getDeclaredConstructor().newInstance();
+        entity.setId(id);
+        return entity;
+    }
+
+    @SneakyThrows
+    public <T extends DbEntity> List<T> toListEntitiesFromIdsList(List<Long> ids, Class<T> clazz) {
+        if (ids == null) {
+            return null;
+        }
+        List<T> entities = new ArrayList<>();
+        for (Long id : ids) {
+            entities.add(toEntityFromId(id, clazz));
+        }
+        return entities;
     }
 
 }

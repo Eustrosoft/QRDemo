@@ -243,11 +243,8 @@ public class ParticipantService {
         if (!part.isPresent()) {
             throw new IllegalArgumentException("Participant not found");
         }
-        QRRange qrRange = qrRangeService.create(range);
-
-        Collection<QRRange> ranges = part.get().getRanges();
-        ranges.add(qrRange);
-        update(participant);
+        range.setParticipantId(participant.getId());
+        qrRangeService.create(range);
         return findById(participant.getId());
     }
 
