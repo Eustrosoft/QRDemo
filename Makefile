@@ -85,6 +85,7 @@ ROOT:
 # install into ROOT/${TIME_STAMP_BLA_BLA}
 	install -m 644 etc/prod/webapps/ROOT/js/qrdemo/api.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/api.js
 	install -m 644 src/main/site/timestamped_assets/js/commons/common.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/commons/common.js
+	install -m 644 src/main/site/timestamped_assets/js/commons/header.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/commons/header.js
 	install -m 644 src/main/site/timestamped_assets/js/commons/dateUtils.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/commons/dateUtils.js
 	install -m 644 src/main/site/timestamped_assets/js/package.json work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/package.json
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/buttons.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/buttons.js
@@ -124,6 +125,7 @@ ROOT:
 	install -m 644 src/main/site/timestamped_assets/styles/landing/signup.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/signup.css
 	install -m 644 src/main/site/timestamped_assets/styles/landing/tariffs.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/tariffs.css
 	install -m 644 src/main/site/timestamped_assets/styles/landing/vars.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/vars.css
+	install -m 644 src/main/site/timestamped_assets/styles/landing/landing.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/landing/landing.css
 	install -m 644 src/main/site/timestamped_assets/assets/fonts/Lato-Bold.ttf work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/fonts/Lato-Bold.fft
 	install -m 644 src/main/site/timestamped_assets/assets/fonts/Lato-Regular.ttf work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/fonts/Lato-Regular.fft
 	install -m 644 src/main/site/timestamped_assets/assets/img/background.jpeg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/img/background.jpeg
