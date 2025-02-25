@@ -67,10 +67,11 @@ public class QRRangeService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public QRRange create(QRRange qrRange) {
-        long codes = qrRange.getTo() - qrRange.getFrom();
-        if (codes != qrRangeConfig.getCodesForRange()) {
-            throw new IllegalArgumentException("Not 16 codes for range");
-        }
+        // TODO: removed check for 16 codes
+//        long codes = qrRange.getTo() - qrRange.getFrom();
+//        if (codes != qrRangeConfig.getCodesForRange()) {
+//            throw new IllegalArgumentException("Not 16 codes for range");
+//        }
 //        List<QRRange> existed = findAll();
         // TODO: added ability to create any range
 //        boolean canCreate = canCreateQRRange(existed, qrRange);
