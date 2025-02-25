@@ -89,4 +89,7 @@ END $$;
 alter table qrdemo.qr add action varchar(16) NULL;
 alter table qrdemo.qr add redirect varchar(127) NULL;
 
+-- SELECT NEEDED RANGE AND INSECT SEQUENCE
+-- insert into qrdemo.qrange_seq(name, start, rend, step, lastid, ts) values ('QRDEMO', 17301504, 17367039, 16, 17301792, now());
+
 

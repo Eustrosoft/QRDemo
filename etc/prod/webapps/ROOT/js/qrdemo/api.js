@@ -223,7 +223,7 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        createQR: (name, description) => {
+        createQR: (json) => {
             let url = `${QR_DEMO_API}secured/qrs`
 
             const req = new Request(
@@ -232,7 +232,7 @@ export function qrApi() {
                     method: 'POST',
                     headers: headers,
                     credentials: 'include',
-                    body: JSON.stringify({name: name, description: description})
+                    body: JSON.stringify(json)
                 }
             )
             return authFetch(req)
@@ -407,6 +407,18 @@ export function adminApi() {
                     headers: headers,
                     credentials: 'include',
                     body: JSON.stringify({ id: id, reason: reason })
+                }
+            )
+            return authFetch(req)
+        },
+        addRangeToParticipant: (id, json) => {
+            const req = new Request(
+                `${QR_DEMO_API}admin/panel/participants/${id}/ranges/add`,
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify(json)
                 }
             )
             return authFetch(req)
@@ -588,10 +600,10 @@ function uploadSingleFile(url, fileRequest) {
     let file = fileRequest.file.files[0]
     let fileSize = file.size
 
-    if (fileSize > MAX_FILE_UPLOAD_SIZE) {
-        alert('Файл слишком большой, выберите файл менее 10 МБ!')
-        throw new Error('Выберите файл менее 10 МБ!')
-    }
+    // if (fileSize > MAX_FILE_UPLOAD_SIZE) {
+    //     alert('Файл слишком большой, выберите файл менее 10 МБ!')
+    //     throw new Error('Выберите файл менее 10 МБ!')
+    // }
 
     data.append('file', file, file.name)
     data.append('name', fileRequest.name)
