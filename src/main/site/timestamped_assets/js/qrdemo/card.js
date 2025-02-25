@@ -384,7 +384,7 @@ function addCodeBtnListeners() {
                 code: qrCode,
                 name: nameElem.value,
                 description: descriptionElem.value,
-                formId: formElement.options[formElement.selectedIndex].id,
+                formId: Number(formElement.options[formElement.selectedIndex].id),
                 filesIds: collectedFiles.map(f => f.id),
                 data: data
             }).then(resp => {

@@ -90,7 +90,7 @@ public class QrMapper extends EntityMapper {
         qr.setDescription(dto.getDescription());
         qr.setCode(dto.getCode());
         if (dto.getFormId() != null) {
-            qr.setForm(formMapper.toEntityFromId(dto.getFormId(), Form.class));
+            qr.setFormId(dto.getFormId());
         }
         if (dto.getData() != null) {
             qr.setData(dto.getData().toString());
