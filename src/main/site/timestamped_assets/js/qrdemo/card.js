@@ -261,9 +261,10 @@ function renderCardFiles(parentDiv, qr) {
                 let description = document.getElementById('file_description')
                 let file = document.getElementById('file_content')
                 let isPublic = document.getElementById('file_public')
+                let isActive = document.getElementById('file_active')
 
                 try {
-                    qrApi().uploadQRFile(qr?.id, { name: name.value, description: description.value, file: file, public: isPublic.checked })
+                    qrApi().uploadQRFile(qr?.id, { name: name.value, description: description.value, file: file, public: isPublic.checked, active: isActive.checked })
                     notify('Файл успешно загружен!')
                     window.location.reload()
                 } catch (e) {
