@@ -431,12 +431,8 @@ public static class WebApp {
     if (ref == null || ref.isEmpty()) {
       return;
     }
-    String prefix = "";
-    if (!(name != null && (name.startsWith("http://") || name.startsWith("https://") || name.startsWith("ftp://")))) {
-        prefix = "https://";
-    }
     String finalName = name == null ? "Без имени" : name;
-    w(String.format("<a href='%s' target='_blank'>%s</a>", text2value(prefix + ref), text2html(finalName)));
+    w(String.format("<a href='%s' target='_blank'>%s</a>", text2value(ref), text2html(finalName)));
   }
 
   private void w(String str) {
@@ -483,6 +479,14 @@ public static class WebApp {
         return text2html(value);
       }
       if (FormFieldType.URL.equals(fieldType)) {
+      String prefix = "";
+      if (value != null &&
+          !(value.startsWith("http://")
+          || value.startsWith("https://")
+          || value.startsWith("ftp://"))
+      ) {
+          prefix = "https://";
+      }
         return String.format("<a href='%s' target='_blank'>%s</a>", text2value(value), text2html(value));
       } else if (FormFieldType.PHONE.equals(fieldType)) {
         return String.format("<a href='tel:%s' target='_blank'>%s</a>", text2value(value), text2html(value));
