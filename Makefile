@@ -73,6 +73,7 @@ ROOT:
 	install -m 644 src/main/site/site.webmanifest work/webapps/ROOT/site.webmanifest
 #
 	install -m 644 src/main/site/timestamped_assets/logos/logo.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/logos/logo.svg
+	install -m 644 src/main/site/timestamped_assets/logos/favicon.ico work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/logos/favicon.ico
 	install -m 644 src/main/site/timestamped_assets/icons/file-upload-duotone.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/file-upload-duotone.svg
 	install -m 644 src/main/site/timestamped_assets/icons/icons8-file.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/icons8-file.svg
 	install -m 644 src/main/site/timestamped_assets/icons/placeholder.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/placeholder.svg
