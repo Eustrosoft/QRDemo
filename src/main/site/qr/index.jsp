@@ -431,8 +431,12 @@ public static class WebApp {
     if (ref == null || ref.isEmpty()) {
       return;
     }
+    String prefix = "";
+    if (!(name != null && (name.startsWith("http://") || name.startsWith("https://") || name.startsWith("ftp://"))) {
+        prefix = "https://"
+    }
     String finalName = name == null ? "Без имени" : name;
-    w(String.format("<a href='%s' target='_blank'>%s</a>", text2value(ref), text2html(finalName)));
+    w(String.format("<a href='%s' target='_blank'>%s</a>", text2value(prefix + ref), text2html(finalName)));
   }
 
   private void w(String str) {
