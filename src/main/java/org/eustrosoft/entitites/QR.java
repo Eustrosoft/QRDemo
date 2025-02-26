@@ -3,6 +3,8 @@ package org.eustrosoft.entitites;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -37,6 +39,7 @@ public class QR extends DbEntity {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "form_id", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Form form;
 
     @ManyToMany(fetch = FetchType.LAZY)
