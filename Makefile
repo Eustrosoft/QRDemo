@@ -32,7 +32,6 @@ ROOT:
 # Copy needed libraries for jsp
 	cp -r target/qrCodeDemo/WEB-INF/lib/jackson-* work/webapps/ROOT/WEB-INF/lib
 
-	install -m 644 ../videos/demonstration.mp4 work/webapps/ROOT/videos/
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/qrdemo
