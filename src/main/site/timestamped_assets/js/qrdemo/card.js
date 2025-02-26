@@ -11,6 +11,7 @@ import { booleanToString, notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { formatDate } from "../commons/dateUtils.js";
 import { getLink } from "./components/link.js";
+import { notify } from "./notifications.js";
 
 const mainBlock = document.getElementById('main_block')
 let divCard = document.createElement('div')
@@ -91,8 +92,7 @@ function getEditCardInfoHtml(qr) {
 
     let codeDiv = document.createElement('div')
     codeDiv.className = 'code_block'
-    let nameLabel = document.createElement('label')
-    nameLabel.innerHTML = 'Название:'
+    let nameLabel = getTextLabel('Название:')
     let nameElem = document.createElement('input')
     nameElem.type = 'text'
     nameElem.value = name
@@ -100,7 +100,7 @@ function getEditCardInfoHtml(qr) {
     nameElem.placeholder = 'Введите имя карточки'
 
     let descriptionLabel = document.createElement('label')
-    descriptionLabel.innerHTML = 'Описание:'
+    descriptionLabel.innerText = 'Описание:'
     let descriptionElem = document.createElement('input')
     descriptionElem.type = 'text'
     descriptionElem.id = 'description_input'
@@ -108,7 +108,7 @@ function getEditCardInfoHtml(qr) {
     descriptionElem.placeholder = 'Введите описание карточки'
 
     let formLabel = document.createElement('label')
-    formLabel.innerHTML = 'Шаблон:'
+    formLabel.innerText = 'Шаблон:'
 
     let formSelectDiv = document.createElement('div')
     formSelectDiv.className = 'flex'
@@ -119,7 +119,7 @@ function getEditCardInfoHtml(qr) {
     const opt = document.createElement('option')
     opt.value = ''
     opt.id = ''
-    opt.innerHTML = ''
+    opt.innerText = ''
     formChooseElement.append(opt)
 
     qrApi().getAllForms().then(resp => resp.json())
@@ -128,7 +128,7 @@ function getEditCardInfoHtml(qr) {
                 const opt = document.createElement('option')
                 opt.value = json[i].name
                 opt.id = json[i].id
-                opt.innerHTML = json[i].name
+                opt.innerText = json[i].name
                 if (qrForm !== null && qrForm?.id === json[i].id) {
                     opt.selected = true
                 }
@@ -179,6 +179,20 @@ function getEditCardInfoHtml(qr) {
         codeDiv.append(formFieldDiv)
     }
 
+    const filesDiv = document.createElement('div')
+    renderCardFiles(filesDiv, qr)
+    codeDiv.appendChild(filesDiv)
+
+    const showOnPhoneBtn = getBigButton('Просмотр карточки', 'show_public_code_phone_btn');
+    const saveBtn = getBigButton('Сохранить', 'save_code_btn');
+    codeDiv.append(showOnPhoneBtn)
+    codeDiv.append(saveBtn)
+
+    return codeDiv
+}
+
+function renderCardFiles(parentDiv, qr) {
+    parentDiv.innerHTML = ''
     let filesHeaders = [
         new TableHead('Название', '8%', 'name'),
         new TableHead('Оригинальное название', '10%', 'fileName'),
@@ -250,10 +264,10 @@ function getEditCardInfoHtml(qr) {
 
                 try {
                     qrApi().uploadQRFile(qr?.id, { name: name.value, description: description.value, file: file, public: isPublic.checked })
-                    alert('Файл успешно загружен!')
+                    notify('Файл успешно загружен!')
                     window.location.reload()
                 } catch (e) {
-                    alert(e)
+                    notify(ex)
                 }
             }, true,
             () => {
@@ -266,26 +280,19 @@ function getEditCardInfoHtml(qr) {
                         return resp.text()
                     })
                     .then(text => {
-                        alert('Файл успешно прикреплен!')
+                        notify('Файл успешно загружен!')
                         window.location.reload()
                     })
                     .catch(ex => {
-                        alert(ex)
+                        notify(ex)
                     })
 
             })
     })
     let fileTr = getTr(addFileButton, filesHeaders.length + 1)
     tableFiles.appendChild(fileTr)
-    codeDiv.appendChild(getTextLabel('Файлы:'))
-    codeDiv.appendChild(tableFiles)
-
-    const showOnPhoneBtn = getBigButton('Просмотр карточки', 'show_public_code_phone_btn');
-    const saveBtn = getBigButton('Сохранить', 'save_code_btn');
-    codeDiv.append(showOnPhoneBtn)
-    codeDiv.append(saveBtn)
-
-    return codeDiv
+    parentDiv.appendChild(getTextLabel('Файлы:'))
+    parentDiv.appendChild(tableFiles)
 }
 
 function getViewCardInfoHtml(qr) {

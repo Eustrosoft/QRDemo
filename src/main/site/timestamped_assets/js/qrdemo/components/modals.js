@@ -37,7 +37,7 @@ function getModalHeader(modal, headerName) {
     modalContentHeader.className = 'modal-header'
 
     let modalHeaderName = document.createElement('span')
-    modalHeaderName.innerHTML = headerName
+    modalHeaderName.innerText = headerName
     modalHeaderName.className = 'title'
 
     let modalHeaderClose = document.createElement('span')
@@ -116,10 +116,10 @@ export function showAboutModal() {
             throw new Error('Ошибка при получении версии приложения')
         })
         .then(text => {
-            versionSpan.innerHTML = `${text}_b ${APP_VERSION}_f`
+            versionSpan.innerText = `${text}_b ${APP_VERSION}_f`
         })
         .catch(ex => {
-            versionSpan.innerHTML = ex
+            versionSpan.innerText = ex
         })
 
     aboutBlock.appendChild(versionSpan)
@@ -167,7 +167,7 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
     let descriptionBlock = getInput('Описание', 'text', false, 'create_qr_description', 'Введите описание для карточки...', false)
 
     let formLabel = document.createElement('label')
-    formLabel.innerHTML = 'Шаблон:'
+    formLabel.innerText = 'Шаблон:'
 
     let formChooseElement = document.createElement('select')
     formChooseElement.id = 'form_select'
@@ -175,7 +175,7 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
     const opt = document.createElement('option')
     opt.value = ''
     opt.id = ''
-    opt.innerHTML = ''
+    opt.innerText = ''
     formChooseElement.append(opt)
 
     qrApi().getAllForms().then(resp => resp.json())
@@ -184,13 +184,12 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
                 const opt = document.createElement('option')
                 opt.value = json[i].name
                 opt.id = json[i].id
-                opt.innerHTML = json[i].name
+                opt.innerText = json[i].name
                 formChooseElement.append(opt)
             }
         })
 
-    let rangeLabel = document.createElement('label')
-    rangeLabel.innerHTML = 'Диапазон:'
+    let rangeLabel = getTextLabel('Диапазон:')
 
     let rangeSelect = document.createElement('select')
     rangeSelect.id = 'range_select'
@@ -198,7 +197,7 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
     const opt2 = document.createElement('option')
     opt2.value = ''
     opt2.id = ''
-    opt2.innerHTML = ''
+    opt2.innerText = ''
     rangeSelect.append(opt2)
 
     qrApi().getRanges().then(resp => resp.json())
@@ -207,7 +206,7 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
                 const opt = document.createElement('option')
                 opt.value = json[i].id
                 opt.id = json[i].id
-                opt.innerHTML = longToHex(json[i]?.from) + ' - ' + longToHex(json[i]?.to)
+                opt.innerText = longToHex(json[i]?.from) + ' - ' + longToHex(json[i]?.to)
                 rangeSelect.append(opt)
             }
         })

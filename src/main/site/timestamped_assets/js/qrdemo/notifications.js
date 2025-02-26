@@ -8,10 +8,12 @@ export function notify(message, duration = 5000) {
 
     const notification = document.createElement('div')
     notification.classList.add('notification')
-    notification.innerHTML = `
-        <span>${message}</span>
-        <button class='close-btn'>&times;</button>
-    `
+    const spanMessage = document.createElement('span')
+    spanMessage.innerText = message
+    const closeBtn = document.createElement('button')
+    closeBtn.classList.add('close-btn')
+    closeBtn.innerHTML = '&times;'
+    notification.append(spanMessage, closeBtn)
     container.appendChild(notification)
     setTimeout(() => notification.classList.add('show'), 50);
     

@@ -39,7 +39,7 @@ export function getTable(
                 td.innerHTML = items[item][rowItem]
             } else {
                 if (domItemsIndexes != null && domItemsIndexes.includes(item)) {
-                    td.innerHTML = items[item][rowItem]
+                    td.innerText = items[item][rowItem]
                 } else {
                     td.innerText = items[item][rowItem]
                 }
@@ -71,13 +71,13 @@ export function getComplexTable(
         let tr = document.createElement('tr')
         for (let hi in headItems) {
             let th = document.createElement('th')
-            th.innerHTML = headItems[hi].name
+            th.innerText = headItems[hi].name
             th.style = `width: ${headItems[hi].width}`
             tr.appendChild(th)
         }
         if (hasActionsItem) {
             let th = document.createElement('th')
-            th.innerHTML = 'Действия'
+            th.innerText = 'Действия'
             th.style = `width: 8%`
             tr.appendChild(th)
         }
@@ -102,14 +102,14 @@ export function getComplexTable(
             let td = document.createElement('td')
 
             if (headItemKey === DOWNRAISING_INDEX) {
-                td.innerHTML = j       
+                td.innerText = j
             } else if (headItemKey === UPRAISING_INDEX) {
-                td.innerHTML = k
+                td.innerText = k
             } else {
                 if (notNullOrUndefined(headItems[k]?.itemCallback)) {
-                    td.innerHTML = headItems[k]?.itemCallback(item?.[headItemKey])
+                    td.innerText = headItems[k]?.itemCallback(item?.[headItemKey])
                 } else {
-                    td.innerHTML = item?.[headItemKey]
+                    td.innerText = item?.[headItemKey]
                 }
             }
             tr.appendChild(td)

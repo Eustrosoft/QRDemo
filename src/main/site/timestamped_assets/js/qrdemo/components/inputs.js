@@ -20,7 +20,7 @@ export function getInput(labelText, type, required = false, id = '', placeholder
     if (notEmptyOrUndefined(labelText)) {
         let htmlLabel = document.createElement('label');
         let requiredStar = required ? ' *' : ''
-        htmlLabel.innerHTML = labelText + requiredStar
+        htmlLabel.innerText = labelText + requiredStar
         htmlInputDiv.appendChild(htmlLabel)
         if (!inline) {
             htmlInputDiv.appendChild(document.createElement('br'))
@@ -55,7 +55,7 @@ export function getTextArea(labelText, required, id, placeholder, inline = false
     if (notEmptyOrUndefined(labelText)) {
         let htmlLabel = document.createElement('label');
         let requiredStar = required ? ' *' : ''
-        htmlLabel.innerHTML = labelText + requiredStar
+        htmlLabel.innerText = labelText + requiredStar
         htmlInputDiv.appendChild(htmlLabel)
         if (!inline) {
             htmlInputDiv.appendChild(document.createElement('br'))
@@ -97,14 +97,14 @@ export function getSelect(labelText, id = '', values, value = null, required = f
     let htmlInputDiv = document.createElement('div');
 
     let htmlLabel = document.createElement('label');
-    htmlLabel.innerHTML = labelText
+    htmlLabel.innerText = labelText
     let htmlInput = document.createElement('select')
     htmlInput.required = required
     htmlInput.id = id
 
     for (let val in values) {
         let option = document.createElement('option')
-        option.innerHTML = values[val]
+        option.innerText = values[val]
         if (value !== null || value !== undefined) {
             if (values[val] === value) {
                 option.selected = true

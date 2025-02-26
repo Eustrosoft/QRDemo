@@ -132,17 +132,19 @@ function printFormsList(parent, json) {
         const getBtnId = `form_get_btn_${json[i].id}`;
         const deleteBtnId = `form_delete_btn_${json[i].id}`;
         let tableRow = document.createElement('tr')
-        tableRow.innerHTML =
-            `<tr>
-                   <td>${getOrOther(json[i]?.name, '')}</td>
-                   <td>${getOrOther(json[i]?.description, '')}</td>
-                   <td>${new Date(json[i].created).toLocaleString()}</td>
-                   <td>${new Date(json[i].updated).toLocaleString()}</td>
-                   <td>
-                        <button id="${getBtnId}" class="big_button fs-18rem">Перейти</button>
-                        <button id="${deleteBtnId}" class="big_button fs-18rem">Удалить</button>
-                   </td>
-            </tr>`
+        let td1 = document.createElement('td')
+        td1.innerText = getOrOther(json[i]?.name, '')
+        let td2 = document.createElement('td')
+        td2.innerText = getOrOther(json[i]?.description, '')
+        let td3 = document.createElement('td')
+        td3.innerText = new Date(json[i].created).toLocaleString()
+        let td4 = document.createElement('td')
+        td4.innerText = new Date(json[i].updated).toLocaleString()
+        let td5 = document.createElement('td')
+        let btnGo = getBigButton('Перейти', getBtnId)
+        let btnDelete = getBigButton('Удалить', deleteBtnId)
+        td5.append(btnGo, btnDelete)
+        tableRow.append(td1, td2, td3, td4, td5)
 
         tableForms.appendChild(tableRow)
         document.getElementById(deleteBtnId).addEventListener('click', () => {
@@ -276,13 +278,15 @@ function renderForm(parentDiv, objects, json) {
                 let description = document.getElementById('file_description')
                 let file = document.getElementById('file_content')
                 let isPublic = document.getElementById('file_public')
+                let isActive = document.getElementById('file_active')
 
                 qrApi().uploadFormFile(json?.id,
                     {
                         name: name.value,
                         description: description.value,
                         file: file,
-                        public: isPublic.checked
+                        public: isPublic.checked,
+                        active: isActive.checked
                     }
                 )
                 alert('Файл успешно загружен!')

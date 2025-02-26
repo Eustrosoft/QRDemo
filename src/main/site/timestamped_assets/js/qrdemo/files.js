@@ -3,7 +3,7 @@ import { QR_DEMO_API, qrApi } from "./api.js";
 import { getInput } from "./components/inputs.js";
 import { getModalWindow } from "./components/modals.js";
 import { getBigButton } from "./components/buttons.js";
-import { copyToClipboard, notEmptyOrUndefined } from "../commons/common.js";
+import { copyToClipboard, getOrOther, notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { getTextLabel } from "./components/labels.js";
 
@@ -48,19 +48,24 @@ function printFilesList(parent, json) {
         let tableRow = document.createElement('tr')
         tableRow.id = `tr-file-id-${json[i]?.id}`
 
-        tableRow.innerHTML = `
-               <td>${json[i]?.name}</td>
-               <td>${json[i]?.fileName}</td>
-               <td>${json[i]?.description}</td>
-               <td>${new Date(json[i]?.created).toLocaleString()}</td>
-               <td>${formatBytes(json[i]?.fileSize)}</td>
-               <td>${json[i]?.isPublic}</td>
-               <td>
-                    <button id="${editBtnId}" class="big_button fs-18rem">Открыть</button>
-                    <button id="${downloadBtnId}" class="big_button fs-18rem">Скачать</button>
-                    <button id="${deleteBtnId}" class="big_button fs-18rem">Удалить</button>
-               </td>
-        `
+        let td1 = document.createElement('td')
+        td1.innerText = getOrOther(json[i]?.name, '')
+        let td2 = document.createElement('td')
+        td2.innerText = getOrOther(json[i]?.fileName, '')
+        let td3 = document.createElement('td')
+        td3.innerText = getOrOther(json[i]?.description, '')
+        let td4 = document.createElement('td')
+        td4.innerText = new Date(json[i]?.created).toLocaleString()
+        let td5 = document.createElement('td')
+        td5.innerText = formatBytes(json[i]?.fileSize)
+        let td6 = document.createElement('td')
+        td6.innerText = json[i]?.isPublic
+        let td7 = document.createElement('td')
+        let editBtn = getBigButton('Открыть', editBtnId)
+        let downloadBtn = getBigButton('Скачать', downloadBtnId)
+        let deleteBtn = getBigButton('Удалить', deleteBtnId)
+        td7.append(editBtn, downloadBtn, deleteBtn)
+        tableRow.append(td1, td2, td3, td4, td5, td6, td7)
 
         tableForms.appendChild(tableRow)
         document.getElementById(deleteBtnId).addEventListener('click', () => {
@@ -196,9 +201,16 @@ function setStartActions() {
                 let description = document.getElementById('file_description')
                 let file = document.getElementById('file_content')
                 let isPublic = document.getElementById('file_public')
+                let isActive = document.getElementById('file_active')
 
                 try {
-                    qrApi().uploadFile({ name: name.value, description: description.value, file: file, public: isPublic.checked })
+                    qrApi().uploadFile({ 
+                        name: name.value, 
+                        description: description.value, 
+                        file: file, 
+                        public: isPublic.checked, 
+                        active: isActive.checked 
+                    })
                     alert('Файл успешно загружен!')
                     window.location.reload()
                 } catch (e) {
@@ -254,6 +266,7 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
     let fileNameInput = getInput('Имя файла', 'text', true, 'file_name')
     let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_description')
     let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_public', '', true)
+    let isActiveInput = getInput('Доступный', 'checkbox', true, 'file_active', '', true)
     let fileInput = getInput('Файл', 'file', true, 'file_content', '', true)
     let uploadFileBtn = getBigButton('Загрузить')
 
@@ -268,7 +281,12 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
     publicInput.style.width = '11px'
     publicInput.style.height = '11px'
 
-    fileUploadNewWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, fileInput, uploadFileBtn)
+    let activeInput = isActiveInput.getElementsByTagName('input')[0];
+    activeInput.checked = true
+    activeInput.style.width = '11px'
+    activeInput.style.height = '11px'
+
+    fileUploadNewWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, uploadFileBtn)
     fileUploadForm.append(fileUploadNewWindow)
     let modal = getModalWindow('Загрузка файла', fileUploadForm)
     modal.style.display = 'block'
@@ -307,8 +325,7 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
 }
 
 function getFileChooseSelect() {
-    let fileLabel = document.createElement('label')
-    fileLabel.innerHTML = 'Файл: '
+    let fileLabel = getTextLabel('Файл: ')
 
     let fileSelectDiv = document.createElement('div')
     let fileSelectElement = document.createElement('select')
@@ -320,7 +337,7 @@ function getFileChooseSelect() {
     const opt = document.createElement('option')
     opt.value = ''
     opt.id = ''
-    opt.innerHTML = ''
+    opt.innerText = ''
     fileSelectElement.append(opt)
 
     qrApi().getAllFiles()
@@ -330,7 +347,7 @@ function getFileChooseSelect() {
                 const opt = document.createElement('option')
                 opt.value = json[i]?.name
                 opt.id = json[i]?.id
-                opt.innerHTML = `${json[i]?.name} (${json[i]?.description}) [${json[i]?.fileName}]`
+                opt.innerText = `${json[i]?.name} (${json[i]?.description}) [${json[i]?.fileName}]`
                 fileSelectElement.append(opt)
             }
         })

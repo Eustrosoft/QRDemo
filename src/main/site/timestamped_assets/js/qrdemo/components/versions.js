@@ -11,7 +11,7 @@ export function getAppVersionSpan() {
             throw new Error('Ошибка при получении версии приложения')
         })
         .then(text => {
-            appVersionSpan.innerHTML = `${text}_b ${APP_VERSION}_f`
+            appVersionSpan.innerText = `${text}_b ${APP_VERSION}_f`
         })
         .catch(ex => console.log(ex))
     return appVersionSpan

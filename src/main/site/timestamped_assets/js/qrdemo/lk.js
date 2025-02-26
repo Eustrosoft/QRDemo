@@ -79,14 +79,14 @@ function setSettings(div, settingsJson, userDetails) {
     divSettings.className = 'basic_card'
 
     let languageLabel = document.createElement('label')
-    languageLabel.innerHTML = 'Язык: '
+    languageLabel.innerText = 'Язык: '
     let languageSelect = document.createElement('select')
     languageSelect.id = 'lang_select'
 
     let existedLang = settingsJson?.settings?.language
     for (let lang in LANGUAGES) {
         let opt = document.createElement('option');
-        opt.innerHTML = LANGUAGES[lang].code + ' ' + LANGUAGES[lang].name
+        opt.innerText = LANGUAGES[lang].code + ' ' + LANGUAGES[lang].name
         opt.value = LANGUAGES[lang].code
         if (existedLang === opt.value) {
             opt.selected = true
@@ -404,20 +404,20 @@ function getQRRow(data, settings) {
                     ?.filter(field => fieldName === field['name'])
                     .map(field => field['placeholder'])
                 if (notEmptyOrUndefined(dataAttr)) {
-                    td.innerHTML = dataAttr
+                    td.innerText = dataAttr
                 } else if (notEmptyOrUndefined(fieldAttr)) {
-                    td.innerHTML = fieldAttr
+                    td.innerText = fieldAttr
                 } else {
-                    td.innerHTML = ''
+                    td.innerText = ''
                 }
             } else {
                 switch (fieldType) {
                     case "text": {
-                        td.innerHTML = data[fieldName]
+                        td.innerText = data[fieldName]
                         break
                     }
                     case "number": {
-                        td.innerHTML = data[fieldName]
+                        td.innerText = data[fieldName]
                         break
                     }
                     case "qr_code": {
@@ -429,7 +429,7 @@ function getQRRow(data, settings) {
                         break
                     }
                     case "date": {
-                        td.innerHTML = new Date(data[fieldName]).toLocaleString()
+                        td.innerText = new Date(data[fieldName]).toLocaleString()
                         break
                     }
                 }
@@ -467,23 +467,23 @@ function getTableHeader(tableSettings) {
         let tableHeader = document.createElement('tr')
 
         let qrTd = document.createElement('th')
-        qrTd.innerHTML = 'QR'
+        qrTd.innerText = 'QR'
         tableHeader.append(qrTd)
 
         let qrCode = document.createElement('th')
-        qrCode.innerHTML = 'Код'
+        qrCode.innerText = 'Код'
         tableHeader.append(qrCode)
 
         let qrName = document.createElement('th')
-        qrName.innerHTML = 'Название'
+        qrName.innerText = 'Название'
         tableHeader.append(qrName)
 
         let qrDescription = document.createElement('th')
-        qrDescription.innerHTML = 'Описание'
+        qrDescription.innerText = 'Описание'
         tableHeader.append(qrDescription)
 
         let actions = document.createElement('th')
-        actions.innerHTML = 'Действия'
+        actions.innerText = 'Действия'
         tableHeader.append(actions)
 
         return tableHeader
@@ -495,12 +495,12 @@ function getTableHeader(tableSettings) {
         if (tableSettings[ts].enable) {
             let header = document.createElement('th')
             let headerName = getOrOther(tableSettings[ts]?.name, tableSettings[ts]?.fieldName)
-            header.innerHTML = headerName
+            header.innerText = headerName
             tableHeader.append(header)
         }
     }
     let header = document.createElement('th')
-    header.innerHTML = 'Действия'
+    header.innerText = 'Действия'
     tableHeader.append(header)
 
     return tableHeader
@@ -886,7 +886,7 @@ function setUserPanel(parenDiv, participantId) {
                 qrRow.addEventListener('click', (e) => {
                     let qrCode = qrRow?.childNodes[1]?.textContent
                     if (qrCode) {
-                        window.open(`?q=${qrCode}`)
+                        window.open(`/qr?q=${qrCode}`)
                     } else {
                         alert('Ошибка при получении qr кода')
                     }

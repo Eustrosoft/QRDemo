@@ -609,6 +609,7 @@ function uploadSingleFile(url, fileRequest) {
     data.append('name', fileRequest.name)
     data.append('description', fileRequest.description)
     data.append('public', fileRequest.public)
+    data.append('active', fileRequest.active)
 
     const request = new XMLHttpRequest()
     request.open('POST', url, false)

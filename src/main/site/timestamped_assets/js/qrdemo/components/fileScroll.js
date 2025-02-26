@@ -32,7 +32,7 @@ export function getFileComponent(file) {
 
     let divFileMetadata = document.createElement('div')
     divFileMetadata.className = 'file-metadata'
-    divFileMetadata.innerHTML = `Name: ${file?.name}\nSize: ${file?.size}`
+    divFileMetadata.innerText = `Name: ${file?.name}\nSize: ${file?.size}`
 
     divFile.appendChild(divFileIcon)
     divFile.appendChild(divFileMetadata)
