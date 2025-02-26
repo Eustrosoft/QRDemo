@@ -487,7 +487,7 @@ public static class WebApp {
       ) {
           prefix = "https://";
       }
-        return String.format("<a href='%s' target='_blank'>%s</a>", text2value(value), text2html(value));
+        return String.format("<a href='%s' target='_blank'>%s</a>", text2value(prefix + value), text2html(value));
       } else if (FormFieldType.PHONE.equals(fieldType)) {
         return String.format("<a href='tel:%s' target='_blank'>%s</a>", text2value(value), text2html(value));
       } else if (FormFieldType.EMAIL.equals(fieldType)) {
