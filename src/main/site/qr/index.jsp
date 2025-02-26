@@ -432,7 +432,7 @@ public static class WebApp {
       return;
     }
     String prefix = "";
-    if (!(name != null && (name.startsWith("http://") || name.startsWith("https://") || name.startsWith("ftp://"))) {
+    if (!(name != null && (name.startsWith("http://") || name.startsWith("https://") || name.startsWith("ftp://")))) {
         prefix = "https://"
     }
     String finalName = name == null ? "Без имени" : name;
