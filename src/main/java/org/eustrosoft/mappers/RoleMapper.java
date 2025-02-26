@@ -14,12 +14,18 @@ public class RoleMapper extends EntityMapper {
 
     public Role toModel(RoleDto dto) {
         Role role = super.toEntity(dto, Role.class);
+        if (role == null) {
+            return null;
+        }
         role.setActive(dto.getActive());
         return role;
     }
 
     public RoleDto toDto(Role role) {
         RoleDto dto = super.toDto(role, RoleDto.class);
+        if (dto == null) {
+            return null;
+        }
         dto.setActive(role.getActive());
         return dto;
     }

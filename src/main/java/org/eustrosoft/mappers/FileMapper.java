@@ -57,6 +57,9 @@ public class FileMapper extends EntityMapper {
             return null;
         }
         File file = super.toEntity(fileProjection, File.class);
+        if (file == null) {
+            return null;
+        }
         file.setLastAccessed(fileProjection.getLastAccessed());
         file.setStoragePath(fileProjection.getStoragePath());
         file.setChecksum(fileProjection.getChecksum());
@@ -81,6 +84,9 @@ public class FileMapper extends EntityMapper {
             return null;
         }
         File file = super.toEntity(dto, File.class);
+        if (file == null) {
+            return null;
+        }
         file.setLastAccessed(dto.getLastAccessed());
         file.setStoragePath(dto.getStoragePath());
         file.setChecksum(dto.getChecksum());
@@ -158,6 +164,9 @@ public class FileMapper extends EntityMapper {
             return null;
         }
         FileData fd = super.toEntity(dto, FileData.class);
+        if (fd == null) {
+            return null;
+        }
         fd.setIsActive(dto.getIsActive());
         fd.setIsPublic(dto.getIsPublic());
         return fd;

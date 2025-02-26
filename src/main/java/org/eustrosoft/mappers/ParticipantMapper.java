@@ -25,6 +25,9 @@ public class ParticipantMapper extends EntityMapper {
 
     public ParticipantDto toDto(Participant entity) {
         ParticipantDto dto = super.toDto(entity, ParticipantDto.class);
+        if (dto == null) {
+            return null;
+        }
         dto.setUsername(entity.getUsername());
         dto.setEmail(entity.getEmail());
         dto.setLei(entity.getLei());

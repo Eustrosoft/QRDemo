@@ -27,6 +27,9 @@ public class QrMapper extends EntityMapper {
 
     public QRDto toDto(QRSimplestProjection qr) {
         QRDto dto = super.toDtoFromProjection(qr, QRDto.class);
+        if (dto == null) {
+            return null;
+        }
         dto.setCode(qr.getCode());
         return dto;
     }
@@ -51,6 +54,9 @@ public class QrMapper extends EntityMapper {
 
     public QRDto toDto(QR qr) {
         QRDto dto = super.toDto(qr, QRDto.class);
+        if (dto == null) {
+            return null;
+        }
         dto.setCode(qr.getCode());
         dto.setData(qr.getData());
         dto.setForm(formMapper.toDto(qr.getForm()));

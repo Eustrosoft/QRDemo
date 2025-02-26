@@ -23,6 +23,9 @@ public class FormMapper extends EntityMapper {
             return null;
         }
         Form form = super.toEntity(dto, Form.class);
+        if (form == null) {
+            return null;
+        }
         form.setData(dto.getData());
         return form;
     }
@@ -32,6 +35,9 @@ public class FormMapper extends EntityMapper {
             return null;
         }
         FormDto dto = super.toDto(form, FormDto.class);
+        if (dto == null) {
+            return null;
+        }
         if (form.getData() != null) {
             dto.setData(form.getData());
         }
@@ -56,6 +62,9 @@ public class FormMapper extends EntityMapper {
             return null;
         }
         FormDto dto = super.toDtoFromProjection(form, FormDto.class);
+        if (dto == null) {
+            return null;
+        }
         if (form.getFields() != null) {
             dto.setFields(ffMapper.toListDto(form.getFields()));
         }
@@ -67,6 +76,9 @@ public class FormMapper extends EntityMapper {
             return null;
         }
         FormDto dto = super.toDtoFromProjection(form, FormDto.class);
+        if (dto == null) {
+            return null;
+        }
         if (form.getData() != null) {
             dto.setData(form.getData());
         }

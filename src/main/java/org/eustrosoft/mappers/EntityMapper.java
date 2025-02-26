@@ -30,14 +30,18 @@ public class EntityMapper {
         if (entity == null) {
             return null;
         }
-        T entityDto = clazz.getDeclaredConstructor().newInstance();
-        entityDto.setId(entity.getId());
-        entityDto.setCreated(entity.getCreated());
-        entityDto.setUpdated(entity.getUpdated());
-        entityDto.setName(entity.getName());
-        entityDto.setDescription(entity.getDescription());
-        entity.setParticipantId(entity.getParticipantId());
-        return entityDto;
+        try {
+            T entityDto = clazz.getDeclaredConstructor().newInstance();
+            entityDto.setId(entity.getId());
+            entityDto.setCreated(entity.getCreated());
+            entityDto.setUpdated(entity.getUpdated());
+            entityDto.setName(entity.getName());
+            entityDto.setDescription(entity.getDescription());
+            entity.setParticipantId(entity.getParticipantId());
+            return entityDto;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @SneakyThrows
@@ -45,13 +49,17 @@ public class EntityMapper {
         if (projection == null) {
             return null;
         }
-        T entityDto = clazz.getDeclaredConstructor().newInstance();
-        entityDto.setId(projection.getId());
-        entityDto.setCreated(projection.getCreated());
-        entityDto.setUpdated(projection.getUpdated());
-        entityDto.setName(projection.getName());
-        entityDto.setDescription(projection.getDescription());
-        return entityDto;
+        try {
+            T entityDto = clazz.getDeclaredConstructor().newInstance();
+            entityDto.setId(projection.getId());
+            entityDto.setCreated(projection.getCreated());
+            entityDto.setUpdated(projection.getUpdated());
+            entityDto.setName(projection.getName());
+            entityDto.setDescription(projection.getDescription());
+            return entityDto;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @SneakyThrows
@@ -59,13 +67,17 @@ public class EntityMapper {
         if (dto == null) {
             return null;
         }
-        T entity = clazz.getDeclaredConstructor().newInstance();
-        entity.setId(dto.getId());
-        entity.setCreated(dto.getCreated());
-        entity.setUpdated(dto.getUpdated());
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        return entity;
+        try {
+            T entity = clazz.getDeclaredConstructor().newInstance();
+            entity.setId(dto.getId());
+            entity.setCreated(dto.getCreated());
+            entity.setUpdated(dto.getUpdated());
+            entity.setName(dto.getName());
+            entity.setDescription(dto.getDescription());
+            return entity;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @SneakyThrows
@@ -73,14 +85,18 @@ public class EntityMapper {
         if (projection == null) {
             return null;
         }
-        T entity = clazz.getDeclaredConstructor().newInstance();
-        entity.setId(projection.getId());
-        entity.setCreated(projection.getCreated());
-        entity.setUpdated(projection.getUpdated());
-        entity.setName(projection.getName());
-        entity.setDescription(projection.getDescription());
-        entity.setParticipantId(projection.getParticipantId());
-        return entity;
+        try {
+            T entity = clazz.getDeclaredConstructor().newInstance();
+            entity.setId(projection.getId());
+            entity.setCreated(projection.getCreated());
+            entity.setUpdated(projection.getUpdated());
+            entity.setName(projection.getName());
+            entity.setDescription(projection.getDescription());
+            entity.setParticipantId(projection.getParticipantId());
+            return entity;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @SneakyThrows
@@ -88,9 +104,13 @@ public class EntityMapper {
         if (id == null) {
             return null;
         }
-        T entity = clazz.getDeclaredConstructor().newInstance();
-        entity.setId(id);
-        return entity;
+        try {
+            T entity = clazz.getDeclaredConstructor().newInstance();
+            entity.setId(id);
+            return entity;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @SneakyThrows
