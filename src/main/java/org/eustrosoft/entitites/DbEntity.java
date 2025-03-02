@@ -2,6 +2,8 @@ package org.eustrosoft.entitites;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -37,9 +39,11 @@ public abstract class DbEntity {
     private Long participantId;
 
     @Column(name = "created", insertable = false, updatable = false)
+    @CreationTimestamp
     private Date created;
 
     @Column(name = "updated", insertable = false)
+    @UpdateTimestamp
     private Date updated;
 
     protected DbEntity(Long id) {

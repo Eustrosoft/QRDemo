@@ -2,7 +2,7 @@ package org.eustrosoft.repositories.projections;
 
 public interface QRSimpleProjection extends QRSimplestProjection {
 
-    FormWithFieldsProjection getForm();
+    FormWithFieldsProjection getFormWithFieldsProjection();
 
     String getData();
 }

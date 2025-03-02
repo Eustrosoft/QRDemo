@@ -3,8 +3,11 @@ package org.eustrosoft.entitites;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.eustrosoft.repositories.projections.FormWithFieldsProjection;
+import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,7 +28,7 @@ import java.util.List;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "qr", schema = "qrdemo")
-public class QR extends DbEntity {
+public class QR extends DbEntity implements QRSimpleProjection {
     public static final String TYPE = "QR";
 
     @Column(name = "code")
@@ -40,6 +43,7 @@ public class QR extends DbEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "form_id", insertable = false, updatable = false)
     @NotFound(action = NotFoundAction.IGNORE)
+    @Lazy
     private Form form;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -48,9 +52,20 @@ public class QR extends DbEntity {
             joinColumns = {@JoinColumn(name = "qr_id")},
             inverseJoinColumns = {@JoinColumn(name = "file_id")}
     )
+    @Lazy
     private List<File> files;
 
     @Transient
     @JsonIgnore
+    @Lazy
     private QRRange range;
+
+    @Transient
+    @JsonIgnore
+    @Lazy
+    private FormWithFieldsProjection formWithFieldsProjection;
+
+    public static final class SortAttributeNames {
+        public static final String ATTR_CREATED = "created";
+    }
 }

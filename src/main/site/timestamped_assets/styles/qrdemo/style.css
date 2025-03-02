@@ -754,6 +754,10 @@ tr.participantRow {
     animation: pulse_action 1s linear;
 }
 
+.active {
+    background-color: var(--alpha-middle);
+}
+
 @keyframes pulse_action {
 
     0% {

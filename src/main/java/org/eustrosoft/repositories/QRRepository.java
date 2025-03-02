@@ -3,6 +3,7 @@ package org.eustrosoft.repositories;
 import org.eustrosoft.entitites.QR;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface QRRepository extends JpaRepository<QR, Long> {
+public interface QRRepository extends JpaRepository<QR, Long>, JpaSpecificationExecutor<QRSimpleProjection> {
 
     @Modifying
     @Query(value = "update QR q set q.form = null where id IN ?1")
@@ -36,10 +37,6 @@ public interface QRRepository extends JpaRepository<QR, Long> {
 
     @Query("select q from QR q left outer join fetch q.form f where q.code = ?1")
     <T> Optional<T> findByCode(Long code, Class<T> clazz);
-
-    // TODO: optimize a bit. Makes a single unneeded query
-    // @Query(value = "select q from QR q left outer join fetch Form f on q.form=f where q.participantId = ?1 order by q.code desc")
-    Iterable<QRSimpleProjection> findAllByParticipantIdOrderByCodeDesc(Long participantId);
 
     Iterable<QRSimpleProjection> findAllByParticipantIdOrderByCreatedDesc(Long participantId);
 

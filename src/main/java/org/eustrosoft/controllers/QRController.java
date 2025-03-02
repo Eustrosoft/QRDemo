@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.controllers.request.QRRequestFilter;
 import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.dtos.FileDto;
 import org.eustrosoft.dtos.QRChangeDto;
@@ -33,11 +34,10 @@ import java.util.stream.Collectors;
 public class QRController {
     private final QRService service;
     private final QrMapper mapper;
-    private final FileMapper fileMapper;
 
     @GetMapping
-    public List<QRDto> findAll() throws IllegalAccessException {
-        return service.findAllMine()
+    public List<QRDto> findAllByRange(QRRequestFilter filter) throws IllegalAccessException {
+        return service.findAllMine(filter)
                 .stream().map(mapper::toDto)
                 .collect(Collectors.toList());
     }

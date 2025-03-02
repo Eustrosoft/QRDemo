@@ -118,8 +118,11 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        getQrs: () => {
+        getQrs: (rangeId) => {
             let url = `${QR_DEMO_API}secured/qrs`;
+            if (notEmptyOrUndefined(rangeId)) {
+                url += `?rangeId=${rangeId}`
+            }
 
             const req = new Request(
                 url,

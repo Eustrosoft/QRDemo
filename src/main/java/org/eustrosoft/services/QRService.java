@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.eustrosoft.configurations.QRRangeConfig;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.controllers.request.QRRequestFilter;
 import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.entitites.Form;
@@ -31,6 +30,8 @@ import org.eustrosoft.utils.CommonUtils;
 import org.eustrosoft.utils.JdbcBlobProcessor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -59,6 +60,8 @@ import java.util.zip.ZipOutputStream;
 
 import static org.eustrosoft.Constants.EMPTY_JSON;
 import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
+import static org.eustrosoft.repositories.specifications.QRSpecifications.betweenRange;
+import static org.eustrosoft.repositories.specifications.QRSpecifications.withParticipantId;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
 import static org.eustrosoft.utils.CompressUtils.zipFile;
 
@@ -66,7 +69,6 @@ import static org.eustrosoft.utils.CompressUtils.zipFile;
 @RequiredArgsConstructor
 @Transactional
 public class QRService {
-    private final QRRangeConfig qrRangeConfig;
     private final QRRepository qrRepository;
     private final ParticipantService participantService;
     private final SecurityComponent securityComponent;
@@ -75,6 +77,7 @@ public class QRService {
     private final FileMapper fileMapper;
     private final FileService fileService;
     private final JdbcBlobProcessor jdbcBlobProcessor;
+    private final QRRangeService qrRangeService;
 
     @Transactional(readOnly = true)
     public Optional<QR> get(Long id) throws IllegalAccessException {
@@ -143,6 +146,22 @@ public class QRService {
                 qrRepository.findAllByParticipantIdOrderByCreatedDesc(
                         participantService.getCurrentSimpleOrThrow().getId()
                 )
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<QRSimpleProjection> findAllMine(QRRequestFilter filter) throws IllegalAccessException {
+        if (filter == null || filter.isEmptyFilters()) {
+            return findAllMine();
+        }
+        Long rangeId = filter.getRangeId();
+        QRRange qrRange = qrRangeService.getQRRange(rangeId);
+
+        return qrRepository.findAll(
+                Specification
+                        .where(withParticipantId(participantService.getCurrentSimpleOrThrow().getParticipantId()))
+                        .and(betweenRange(qrRange.getFrom(), qrRange.getTo())),
+                Sort.by(Sort.Order.desc(QR.SortAttributeNames.ATTR_CREATED))
         );
     }
 
@@ -254,8 +273,7 @@ public class QRService {
                 if (fp.getIsPublic() && fp.getIsActive()) {
                     try (FileOutputStream fos
                                  = new FileOutputStream(new File(tempDirPath.toFile(), fp.getFileName()))) {
-                        jdbcBlobProcessor.puller(fp.getId())
-                                .accept(fos);
+                        jdbcBlobProcessor.puller(fp.getId()).accept(fos);
                     }
                 }
             }

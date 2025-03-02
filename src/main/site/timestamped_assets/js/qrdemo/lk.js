@@ -66,7 +66,7 @@ function setUserAccount(userDetails, div) {
                 })
         } else {
             if (!admin) {
-                setupQrs(div)
+                setupQrs(div, userDetails)
             } else {
                 setupAdminPanel(div)
             }
@@ -330,24 +330,24 @@ function printSettingsTableAttribute(parent, existedQrTableSettings, settingsJso
     })
 }
 
-function setupQrs(div) {
+function setupQrs(div, userDetails) {
     userApi().getSettings()
         .then(resp => resp.json())
-        .then(settings => setupQrsPart(div, settings))
+        .then(settings => setupQrsPart(div, settings, userDetails))
         .catch(ex => {
             console.log(ex)
-            setupQrsPart(div, null)
+            setupQrsPart(div, null, userDetails)
         })
 }
 
-function setupQrsPart(div, settings) {
+function setupQrsPart(div, settings, userDetails) {
     if (emptyOrUndefined(settings)) {
         settings = new ParticipantSettings(new Settings('RU', QR_TABLE_COLUMNS))
     }
-    renderQRsTable(div, settings)
+    renderQRsTable(div, settings, userDetails)
 }
 
-function renderQRsTable(div, settings) {
+function renderQRsTable(div, settings, userDetails) {
     const existed = document.getElementById('div_qrs_part')
     if (existed) {
         existed.remove()
@@ -371,6 +371,8 @@ function renderQRsTable(div, settings) {
     buttonsDiv.appendChild(createQrBtn)
     divQrsPart.appendChild(buttonsDiv)
 
+    divQrsPart.appendChild(getUserRangesDiv(userDetails, settings, qrsTable))
+
     qrApi().getQrs()
         .then(resp => resp.json())
         .then(json => {
@@ -385,6 +387,50 @@ function renderQRsTable(div, settings) {
         }).catch(ex => alert(ex))
     divQrsPart.appendChild(qrsTable)
     div.appendChild(divQrsPart)
+}
+
+function getUserRangesDiv(userDetails, settings, qrsTable) {
+    let ranges = userDetails?.ranges
+    let rangesSelectDiv = document.createElement('div')
+    if (ranges == null || ranges.length <= 1) {
+        return rangesSelectDiv
+    }
+
+    let rangesBtns = []
+    rangesSelectDiv.appendChild(getHr("4px"))
+
+    let allRangesBtn = getBigButton('Все диапазоны', '')
+    rangesSelectDiv.appendChild(allRangesBtn)
+    rangesBtns.push(allRangesBtn)
+    for (let userRange in ranges) {
+        let uR = ranges[userRange]
+        let rangeBtn = getBigButton(uR?.from + ' - ' + uR?.to, uR?.id)
+        rangesSelectDiv.appendChild(rangeBtn)
+        rangesBtns.push(rangeBtn)
+    }
+    rangesSelectDiv.appendChild(getHr("4px"))
+
+    for (let rangeBtn in rangesBtns) {
+        let btn = rangesBtns[rangeBtn]
+        btn.addEventListener('click', () => {
+            qrApi().getQrs(btn?.id)
+                .then(resp => resp.json())
+                .then(json => {
+                    rangesBtns.forEach(bt => bt.classList.remove('active'))
+                    qrsTable.innerHTML = ''
+                    let colSettings = settings?.settings?.qrTableColumns
+                    if (json.length > 0) {
+                        qrsTable.append(getTableHeader(colSettings))
+                    }
+                    for (let i = 0; i < json.length; i++) {
+                        const qrLine = getQRRow(json[i], settings?.settings)
+                        qrsTable.appendChild(qrLine)
+                    }
+                    btn.classList.add('active')
+                }).catch(ex => alert(ex))
+        })
+    }
+    return rangesSelectDiv
 }
 
 function getQRRow(data, settings) {
@@ -799,7 +845,7 @@ function setUserPanel(parenDiv, participantId) {
                         adminApi().addRangeToParticipant(
                             participantId,
                             {
-                                name: name, description: description, 
+                                name: name, description: description,
                                 from: parseInt(from, 16), to: parseInt(to, 16)
                             }
                         ).then(resp => {

@@ -2,12 +2,10 @@ package org.eustrosoft.mappers;
 
 import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.dtos.QRChangeDto;
 import org.eustrosoft.dtos.QRCreationDto;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.entitites.File;
-import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.QR;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.repositories.projections.QRProjection;
@@ -39,7 +37,7 @@ public class QrMapper extends EntityMapper {
         dto.setName(qr.getName());
         dto.setDescription(qr.getDescription());
         dto.setData(qr.getData());
-        dto.setForm(formMapper.toDto(qr.getForm()));
+        dto.setForm(formMapper.toDto(qr.getFormWithFieldsProjection()));
         return dto;
     }
 
@@ -59,7 +57,7 @@ public class QrMapper extends EntityMapper {
         }
         dto.setCode(qr.getCode());
         dto.setData(qr.getData());
-        dto.setForm(formMapper.toDto(qr.getForm()));
+        dto.setForm(formMapper.toDto(qr.getFormWithFieldsProjection()));
         dto.setFiles(fileMapper.toListDto(qr.getFiles()));
         return dto;
     }

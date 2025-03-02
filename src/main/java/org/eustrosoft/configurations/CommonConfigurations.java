@@ -8,6 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Configuration
 @EnableScheduling
 @EnableWebSecurity
-@EnableJpaRepositories({"org.eustrosoft"})
+@EnableJpaRepositories(value = {"org.eustrosoft"})
 public class CommonConfigurations {
 }

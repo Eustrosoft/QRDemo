@@ -411,7 +411,7 @@ function addCodeBtnListeners() {
         showPublicPhoneBtn.addEventListener('click', () => {
             let iframe = document.createElement('iframe')
             iframe.id = 'phone_iframe'
-            iframe.src = `?q=${Number(qrCode).toString(16)}`
+            iframe.src = `/qr?q=${Number(qrCode).toString(16)}`
             iframe.style.width = '436px'
             iframe.style.height = '567px'
             let modal = getModalWindow('Просмотр с телефона', iframe)
