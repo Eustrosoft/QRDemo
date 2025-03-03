@@ -12,6 +12,8 @@ import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.entitites.Role;
 import org.eustrosoft.entitites.enums.Roles;
+import org.eustrosoft.exceptions.CommonException;
+import org.eustrosoft.exceptions.JsonApiError;
 import org.eustrosoft.mappers.ParticipantMapper;
 import org.eustrosoft.repositories.ParticipantRepository;
 import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
@@ -21,6 +23,7 @@ import org.eustrosoft.repositories.sub.ParticipantDataRepository;
 import org.eustrosoft.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -169,15 +172,29 @@ public class ParticipantService {
     public Participant update(Participant participant) {
         ParticipantAdminProjection existed = findByIdAdminProjection(participant.getId());
         if (participant.getId() == null) {
-            throw new IllegalArgumentException("Participant id is not provided");
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.bad_credentials",
+                            "exceptions.detail.id_not_provided",
+                            new JsonApiError.Source("id")
+                    )
+            );
         }
-        if (StringUtils.isAnyBlank(participant.getUsername(), participant.getEmail())) {
-            throw new IllegalArgumentException("Username or Email can not be empty");
+        if (StringUtils.isAnyBlank(participant.getUsername())) {
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.bad_credentials",
+                            "exceptions.detail.username_not_provided",
+                            new JsonApiError.Source("username")
+                    )
+            );
         }
         if (!participant.getUsername().equals(existed.getUsername())) {
             participantValidationService.validateUsername(participant.getUsername());
         }
-        if (!participant.getEmail().equals(existed.getEmail())) {
+        if (StringUtils.isNotBlank(participant.getEmail()) && !participant.getEmail().equals(existed.getEmail())) {
             participantValidationService.validateEmail(participant.getEmail());
         }
         return mapper.participantDataToParticipant(

@@ -1,6 +1,6 @@
 import { setLk } from "./lk.js";
 import { setCard } from "./card.js";
-import { emptyOrUndefined, notNullOrUndefined, processFetchError, processFetchErrorToLogin } from "./utils.js";
+import { emptyOrUndefined, notNullOrUndefined, processFetchErrorToLogin } from "./utils.js";
 import { setForm } from "./form.js";
 import { userApi } from "./api.js";
 import { LOCAL_STORAGE_USER, LOCAL_STORAGE_USER_THEME } from "./localStorage.js";
@@ -12,6 +12,7 @@ import { showAboutModal, showContactModal } from "./components/modals.js";
 import { Loader } from "./components/loader.js";
 import { getSwitch } from "./components/inputs.js";
 import { getSpan, MAIN_TEXT } from "./components/texts.js";
+import { processFetchError } from "../commons/common.js";
 
 (function (window, document, undefined) {
     window.onload = init
@@ -255,10 +256,9 @@ async function login(e) {
 
     try {
         let loginResp = await userApi().login(login, password)
-        let loginRespText = await loginResp.text()
         if (!loginResp.ok) {
-            let loginRespJson = JSON.parse(loginRespText)
-            throw Error(loginRespJson?.message)
+            processFetchError(loginResp)
+            return
         }
         processToLk()
         return

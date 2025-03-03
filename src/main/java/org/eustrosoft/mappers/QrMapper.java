@@ -69,6 +69,13 @@ public class QrMapper extends EntityMapper {
         return qrs.stream().map(this::toDto).collect(Collectors.toList());
     }
 
+    public List<QRDto> toDtoListProjections(Collection<QRSimplestProjection> qrs) {
+        if (Collections.isEmpty(qrs)) {
+            return java.util.Collections.emptyList();
+        }
+        return qrs.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
     public QR fromCreationDto(QRCreationDto dto) {
         QR qr = new QR();
         qr.setName(dto.getName());

@@ -3,6 +3,7 @@ package org.eustrosoft.controllers;
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.dtos.EntityDto;
 import org.eustrosoft.dtos.ParticipantChangeDto;
+import org.eustrosoft.dtos.ParticipantDto;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.dtos.QRRangeDto;
 import org.eustrosoft.dtos.RegistrationDto;
@@ -15,10 +16,10 @@ import org.eustrosoft.mappers.ParticipantMapper;
 import org.eustrosoft.mappers.QrMapper;
 import org.eustrosoft.mappers.QrRangeMapper;
 import org.eustrosoft.mappers.RoleMapper;
-import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
 import org.eustrosoft.repositories.projections.ParticipantAdminSimpleProjection;
 import org.eustrosoft.services.AdminService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,9 +30,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping("/v1/api/admin/panel")
 @RequiredArgsConstructor
@@ -49,8 +52,8 @@ public class AdminController {
     }
 
     @GetMapping("/participants/{id}")
-    public ParticipantAdminProjection findById(@PathVariable Long id) {
-        return adminService.findById(id);
+    public ParticipantDto findById(@PathVariable Long id) {
+        return participantMapper.toDto(adminService.findById(id));
     }
 
     @GetMapping("/participants")
@@ -64,14 +67,14 @@ public class AdminController {
     }
 
     @PostMapping("/participants")
-    public Participant addParticipant(@RequestBody RegistrationDto registrationDto) throws IllegalAccessException {
+    public Participant addParticipant(@Valid @RequestBody RegistrationDto registrationDto) throws IllegalAccessException {
         return adminService.addParticipant(participantMapper.fromRegistrationDto(registrationDto));
     }
 
     @PutMapping("/participants/{id}")
     public void updateParticipant(
             @PathVariable("id") Long id,
-            @RequestBody ParticipantChangeDto dto
+            @Valid @RequestBody ParticipantChangeDto dto
     ) {
         adminService.updateParticipant(id, participantMapper.fromChangeDto(dto));
     }
@@ -79,7 +82,7 @@ public class AdminController {
     @PutMapping("/participants/{id}/change-password")
     public void changeParticipantPassword(
             @PathVariable("id") Long id,
-            @RequestBody ParticipantChangePasswordDto dto
+            @Valid @RequestBody ParticipantChangePasswordDto dto
     ) {
         adminService.changeParticipantPassword(id, dto);
     }

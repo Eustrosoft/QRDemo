@@ -1,23 +1,22 @@
 package org.eustrosoft.exceptions;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-@Getter
+import java.util.Collections;
+import java.util.List;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommonException extends RuntimeException {
 
-    public Code code;
+    private List<JsonApiError> errors;
 
-    public CommonException(Code code) {
-        this.code = code;
-    }
-
-    public CommonException(Code code, String message) {
-        super(message);
-        this.code = code;
-    }
-
-    public CommonException(Code code, String message, Throwable throwable) {
-        super(message, throwable);
-        this.code = code;
+    public CommonException(JsonApiError error) {
+        this.errors = Collections.singletonList(error);
     }
 }

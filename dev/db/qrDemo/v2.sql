@@ -103,9 +103,8 @@ CREATE TABLE if NOT EXISTS file
     storage_place   VARCHAR(64)  NOT NULL DEFAULT 'DB', -- storage type, maybe will store in S3 in future
     storage_path    VARCHAR(256),   -- path for local/S3 file storing type
     file_data       BYTEA,          -- file_data could be null due to stop process uploading - it could be reinit in future
-    file_size       BIGINT       NOT NULL CHECK (file_size <= 10485760), -- fast file length access, to not counting it from bytea directly
-
-    CONSTRAINT check_file_data_size  CHECK   (octet_length(file_data) <= 10485760), -- check file size before upload
+    file_size       BIGINT       NOT NULL, -- fast file length access, to not counting it from bytea directly
+    
     CONSTRAINT check_storage_place   CHECK   (storage_place IN ('S3', 'DB', 'LOCAL')),
 
     PRIMARY KEY (id)

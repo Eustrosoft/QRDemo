@@ -1,4 +1,4 @@
-import { getOrOther, notEmptyOrUndefined } from "../commons/common.js";
+import { getOrOther, notEmptyOrUndefined, processFetchError } from "../commons/common.js";
 import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
 export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
@@ -625,12 +625,18 @@ class RequestDecorators {
         return function(req) {
             const response = fetch(req);
             return response.then(resp => {
-                if (resp.status === 401) {
-                    throw new Error('Unauthorized')
+                if (!resp.ok) {
+                    return Promise.reject(resp)
                 }
                 return resp
             })
-            .catch(processFetchErrorToLogin)
+            .catch(resp => {
+                if (resp.status == 401) {
+                    processFetchErrorToLogin()
+                } else {
+                    processFetchError(resp)
+                }
+            })
         }
     }
 }

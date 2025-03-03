@@ -7,6 +7,7 @@ import org.eustrosoft.dtos.SettingsChangeDto;
 import org.eustrosoft.dtos.SettingsDto;
 import org.eustrosoft.mappers.ParticipantMapper;
 import org.eustrosoft.services.ParticipantService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
+@Validated
 @RestController("Participant")
 @RequestMapping("/v1/api/secured/participants")
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ public class ParticipantController {
     }
 
     @PostMapping("/settings/change-password")
-    public void changePassword(@RequestBody PasswordChangeDto dto) throws IllegalAccessException {
+    public void changePassword(@Valid @RequestBody PasswordChangeDto dto) throws IllegalAccessException {
         participantService.changePassword(dto);
     }
 
@@ -37,7 +41,7 @@ public class ParticipantController {
     }
 
     @PatchMapping("/settings")
-    public SettingsDto updateSettings(@RequestBody SettingsChangeDto dto) throws IllegalAccessException {
+    public SettingsDto updateSettings(@Valid @RequestBody SettingsChangeDto dto) throws IllegalAccessException {
         return mapper.toSettingsDto(participantService.updateSettings(dto));
     }
 }

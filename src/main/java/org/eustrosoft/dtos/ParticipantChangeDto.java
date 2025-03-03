@@ -7,5 +7,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class ParticipantChangeDto extends ParticipantDto {
+public class ParticipantChangeDto extends RegistrationDto {
+
 }

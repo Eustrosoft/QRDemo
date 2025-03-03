@@ -1,31 +1,14 @@
 package org.eustrosoft.exceptions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.lang.reflect.UndeclaredThrowableException;
+import java.util.List;
 
-@AllArgsConstructor
-public class ExceptionObject {
-    @JsonIgnore
-    private final Throwable error;
-
-    @JsonProperty("message")
-    public String getMessage() {
-        String message = error.getMessage();
-        if (error instanceof UndeclaredThrowableException) {
-            message = ((UndeclaredThrowableException) error).getUndeclaredThrowable().getMessage();
-        }
-        return message;
-    }
-
-    @JsonProperty("code")
-    public String getCode() {
-        String code = null;
-        if (error instanceof CommonException) {
-            code = ((CommonException) error).getCode().getCode();
-        }
-        return code;
-    }
+@Data
+@RequiredArgsConstructor
+public class ExceptionObject<T extends JsonApiError> {
+    @Getter
+    private final List<T> errors;
 }

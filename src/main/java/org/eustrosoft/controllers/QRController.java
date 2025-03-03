@@ -6,13 +6,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.controllers.request.QRRequestFilter;
 import org.eustrosoft.dtos.FileChooseRequest;
-import org.eustrosoft.dtos.FileDto;
 import org.eustrosoft.dtos.QRChangeDto;
 import org.eustrosoft.dtos.QRCreationDto;
 import org.eustrosoft.dtos.QRDto;
-import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.mappers.QrMapper;
 import org.eustrosoft.services.QRService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,10 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping("/v1/api/secured/qrs")
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class QRController {
     }
 
     @PostMapping
-    public QRDto create(@RequestBody QRCreationDto dto) throws Exception {
+    public QRDto create(@Valid @RequestBody QRCreationDto dto) throws Exception {
         return mapper.toDto(service.create(mapper.fromCreationDto(dto)));
     }
 
@@ -64,14 +65,14 @@ public class QRController {
     }
 
     @PutMapping
-    public QRDto update(@RequestBody QRChangeDto dto) throws IllegalAccessException, JsonProcessingException {
+    public QRDto update(@Valid @RequestBody QRChangeDto dto) throws IllegalAccessException, JsonProcessingException {
         return mapper.toDto(service.update(mapper.fromChangeDto(dto)));
     }
 
     @PostMapping("/{id}/files/upload")
     public QRDto uploadFile(
             @PathVariable Long id,
-            FileUploadRequest fur
+            @Valid FileUploadRequest fur
     ) throws IllegalAccessException, IOException {
         return mapper.toDto(service.uploadFile(id, fur));
     }

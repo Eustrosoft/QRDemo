@@ -1,14 +1,15 @@
 package org.eustrosoft.dtos;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
 public class QRChangeDto extends QRCreationDto {
-    private Long id;
+
 }

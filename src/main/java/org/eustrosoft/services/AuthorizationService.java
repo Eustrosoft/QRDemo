@@ -7,6 +7,8 @@ import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.UserLoginDto;
 import org.eustrosoft.dtos.UserLoginResponseDto;
 import org.eustrosoft.entitites.Participant;
+import org.eustrosoft.exceptions.CommonException;
+import org.eustrosoft.exceptions.JsonApiError;
 import org.eustrosoft.mappers.ParticipantMapper;
 import org.eustrosoft.utils.HttpUtils;
 import org.eustrosoft.utils.JwtTokenUtils;
@@ -18,11 +20,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import org.eustrosoft.exceptions.Error;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.eustrosoft.configurations.security.CookieUserToken.JWT_COOKIE_NAME;
@@ -48,9 +50,13 @@ public class AuthorizationService {
                     new UsernamePasswordAuthenticationToken(userLoginDto.getUsername(), userLoginDto.getPassword())
             );
         } catch (BadCredentialsException ex) {
-            return new ResponseEntity<>(
-                    new Error(HttpStatus.UNAUTHORIZED.value(), "Not correct Participant or password."),
-                    HttpStatus.UNAUTHORIZED
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, 1001L,
+                            "exceptions.title.bad_credentials",
+                            "exceptions.detail.illegal_username_or_password",
+                            new JsonApiError.Source("credentials")
+                    )
             );
         }
 
@@ -65,9 +71,13 @@ public class AuthorizationService {
             httpUtils.setCookie(JWT_COOKIE_NAME, "", true, false, 0L);
             SecurityContextHolder.getContext().setAuthentication(null);
         } catch (Exception ex) {
-            return new ResponseEntity<>(
-                    new Error(HttpStatus.UNAUTHORIZED.value(), "Not correct Participant or password."),
-                    HttpStatus.UNAUTHORIZED
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.UNPROCESSABLE_ENTITY, 1002L,
+                            "exceptions.title.bad_credentials",
+                            "exceptions.detail.illegal_username_or_password",
+                            new JsonApiError.Source("credentials")
+                    )
             );
         }
         return ResponseEntity.ok("logged out successfully.");
@@ -90,9 +100,12 @@ public class AuthorizationService {
     private ResponseEntity<?> validateUserLogin(final UserLoginDto userLoginDto) {
         Optional<Participant> participant = userService.getByUsername(userLoginDto.getUsername());
         if (!participant.isPresent()) {
-            return new ResponseEntity<>(
-                    new Error(HttpStatus.BAD_REQUEST.value(), "Пользователя не существует."),
-                    HttpStatus.BAD_REQUEST
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.bad_credentials", "exceptions.detail.user_does_not_exist",
+                            new JsonApiError.Source("credentials")
+                    )
             );
         }
         if (participant.get().getBanned()) {
@@ -100,9 +113,13 @@ public class AuthorizationService {
             if (StringUtils.isBlank(bannedReason)) {
                 bannedReason = "неизвестной причины";
             }
-            return new ResponseEntity<>(
-                    new Error(HttpStatus.BAD_REQUEST.value(), "Пользователь заблокирован из-за " + bannedReason),
-                    HttpStatus.BAD_REQUEST
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.user_blocked", "exceptions.detail.user_blocked",
+                            new JsonApiError.Source("credentials"),
+                            bannedReason
+                    )
             );
         }
         return null;
@@ -110,31 +127,83 @@ public class AuthorizationService {
 
     @Transactional(readOnly = true)
     public ResponseEntity<?> validateUser(RegistrationDto registrationDto) {
-        if (Strings.isEmpty(registrationDto.getUsername())
-                || Strings.isEmpty(registrationDto.getPassword())
-                || Strings.isEmpty(registrationDto.getConfirmPassword())) {
-            return new ResponseEntity<>(
-                    new Error(HttpStatus.BAD_REQUEST.value(), "Required fields are empty."),
-                    HttpStatus.BAD_REQUEST
+        List<JsonApiError> errors = new ArrayList<>();
+        if (Strings.isEmpty(registrationDto.getUsername())) {
+            errors.add(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.parameter_not_provided",
+                            "exceptions.detail.username_not_provided",
+                            new JsonApiError.Source("username")
+                    )
             );
+        }
+        if (Strings.isEmpty(registrationDto.getPassword())) {
+            errors.add(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.parameter_not_provided",
+                            "exceptions.detail.password_not_provided",
+                            new JsonApiError.Source("password")
+                    )
+            );
+        }
+        if (Strings.isEmpty(registrationDto.getConfirmPassword())) {
+            errors.add(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.parameter_not_provided",
+                            "exceptions.detail.confirm_password_not_provided",
+                            new JsonApiError.Source("confirm_password")
+                    )
+            );
+        }
+        if (!errors.isEmpty()) {
+            throw new CommonException(errors);
         }
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
-            return new ResponseEntity<>(
-                    new Error(HttpStatus.BAD_REQUEST.value(), "Passwords are not the same."),
-                    HttpStatus.BAD_REQUEST
+            errors.add(
+                    new JsonApiError(
+                        HttpStatus.BAD_REQUEST, -1L,
+                        "exceptions.title.passwords_are_not_same",
+                        "exceptions.detail.passwords_are_not_same",
+                        new JsonApiError.Source("password")
+                    )
+            );
+            errors.add(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.passwords_are_not_same",
+                            "exceptions.detail.passwords_are_not_same",
+                            new JsonApiError.Source("confirm_password")
+                    )
             );
         }
+        if (!errors.isEmpty()) {
+            throw new CommonException(errors);
+        }
         if (userService.getByUsername(registrationDto.getUsername()).isPresent()) {
-            return new ResponseEntity<>(
-                    new Error(HttpStatus.BAD_REQUEST.value(), "Participant with this username already exists."),
-                    HttpStatus.BAD_REQUEST
+            errors.add(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.user_already_exists",
+                            "exceptions.detail.user_with_username_exists",
+                            new JsonApiError.Source("username")
+                    )
             );
+        }
+        if (!errors.isEmpty()) {
+            throw new CommonException(errors);
         }
         if (StringUtils.isNotBlank(registrationDto.getEmail())
                 && userService.getByEmail(registrationDto.getEmail()).isPresent()) {
-            return new ResponseEntity<>(
-                    new Error(HttpStatus.BAD_REQUEST.value(), "Participant with this email already exists."),
-                    HttpStatus.BAD_REQUEST
+            errors.add(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, -1L,
+                            "exceptions.title.user_already_exists",
+                            "exceptions.detail.user_with_email_exists",
+                            new JsonApiError.Source("email")
+                    )
             );
         }
         return null;

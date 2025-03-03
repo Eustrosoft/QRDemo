@@ -10,6 +10,7 @@ import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.Role;
 import org.eustrosoft.entitites.enums.Roles;
 import org.eustrosoft.entitites.subentities.ParticipantData;
+import org.eustrosoft.repositories.projections.ParticipantAdminProjection;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class ParticipantMapper extends EntityMapper {
     private final RoleMapper roleMapper;
     private final QrRangeMapper qrRangeMapper;
+    private final QrMapper qrMapper;
 
     public ParticipantDto toDto(Participant entity) {
         ParticipantDto dto = super.toDto(entity, ParticipantDto.class);
@@ -39,6 +41,26 @@ public class ParticipantMapper extends EntityMapper {
                         .map(roleMapper::toDto)
                         .collect(Collectors.toList())
         );
+        return dto;
+    }
+
+    public ParticipantDto toDto(ParticipantAdminProjection entity) {
+        ParticipantDto dto = super.toDtoFromProjection(entity, ParticipantDto.class);
+        if (dto == null) {
+            return null;
+        }
+        dto.setUsername(entity.getUsername());
+        dto.setEmail(entity.getEmail());
+        dto.setLei(entity.getLei());
+        dto.setOrganization(entity.getOrganization());
+        dto.setAddress(entity.getAddress());
+        dto.setWebsite(entity.getWebsite());
+        dto.setBanned(entity.getBanned());
+        dto.setBannedReason(entity.getBannedReason());
+        dto.setActive(entity.getActive());
+        dto.setRoles(roleMapper.toListDto(entity.getRoles()));
+        dto.setQrs(qrMapper.toDtoListProjections(entity.getQrs()));
+        dto.setRanges(qrRangeMapper.toDtoList(entity.getRanges()));
         return dto;
     }
 

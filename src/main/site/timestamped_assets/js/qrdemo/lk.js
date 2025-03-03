@@ -5,7 +5,7 @@ import { getBigButton } from "./components/buttons.js";
 import { getModalWindow, showCreateQrModal, showGenerateRandomPasswordModal } from "./components/modals.js";
 import { getInput, getSelect, getSingleInput, getTextArea } from "./components/inputs.js";
 import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
-import { getOrOther, notEmptyOrUndefined, USER_ROLES } from "../commons/common.js";
+import { getInputValue, getOrOther, notEmptyOrUndefined, processFetchError, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getHr } from "./components/hrs.js";
@@ -582,7 +582,6 @@ function setupAdminPanel(div) {
 
         const username = getInput('Имя пользователя', 'text', true, 'create_participant_username', 'Введите имя пользователя...', false, 'off')
         const passw1 = getInput('Пароль', 'password', true, 'create_participant_password_1', 'Введите пароль...', false, 'new-password')
-        const passw2 = getInput('Повтор пароля', 'password', true, 'create_participant_password_2', 'Повторите пароль...', false, 'new-password')
         const email = getInput('Почта', 'email', false, 'create_participant_email', 'Введите электронную почту...')
         const lei = getInput('ИНН', 'text', false, 'create_participant_lei', 'ИНН...')
         const address = getInput('Адрес', 'text', false, 'create_participant_address', 'Введите адрес...')
@@ -601,7 +600,6 @@ function setupAdminPanel(div) {
                     {
                         username: document.getElementById('create_participant_username').value,
                         password: document.getElementById('create_participant_password_1').value,
-                        confirmPassword: document.getElementById('create_participant_password_2').value,
                         email: document.getElementById('create_participant_email').value,
                         lei: document.getElementById('create_participant_lei').value,
                         address: document.getElementById('create_participant_address').value,
@@ -611,11 +609,11 @@ function setupAdminPanel(div) {
                     }
                 ).then(resp => {
                     if (!resp.ok)
-                        throw new Error('Ошибка при создании пользователя')
+                        return Promise.reject(resp)
                     return resp.json()
                 }).then(json => {
                     alert('Пользователь был создан!')
-                }).catch(ex => alert(ex))
+                }).catch(processFetchError)
         })
 
         let passGenerateBtn = getBigButton('Сгенерировать пароль')
@@ -626,7 +624,7 @@ function setupAdminPanel(div) {
             .then(json => {
                 roles = json
                 swtch = getSelect('Роль', 'role', roles.map((role => role.name)), USER_ROLES.USER)
-                innerDiv.append(username, passw1, passw2, email, lei, address, organization, website, swtch, tariff, saveBtn, passGenerateBtn)
+                innerDiv.append(username, passw1, email, lei, address, organization, website, swtch, tariff, saveBtn, passGenerateBtn)
                 const modal = getModalWindow('Создание нового пользователя', innerDiv);
                 modal.style.display = 'block'
             })
@@ -795,13 +793,13 @@ function setUserPanel(parenDiv, participantId) {
                         adminApi().updateParticipant(
                             json?.id,
                             {
-                                username: document.getElementById('change_participant_username').value,
-                                email: document.getElementById('change_participant_email').value,
-                                lei: document.getElementById('change_participant_lei').value,
-                                address: document.getElementById('change_participant_address').value,
-                                organization: document.getElementById('change_participant_organization').value,
-                                website: document.getElementById('change_participant_website').value,
-                                description: document.getElementById('change_participant_description').value
+                                username: getInputValue(document.getElementById('change_participant_username')),
+                                email: getInputValue(document.getElementById('change_participant_email')),
+                                lei: getInputValue(document.getElementById('change_participant_lei')),
+                                address: getInputValue(document.getElementById('change_participant_address')),
+                                organization: getInputValue(document.getElementById('change_participant_organization')),
+                                website: getInputValue(document.getElementById('change_participant_website')),
+                                description: getInputValue(document.getElementById('change_participant_description'))
                             }
                         ).then(resp => {
                             if (resp.ok) {
@@ -877,8 +875,8 @@ function setUserPanel(parenDiv, participantId) {
                 rangesBody.push(
                     {
                         id: range?.id,
-                        from: Number(range?.from).toString(16),
-                        to: Number(range?.to).toString(16),
+                        from: range?.from,
+                        to: range?.to,
                         created: range?.created,
                         name: range?.name,
                         description: range?.description

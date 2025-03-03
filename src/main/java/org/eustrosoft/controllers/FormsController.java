@@ -12,6 +12,7 @@ import org.eustrosoft.mappers.FormFieldMapper;
 import org.eustrosoft.mappers.FormMapper;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.services.FormService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,10 +22,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/api/secured/forms")
@@ -45,7 +48,7 @@ public class FormsController {
     }
 
     @PostMapping
-    public FormDto createForm(@RequestBody FormCreationDto dto) throws IllegalAccessException {
+    public FormDto createForm(@Valid @RequestBody FormCreationDto dto) throws IllegalAccessException {
         return formMapper.toDto(
                 service.create(formMapper.fromCreationDto(dto))
         );
@@ -59,7 +62,7 @@ public class FormsController {
     @PostMapping("/{id}/files/upload")
     public FileProjection uploadFile(
             @PathVariable Long id,
-            FileUploadRequest fur
+            @Valid FileUploadRequest fur
     ) throws IllegalAccessException {
         return service.uploadFile(id, fur);
     }
@@ -81,7 +84,9 @@ public class FormsController {
     }
 
     @PutMapping("/{id}")
-    public FormDto update(@RequestBody FormChangeDto dto) throws IllegalAccessException, JsonProcessingException {
+    public FormDto update(
+            @Valid @RequestBody FormChangeDto dto
+    ) throws IllegalAccessException, JsonProcessingException {
         return formMapper.toDto(
                 service.update(formMapper.fromChangeDto(dto))
         );

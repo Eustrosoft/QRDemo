@@ -1,3 +1,4 @@
+import { notify } from "../qrdemo/notifications.js"
 
 export const RANDOM_PASSWORD_LENGTH = 12
 
@@ -6,8 +7,19 @@ export function notNullOrUndefined(value) {
     return value !== null && value !== undefined
 }
 
-export const processFetchError = (error) => {
-    alert(error)
+export const processFetchError = (resp) => {
+    try {
+        resp.json()
+            .then(json => {
+                let errors = json?.errors
+                for (let err in errors) {
+                    notify(errors[err]?.detail, errors[err]?.title)
+                }
+            })
+    } catch (e) {
+        // Ignore
+        //console.log(e)
+    }
 }
 
 export function rolesToList(roles) {
@@ -106,6 +118,17 @@ export function booleanToString(bool) {
 
 export function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
+}
+
+export function getInputValue(input) {
+    if (input == null) {
+        return null
+    }
+    let val = input.value
+    if (emptyOrUndefined(val) || val.trim() == '') {
+        return null
+    }
+    return val
 }
 
 // Structures

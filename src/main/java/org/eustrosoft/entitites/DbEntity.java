@@ -29,10 +29,10 @@ public abstract class DbEntity {
     @Column(name = "type", updatable = false)
     private String type;
 
-    @Column(name = "name")
+    @Column(name = "name", length = 128)
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 512)
     private String description;
 
     @Column(name = "participant_id", updatable = false)
