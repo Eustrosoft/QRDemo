@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QRCreationDto extends EntityDto {
-    @Size(max = 65536)
     private JsonNode data;
     private List<Long> filesIds;
     private Long formId;

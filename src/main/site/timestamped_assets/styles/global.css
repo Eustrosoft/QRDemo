@@ -279,7 +279,11 @@ video {
 }
 
 textarea {
-    resize: none;
-    font-size: 1.3rem;
-    color: var(--table-body-color);
+    padding: 4px 8px;
+    box-sizing: border-box;
+    border: 2px solid var(--font-half-color);
+    border-radius: 4px;
+    background-color: var(--bg-color);
+    font-size: 14px;
+    resize: vertical;
 }

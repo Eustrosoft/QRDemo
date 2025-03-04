@@ -120,7 +120,7 @@ export function fieldToHtmlItems(field, index, fieldTypes = []) {
         `<input name="id" type="hidden" value="${id}" id="field_id_${id}">
          <select name="type">${fieldTypesStr}</select>`,
         `<input name="caption" class="field_caption" type="text" value="${escapeDQuotes(caption)}">`,
-        `<input name="placeholder" type="text" value="${escapeDQuotes(placeholder)}">`,
+        `${getInputFromType(type, placeholder)}`,
         `<input name="isStatic" type="checkbox" ${isStatic ? 'checked' : ''}></input>`,
         `<input name="isPublic" type="checkbox" ${isPublic ? 'checked' : ''}></input>`,
         `<input name="fieldOrder" type="number" value="${order}">`,
@@ -129,6 +129,13 @@ export function fieldToHtmlItems(field, index, fieldTypes = []) {
     ]
 
     return items
+}
+
+function getInputFromType(type, placeholder) {
+    if (type === 'TEXTAREA') {
+        return `<textarea rows="3" style="width: 100%" name="placeholder">${escapeDQuotes(placeholder)}</textarea>`
+    }
+    return `<input name="placeholder" type="text" value="${escapeDQuotes(placeholder)}">`
 }
 
 function fieldTypesToOptions(fieldTypes, type) {

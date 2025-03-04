@@ -235,7 +235,8 @@
     DATE,
     URL,
     PHONE,
-    EMAIL
+    EMAIL,
+    TEXTAREA
   }
 
 

@@ -1,8 +1,14 @@
 import { notEmptyOrUndefined } from "../../commons/common.js";
 
 export function getSingleInput(type, required = false, id = '', placeholder = '', value = '', editable = true) {
-    let htmlInput = document.createElement('input')
-    htmlInput.type = type
+    let htmlInput
+    if (type === 'TEXTAREA') {
+        htmlInput = getTextArea(null, required, id, placeholder, false, value)
+        htmlInput.style.width = '100%'
+    } else {
+        htmlInput = document.createElement('input')
+        htmlInput.type = type
+    }
     htmlInput.placeholder = placeholder
     htmlInput.required = required
     htmlInput.id = id
@@ -52,6 +58,15 @@ export function getTextArea(labelText, required, id, placeholder, inline = false
         htmlInputDiv.style.display = 'flex'
     }
 
+    let textarea = document.createElement('textarea')
+    textarea.placeholder = placeholder
+    textarea.required = required
+    textarea.id = id
+    textarea.rows = 4
+    if (notEmptyOrUndefined(value)) {
+        textarea.value = value
+    }
+
     if (notEmptyOrUndefined(labelText)) {
         let htmlLabel = document.createElement('label');
         let requiredStar = required ? ' *' : ''
@@ -60,14 +75,8 @@ export function getTextArea(labelText, required, id, placeholder, inline = false
         if (!inline) {
             htmlInputDiv.appendChild(document.createElement('br'))
         }
-    }
-    let textarea = document.createElement('textarea')
-    textarea.placeholder = placeholder
-    textarea.required = required
-    textarea.id = id
-    textarea.rows = 4
-    if (notEmptyOrUndefined(value)) {
-        textarea.value = value
+    } else {
+        return textarea
     }
     htmlInputDiv.appendChild(textarea)
     return htmlInputDiv

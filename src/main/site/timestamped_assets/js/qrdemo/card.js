@@ -434,7 +434,7 @@ function isCardFile(tableRow) {
     return true
 }
 
-const processedTags = ['INPUT']
+const processedTags = ['INPUT', 'TEXTAREA']
 
 function collectFormData() {
     let data = {}
