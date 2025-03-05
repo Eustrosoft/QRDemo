@@ -627,7 +627,7 @@ function uploadSingleFile(url, fileRequest) {
     request.open('POST', url, false)
     request.withCredentials = true
     request.send(data)
-    if (request.status != 200 || 204) {
+    if (request.status != 200 && request.status != 204) {
         throw new Error('Ошибка сервера')
     }
 }

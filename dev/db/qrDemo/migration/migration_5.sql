@@ -8,3 +8,6 @@ ALTER TABLE qrdemo.file ALTER checksum DROP NOT NULL;
 ALTER TABLE qrdemo.file ALTER file_size DROP NOT NULL;
 ALTER TABLE qrdemo.file ALTER file_data DROP NOT NULL;
 ALTER TABLE qrdemo.file ALTER file_name DROP NOT NULL;
+ALTER TABLE qrdemo.file ALTER storage_path DROP NOT NULL;
+ALTER TABLE qrdemo.file ALTER storage_place DROP NOT NULL;
+ALTER TABLE qrdemo.file ALTER file_size DROP NOT NULL;

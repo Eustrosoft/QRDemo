@@ -25,9 +25,9 @@ public class QRCacheCleaner {
     public void clearCache() {
         try {
             qrCacheControlService.clearCache();
-            LOGGER.log(Level.INFO, "Cache, named \"{0}\" was cleared", QR_CACHE_NAME);
+            LOGGER.log(Level.FINER, "Cache, named \"{0}\" was cleared", QR_CACHE_NAME);
         } catch (Exception ex) {
-            LOGGER.log(Level.ALL, "Error while clearing cache: " + ex.getLocalizedMessage());
+            LOGGER.log(Level.ALL,"Error while clearing cache: " + ex.getLocalizedMessage());
         }
     }
 }

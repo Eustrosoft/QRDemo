@@ -178,8 +178,10 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                 uploadBtn.addEventListener('click', () => {
                     try {
                         qrApi().reuploadFile(json?.id, { file: document.getElementById('file_content') })
+                        alert('Файл был загружен!')
+                        window.location.reload()
                     } catch (e) {
-                        alert(e)
+                        notify(e)
                     }
                 })
                 let modal = getModalWindow('Замена файла', fileChangeDiv)
@@ -286,6 +288,8 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
                         if (closeOnComplete) {
                             modal.remove()
                         }
+                        alert('Файл был загружен!')
+                        window.location.reload()
                     } catch (e) {
                         if (closeOnError) {
                             modal.remove()
@@ -354,6 +358,8 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
                 if (closeOnComplete) {
                     modal.remove()
                 }
+                alert('Файл был загружен!')
+                window.location.reload()
             } catch (e) {
                 if (closeOnError) {
                     modal.remove()
@@ -449,6 +455,8 @@ export function showLinkFileModal(uploadFileCallback, closeOnComplete = true, cl
                 if (closeOnComplete) {
                     modal.remove()
                 }
+                alert('Ссылка на файл была добавлена')
+                window.location.reload()
             } catch (e) {
                 if (closeOnError) {
                     modal.remove()
