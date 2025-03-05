@@ -2,6 +2,7 @@ package org.eustrosoft.mappers;
 
 import lombok.SneakyThrows;
 import org.apache.commons.compress.utils.FileNameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.dtos.FileChangeDto;
@@ -120,22 +121,25 @@ public class FileMapper extends EntityMapper {
             return null;
         }
         MultipartFile file = fur.getFile();
-        if (file == null) {
+        if (file == null && StringUtils.isBlank(fur.getStoragePath())) {
             return null;
         }
         File entity = new File();
         entity.setName(fur.getName());
         entity.setDescription(fur.getDescription());
-        entity.setFileSize(file.getSize());
-        entity.setExtension(FileNameUtils.getExtension(file.getOriginalFilename()));
-        entity.setFileName(file.getOriginalFilename());
+        if (file != null) {
+            entity.setFileSize(file.getSize());
+            entity.setExtension(FileNameUtils.getExtension(file.getOriginalFilename()));
+            entity.setFileName(file.getOriginalFilename());
+            byte[] bytes = file.getBytes();
+            entity.setFileData(bytes);
+            entity.setChecksum(String.valueOf(ChecksumUtils.getCRC32Checksum(bytes)));
+            entity.setFileType(file.getContentType());
+        }
         entity.setStoragePlace(fur.getFileStorageType());
-        byte[] bytes = file.getBytes();
-        entity.setFileData(bytes);
-        entity.setChecksum(String.valueOf(ChecksumUtils.getCRC32Checksum(bytes)));
+        entity.setStoragePath(fur.getStoragePath());
         entity.setIsActive(fur.isActive());
         entity.setIsPublic(fur.isPublic());
-        entity.setFileType(file.getContentType());
         return entity;
     }
 
@@ -166,6 +170,9 @@ public class FileMapper extends EntityMapper {
         FileData fd = super.toEntity(dto, FileData.class);
         if (fd == null) {
             return null;
+        }
+        if (dto.getStoragePath() != null) {
+            fd.setStoragePath(dto.getStoragePath());
         }
         fd.setIsActive(dto.getIsActive());
         fd.setIsPublic(dto.getIsPublic());

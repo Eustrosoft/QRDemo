@@ -1,4 +1,4 @@
-import { notEmptyOrUndefined } from "../commons/common.js";
+import { notEmptyOrUndefined, processFetchError } from "../commons/common.js";
 import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
 export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
@@ -118,8 +118,11 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        getQrs: () => {
+        getQrs: (rangeId) => {
             let url = `${QR_DEMO_API}secured/qrs`;
+            if (notEmptyOrUndefined(rangeId)) {
+                url += `?rangeId=${rangeId}`
+            }
 
             const req = new Request(
                 url,
@@ -191,7 +194,7 @@ export function qrApi() {
                     method: 'PUT',
                     headers: headers,
                     credentials: 'include',
-                    body: JSON.stringify({id: fileId})
+                    body: JSON.stringify({ id: fileId })
                 }
             )
             return authFetch(req)
@@ -205,7 +208,7 @@ export function qrApi() {
                     method: 'PUT',
                     headers: headers,
                     credentials: 'include',
-                    body: JSON.stringify({id: fileId})
+                    body: JSON.stringify({ id: fileId })
                 }
             )
             return authFetch(req)
@@ -430,7 +433,7 @@ export function adminApi() {
                     method: 'PUT',
                     headers: headers,
                     credentials: 'include',
-                    body: JSON.stringify({password: password, confirmPassword: confirmPassword})
+                    body: JSON.stringify({ password: password, confirmPassword: confirmPassword })
                 }
             )
             return authFetch(req)
@@ -465,7 +468,7 @@ export function userApi() {
                     method: 'POST',
                     headers: headers,
                     credentials: 'include',
-                    body: JSON.stringify({'username': login, 'password': password, 'confirmPassword': password_2})
+                    body: JSON.stringify({ 'username': login, 'password': password, 'confirmPassword': password_2 })
                 }
             )
             return fetch(req)
@@ -479,7 +482,7 @@ export function userApi() {
                     method: 'POST',
                     headers: headers,
                     credentials: 'include',
-                    body: JSON.stringify({'username': user, 'password': password})
+                    body: JSON.stringify({ 'username': user, 'password': password })
                 }
             )
             return fetch(req)
@@ -597,37 +600,55 @@ const MAX_FILE_UPLOAD_SIZE = 10_485_760
 
 function uploadSingleFile(url, fileRequest) {
     let data = new FormData()
-    let file = fileRequest.file.files[0]
-    let fileSize = file.size
+    let file = fileRequest?.file?.files[0]
+    let fileSize = file?.size
 
-     if (fileSize > MAX_FILE_UPLOAD_SIZE) {
-         alert('Файл слишком большой, выберите файл менее 10 МБ!')
-         throw new Error('Выберите файл менее 10 МБ!')
-     }
+    if (notEmptyOrUndefined(file) && notEmptyOrUndefined(fileSize)) {
+        data.append('file', file, file.name)
 
-    data.append('file', file, file.name)
+        if (fileSize > MAX_FILE_UPLOAD_SIZE) {
+            alert('Файл слишком большой, выберите файл менее 10 МБ!')
+            throw new Error('Выберите файл менее 10 МБ!')
+        }
+    } else if (notEmptyOrUndefined(fileRequest.storagePath)) {
+        data.append('storagePath', fileRequest.storagePath)
+    }
+
     data.append('name', fileRequest.name)
     data.append('description', fileRequest.description)
     data.append('public', fileRequest.public)
     data.append('active', fileRequest.active)
 
+    if (fileRequest.fileStorageType) {
+        data.append('fileStorageType', fileRequest.fileStorageType)
+    }
+
     const request = new XMLHttpRequest()
     request.open('POST', url, false)
     request.withCredentials = true
     request.send(data)
+    if (request.status != 200 || 204) {
+        throw new Error('Ошибка сервера')
+    }
 }
 
 class RequestDecorators {
     static withAuth(fetch) {
-        return function(req) {
+        return function (req) {
             const response = fetch(req);
             return response.then(resp => {
-                if (resp.status === 401) {
-                    throw new Error('Unauthorized')
+                if (!resp.ok) {
+                    return Promise.reject(resp)
                 }
                 return resp
             })
-                .catch(processFetchErrorToLogin)
+                .catch(resp => {
+                if (resp.status == 401) {
+                    processFetchErrorToLogin()
+                } else {
+                    processFetchError(resp)
+                }
+            })
         }
     }
 }

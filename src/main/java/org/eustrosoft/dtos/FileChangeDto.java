@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.eustrosoft.entitites.enums.FileStorageType;
 
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
@@ -13,6 +14,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileChangeDto extends EntityDto {
+    @Size(max = 256)
+    private String storagePath;
     private Boolean isActive;
     private Boolean isPublic;
 }

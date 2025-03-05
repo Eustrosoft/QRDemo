@@ -22,6 +22,8 @@ public class FileUploadRequest extends EntityDto {
     @Size(max = 512)
     private String description;
     private MultipartFile file;
+    @Size(max = 256)
+    private String storagePath;
     private FileStorageType fileStorageType = FileStorageType.DB;
     private boolean isPublic = false;
     private boolean isActive = true;

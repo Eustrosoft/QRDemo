@@ -7,7 +7,10 @@ import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Participant;
+import org.eustrosoft.entitites.enums.FileStorageType;
 import org.eustrosoft.entitites.subentities.FileData;
+import org.eustrosoft.exceptions.CommonException;
+import org.eustrosoft.exceptions.JsonApiError;
 import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.repositories.FileRepository;
 import org.eustrosoft.repositories.projections.FileBytesProjection;
@@ -21,8 +24,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -61,6 +69,15 @@ public class FileService {
     @SneakyThrows
     public FileProjection uploadFile(FileUploadRequest fur) {
         File entity = mapper.toEntity(fur);
+        if (entity == null) {
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST,
+                            "exceptions.title.unprocessable_entity",
+                            "exceptions.detail.unprocessable_entity"
+                    )
+            );
+        }
         return save(entity);
     }
 
@@ -72,8 +89,9 @@ public class FileService {
 
     @SneakyThrows
     private FileProjection save(File entity) {
-        if (entity.getFileData() == null || entity.getFileData().length == 0) {
-            throw new IllegalArgumentException("File is empty");
+        if ((entity.getFileData() == null || entity.getFileData().length == 0)
+                && StringUtils.isBlank(entity.getStoragePath())) {
+            throw new IllegalArgumentException("Content could not be found");
         }
         Participant current = participantService.getCurrentSimpleOrThrow();
         entity.setParticipantId(current.getId());
@@ -118,7 +136,8 @@ public class FileService {
             if (file.getIsPublic() == null || file.getIsActive() == null) {
                 throw new IllegalArgumentException("File is not public or inactive");
             }
-            if (StringUtils.isEmpty(fileName) || !file.getFileName().equals(fileName)) {
+            if (FileStorageType.DB.equals(file.getStoragePlace())
+                    && (StringUtils.isEmpty(fileName) || !file.getFileName().equals(fileName))) {
                 throw new IllegalArgumentException("File name is not correct");
             }
             if (file.getIsActive()) {
@@ -134,6 +153,17 @@ public class FileService {
     @SneakyThrows
     @Transactional(readOnly = true)
     private ResponseEntity<byte[]> getFileResponse(Long id, FileProjection file) {
+        if (FileStorageType.URL.equals(file.getStoragePlace())
+                && StringUtils.isNotBlank(file.getStoragePath())) {
+            HttpServletResponse response = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
+                    .getResponse();
+            // TODO: think about redirect page on js
+            // response.setHeader("Redirect-url", file.getStoragePath());
+            response.sendRedirect(file.getStoragePath());
+            return ResponseEntity
+                    .status(308)
+                    .build();
+        }
         byte[] fileData = getFileData(id);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, file.getFileType());

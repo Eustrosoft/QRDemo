@@ -18,6 +18,17 @@ public class JsonApiError {
     @JsonIgnore
     private Object[] parameters;
 
+    public JsonApiError(HttpStatus status, String title, String detail) {
+        this.status = status;
+        this.code = -1L;
+        this.title = title;
+        this.detail = detail;
+        this.source = new Source(
+                "Unknown",
+                ServiceName.QR_DEMO
+        );
+    }
+
     public JsonApiError(HttpStatus status, String title, String detail, Throwable exception) {
         this.status = status;
         this.code = -1L;

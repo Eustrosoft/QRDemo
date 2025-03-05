@@ -6,6 +6,7 @@ import { getBigButton } from "./components/buttons.js";
 import { copyToClipboard, getOrOther, notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { getTextLabel } from "./components/labels.js";
+import { notify } from "./notifications.js";
 
 let fileSelection
 
@@ -38,7 +39,10 @@ function printFilesList(parent, json) {
     parent.appendChild(tableForms)
 
     let tableHeaderRow = document.createElement('tr')
-    tableHeaderRow.innerHTML = `<th>Название</th><th>Оригинальное название</th><th>Описание</th><th>Создан</th><th>Размер</th><th>Публичный</th><th>Действия</th>`
+    tableHeaderRow.innerHTML = `
+        <th>Название</th><th>Оригинальное название</th><th>Описание</th>
+        <th>Создан</th><th>Размер</th><th>Публичный</th><th>Место</th><th>Действия</th>
+    `
     tableForms.appendChild(tableHeaderRow)
 
     for (let i = 0; i < json.length; i++) {
@@ -61,18 +65,24 @@ function printFilesList(parent, json) {
         let td6 = document.createElement('td')
         td6.innerText = json[i]?.isPublic
         let td7 = document.createElement('td')
+        td7.innerText = json[i]?.fileStorageType
+        let td8 = document.createElement('td')
         let editBtn = getBigButton('Открыть', editBtnId)
         let downloadBtn = getBigButton('Скачать', downloadBtnId)
         let deleteBtn = getBigButton('Удалить', deleteBtnId)
-        td7.append(editBtn, downloadBtn, deleteBtn)
-        tableRow.append(td1, td2, td3, td4, td5, td6, td7)
+        td8.append(editBtn, downloadBtn, deleteBtn)
+        tableRow.append(td1, td2, td3, td4, td5, td6, td7, td8)
 
         tableForms.appendChild(tableRow)
         document.getElementById(deleteBtnId).addEventListener('click', () => {
             deleteFile(json[i]?.id)
         })
         document.getElementById(downloadBtnId).addEventListener('click', () => {
-            qrApi().downloadFile(json[i]?.id, json[i]?.fileName)
+            if (json[i]?.fileStorageType === 'URL') {
+                window.open(json[i]?.storagePath, '_blank')
+            } else {
+                qrApi().downloadFile(json[i]?.id, json[i]?.fileName)
+            }
         })
         document.getElementById(editBtnId).addEventListener('click', () => showEditFileModal(json[i]?.id))
 
@@ -96,7 +106,7 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
         .then(json => {
             let fileEditForm = document.createElement('div')
 
-            let fileNameInput = getInput('Имя файла', 'text', true, 'file_edit_name', 'Введите имя', false, 'off', json?.name)
+            let fileNameInput = getInput('Название файла', 'text', true, 'file_edit_name', 'Введите имя', false, 'off', json?.name)
             let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_edit_description', 'Введите описание', false, 'off', json?.description)
             let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_edit_public', '', true, 'off', json?.isPublic)
             let isActiveInput = getInput('Доступный', 'checkbox', true, 'file_edit_active', '', true, 'off', json?.isActive)
@@ -108,7 +118,13 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
             let copyBtn = getBigButton('Скопировать ссылку')
             let changeFileBtn = getBigButton('Заменить файл')
 
-            fileEditForm.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, updateBtn, copyBtn, changeFileBtn)
+            fileEditForm.append(fileNameInput, fileDescriptionInput)
+            if (json?.fileStorageType === 'URL') {
+                let fileStoragePath = getInput('Ссылка на файл', 'text', false, 'file_edit_link', 'Введите ссылку на файл', false, 'off', json?.storagePath)
+                fileEditForm.append(fileStoragePath)
+            }
+
+            fileEditForm.append(isPublicInput, isActiveInput, updateBtn, copyBtn, changeFileBtn)
             let modal = getModalWindow('Редактирование файла', fileEditForm)
             modal.style.display = 'block'
 
@@ -118,6 +134,7 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                     {
                         name: document.getElementById('file_edit_name')?.value,
                         description: document.getElementById('file_edit_description')?.value,
+                        storagePath: document.getElementById('file_edit_link')?.value,
                         isPublic: document.getElementById('file_edit_public')?.checked,
                         isActive: document.getElementById('file_edit_active')?.checked
                     }
@@ -134,7 +151,12 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
             })
 
             copyBtn.addEventListener('click', () => {
-                let linkRef = `${QR_DEMO_API}unsecured/files/${json?.id}/download/${json?.fileName}`
+                let linkRef
+                if (json?.fileStorageType === 'URL') {
+                    linkRef = json?.storagePath
+                } else {
+                    linkRef = `${QR_DEMO_API}unsecured/files/${json?.id}/download/${json?.fileName}`
+                }
                 if (linkRef) {
                     if (notEmptyOrUndefined(linkRef)) {
                         copyToClipboard(linkRef)
@@ -144,7 +166,7 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                         }, 1_000)
                         return
                     }
-                    alert('Нечего копировать')
+                    notify('Нечего копировать')
                 }
             })
 
@@ -156,8 +178,6 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                 uploadBtn.addEventListener('click', () => {
                     try {
                         qrApi().reuploadFile(json?.id, { file: document.getElementById('file_content') })
-                        alert('Файл успешно загружен!')
-                        window.location.reload()
                     } catch (e) {
                         alert(e)
                     }
@@ -183,11 +203,11 @@ export function downloadFileUnsecured(id, fileName) {
 }
 
 function getStartPage() {
+    // TODO: create html elements, not static html text
     return `
         <div class="account_card_buttons">
-            <button class="big_button" id="upload_file_btn">
-                    Загрузить новый файл
-            </button>
+            <button class="big_button" id="upload_file_btn">Загрузить новый файл</button>
+            <button class="big_button" id="link_file_btn">Добавить ссылку на файл</button>
         </div>
     
     `
@@ -204,17 +224,38 @@ function setStartActions() {
                 let isActive = document.getElementById('file_active')
 
                 try {
-                    qrApi().uploadFile({ 
-                        name: name.value, 
-                        description: description.value, 
-                        file: file, 
-                        public: isPublic.checked, 
-                        active: isActive.checked 
+                    qrApi().uploadFile({
+                        name: name.value,
+                        description: description.value,
+                        file: file,
+                        public: isPublic.checked,
+                        active: isActive.checked
                     })
-                    alert('Файл успешно загружен!')
-                    window.location.reload()
                 } catch (e) {
-                    alert(e)
+                    notify(e, 'Ошибка обработки файла')
+                }
+            })
+        })
+    document.getElementById('link_file_btn')
+        .addEventListener('click', () => {
+            showLinkFileModal(() => {
+                let name = document.getElementById('file_name')
+                let description = document.getElementById('file_description')
+                let fileLink = document.getElementById('file_link')
+                let isPublic = document.getElementById('file_public')
+                let isActive = document.getElementById('file_active')
+
+                try {
+                    qrApi().uploadFile({
+                        name: name.value,
+                        description: description.value,
+                        storagePath: fileLink?.value,
+                        fileStorageType: 'URL',
+                        public: isPublic.checked,
+                        active: isActive.checked
+                    })
+                } catch (e) {
+                    notify('Ошибка обработки ссылки', e)
                 }
             })
         })
@@ -249,7 +290,7 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
                         if (closeOnError) {
                             modal.remove()
                         }
-                        alert(e)
+                        notify(e, 'Ошибка обработки файла')
                     }
                 })
             }
@@ -263,7 +304,7 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
         fileUploadForm.append(fileChooseOrUploadWindow, fileChooseOldWindow)
     }
 
-    let fileNameInput = getInput('Имя файла', 'text', true, 'file_name')
+    let fileNameInput = getInput('Название файла', 'text', true, 'file_name')
     let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_description')
     let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_public', '', true)
     let isActiveInput = getInput('Доступный', 'checkbox', true, 'file_active', '', true)
@@ -317,9 +358,10 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
                 if (closeOnError) {
                     modal.remove()
                 }
+                notify(e, 'Ошибка обработки файла')
             }
         } else {
-            alert('Необходимо ввести имя файла и выбрать файл')
+            notify('Необходимо ввести название файла и выбрать файл', 'Ошибка')
         }
     })
 }
@@ -353,4 +395,68 @@ function getFileChooseSelect() {
         })
     fileSelectDiv.append(fileLabel, fileSelectElement)
     return fileSelectDiv
+}
+
+export function showLinkFileModal(uploadFileCallback, closeOnComplete = true, closeOnError = false) {
+    let fileLinkForm = document.createElement('div')
+    let fileLinkNewWindow = document.createElement('div')
+
+    let fileNameInput = getInput('Название файла', 'text', true, 'file_name')
+    let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_description')
+    let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_public', '', true)
+    let isActiveInput = getInput('Доступный', 'checkbox', true, 'file_active', '', true)
+    let fileInput = getInput('Ссылка на файл', 'text', true, 'file_link', '', true)
+    let addFileLinkBtn = getBigButton('Создать')
+
+    let nameInput = fileNameInput.getElementsByTagName('input')[0];
+    nameInput.maxLength = '127'
+    let descriptionInput = fileDescriptionInput.getElementsByTagName('input')[0];
+    descriptionInput.maxLength = '511'
+    let publicInput = isPublicInput.getElementsByTagName('input')[0];
+    publicInput.checked = true
+    publicInput.style.width = '11px'
+    publicInput.style.height = '11px'
+    let activeInput = isActiveInput.getElementsByTagName('input')[0];
+    activeInput.checked = true
+    activeInput.style.width = '11px'
+    activeInput.style.height = '11px'
+
+    fileLinkNewWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, addFileLinkBtn)
+    fileLinkForm.append(fileLinkNewWindow)
+    let modal = getModalWindow('Привязка ссылки на файл', fileLinkForm)
+    modal.style.display = 'block'
+
+    let fileLink = document.getElementById('file_link')
+    let fileName = document.getElementById('file_name')
+
+    if (fileLink && fileName) {
+        fileLink.addEventListener('input', (e) => {
+            try {
+                fileName.value = e.target?.value?.split("/").at(-1)
+                fileName.select()
+            } catch (e) {
+                console.log(e)
+            }
+        })
+    }
+
+    addFileLinkBtn.addEventListener('click', () => {
+        let fileLink = document.getElementById('file_link')
+        let fileName = document.getElementById('file_name')
+        if (fileName && notEmptyOrUndefined(fileName.value) && fileLink && notEmptyOrUndefined(fileLink.value)) {
+            try {
+                uploadFileCallback()
+                if (closeOnComplete) {
+                    modal.remove()
+                }
+            } catch (e) {
+                if (closeOnError) {
+                    modal.remove()
+                }
+                notify(e, 'Ошибка обработки ссылки')
+            }
+        } else {
+            notify('Необходимо добавить имя и ввести ссылку', 'Ошибка')
+        }
+    })
 }
