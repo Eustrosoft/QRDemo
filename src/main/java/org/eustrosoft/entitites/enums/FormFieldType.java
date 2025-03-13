@@ -9,5 +9,6 @@ public enum FormFieldType {
     URL,
     PHONE,
     EMAIL,
-    TEXTAREA
+    TEXTAREA,
+    EDIT
 }

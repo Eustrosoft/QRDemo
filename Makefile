@@ -103,6 +103,7 @@ ROOT:
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/hrs.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/hrs.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/link.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/link.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/loader.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/loader.js
+	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/accordion.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/accordion.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/domain/participantSettings.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/domain/participantSettings.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/domain/dictionaries.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/domain/dictionaries.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/form.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/form.js

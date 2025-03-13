@@ -17,7 +17,7 @@ export function getSingleInput(type, required = false, id = '', placeholder = ''
     return htmlInput
 }
 
-export function getInput(labelText, type, required = false, id = '', placeholder = '', inline = false, autocomplete = 'on', value = '') {
+export function getInput(labelText, type, required = false, id = '', placeholder = '', inline = false, autocomplete = 'on', value = '', wrap = 'nowrap') {
     let htmlInputDiv = document.createElement('div');
     if (inline) {
         htmlInputDiv.style.display = 'flex'
@@ -27,6 +27,9 @@ export function getInput(labelText, type, required = false, id = '', placeholder
         let htmlLabel = document.createElement('label');
         let requiredStar = required ? ' *' : ''
         htmlLabel.innerText = labelText + requiredStar
+        htmlLabel.style.whiteSpace = wrap
+        htmlLabel.style.lineHeight = '200%'
+        htmlLabel.style.marginRight = '8px'
         htmlInputDiv.appendChild(htmlLabel)
         if (!inline) {
             htmlInputDiv.appendChild(document.createElement('br'))

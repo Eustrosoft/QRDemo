@@ -1,42 +1,49 @@
 set schema 'qrdemo';
 
-CREATE TABLE if NOT EXISTS tariff (
-    id              BIGSERIAL       NOT NULL UNIQUE,
-    name            VARCHAR(64)     NOT NULL,
-    description     VARCHAR(1024)    DEFAULT NULL,
-    version         INT             NOT NULL DEFAULT 1,
-    is_active       BOOLEAN         NOT NULL DEFAULT TRUE,
-    created         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- ADD EDIT TYPE Into dictionary
+INSERT INTO qrdemo.dictionary (...) values ();
+
+CREATE TABLE qrdemo.h_entity (
+    zsta character(1),
+    zdato timestamp without time zone,
+    id bigint NOT NULL,
+    participant_id bigint,
+    type character varying(16) NOT NULL,
+    created timestamp without time zone NOT NULL,
+    updated timestamp without time zone NOT NULL,
+    name character varying(128),
+    description character varying(512)
 );
 
-CREATE TABLE limits_seq (
+CREATE TABLE qrdemo.h_qr (
+    code bigint NOT NULL,
+    form_id bigint,
+    data character varying(65536),
+    action character varying(16),
+    redirect character varying(127)
+) INHERITS (qrdemo.h_entity);
 
-    participant_id       BIGINT         NOT NULL,
-    tariff_id            BIGINT         NULL,
-    type                 VARCHAR(64)    NOT_NULL,
-    current              INT            NOT_NULL DEFAULT 0,
-    max                  INT            NOT_NULL DEFAULT 16,
-    max_size             INT            DEFAULT NULL,
-    valid_from           TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
-    valid_until          TIMESTAMP      DEFAULT NULL,
-    assigned_at          TIMESTAMP      DEFAULT NULL,
-    created              TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
-    updated              TIMESTAMP      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+CREATE FUNCTION qrdemo.do_h_qr() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        --
+        -- Добавление строки в emp_audit, которая отражает операцию, выполняемую в emp;
+        -- для определения типа операции применяется специальная переменная TG_OP.
+        --
+        IF (TG_OP = 'DELETE') THEN
+            INSERT INTO qrdemo.h_qr SELECT 'D', now(), OLD.*;
+            RETURN OLD;
+        ELSIF (TG_OP = 'UPDATE') THEN
+            IF (OLD = NEW) THEN
+             RETURN NEW;
+            END IF;
+            INSERT INTO qrdemo.h_qr SELECT 'C', now(), OLD.*;
+            RETURN NEW;
+        END IF;
+        RETURN NULL; -- возвращаемое значение для триггера AFTER игнорируется
+    END;
+$$;
+ALTER FUNCTION qrdemo.do_h_qr() OWNER TO qrdemo;
 
---CREATE TABLE if not exists qrdemo.registration_request (
---        username      varchar(64) not null unique,
---        password      varchar(128) not null,
---        email         varchar(128) not null unique,
---        referer       bigint,
---        lei           varchar(256),
---        address       varchar(128),
---        site          varchar(512),
---        organization  varchar(512),
---        active        boolean     not null default true,
---        status        varchar(16) not null default 'start'
---        ip_address    varchar(64),
---        client_name   varchar(128),
---
---        primary key (id)
---)  INHERITS (entity);
+CREATE OR REPLACE TRIGGER qrdemo_qr_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.qr FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_qr();

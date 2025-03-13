@@ -6,12 +6,13 @@ import { getBigButton, getCustomButton } from "./components/buttons.js";
 import { downloadFileUnsecured, showEditFileModal, showUploadFileModal } from "./files.js";
 import { addDeleteFileRowActions, Field } from "./form.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
-import { getSingleInput } from "./components/inputs.js";
+import { getInput, getSingleInput } from "./components/inputs.js";
 import { booleanToString, notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { formatDate } from "../commons/dateUtils.js";
 import { getLink } from "./components/link.js";
 import { notify } from "./notifications.js";
+import { getAccordion } from "./components/accordion.js";
 
 const mainBlock = document.getElementById('main_block')
 let divCard = document.createElement('div')
@@ -92,20 +93,11 @@ function getEditCardInfoHtml(qr) {
 
     let codeDiv = document.createElement('div')
     codeDiv.className = 'code_block'
-    let nameLabel = getTextLabel('Название:')
-    let nameElem = document.createElement('input')
-    nameElem.type = 'text'
-    nameElem.value = name
-    nameElem.id = 'name_input'
-    nameElem.placeholder = 'Введите имя карточки'
 
-    let descriptionLabel = document.createElement('label')
-    descriptionLabel.innerText = 'Описание:'
-    let descriptionElem = document.createElement('input')
-    descriptionElem.type = 'text'
-    descriptionElem.id = 'description_input'
-    descriptionElem.value = description
-    descriptionElem.placeholder = 'Введите описание карточки'
+    let basicFieldsDiv = document.createElement('div')
+
+    let nameInput = getInput('Название:', 'text', false, 'name_input', 'Введите имя карточки', true, false, name)
+    let descriptionInput = getInput('Описание:', 'text', false, 'description_input', 'Введите описание карточки', true, false, description)
 
     let formLabel = document.createElement('label')
     formLabel.innerText = 'Шаблон:'
@@ -135,12 +127,16 @@ function getEditCardInfoHtml(qr) {
                 formChooseElement.append(opt)
             }
         })
+    
+    formSelectDiv.append(formChooseElement, formViewBtn)
 
-    codeDiv.append(get2TextLabels('QR Код: ', Number(qr?.code).toString(16)))
-    codeDiv.append(formLabel)
-    formSelectDiv.append(formChooseElement)
-    formSelectDiv.append(formViewBtn)
-    codeDiv.appendChild(formSelectDiv)
+    basicFieldsDiv.appendChild(formLabel)
+    basicFieldsDiv.appendChild(formSelectDiv)
+    basicFieldsDiv.appendChild(nameInput)
+    basicFieldsDiv.appendChild(descriptionInput)
+    let accordion = getAccordion(basicFieldsDiv, get2TextLabels('QR Код: ', Number(qr?.code).toString(16)).innerText)
+
+    codeDiv.appendChild(accordion)
 
     formViewBtn.addEventListener('click', () => {
         let formElement = document.getElementById('form_select')
@@ -150,15 +146,8 @@ function getEditCardInfoHtml(qr) {
         }
     })
 
-    codeDiv.appendChild(nameLabel)
-    codeDiv.appendChild(nameElem)
-    codeDiv.appendChild(descriptionLabel)
-    codeDiv.appendChild(descriptionElem)
-
+    let fieldsArray = []
     for (let field in fields) {
-        const formFieldDiv = document.createElement('div')
-        formFieldDiv.className = 'form_field_div'
-
         let f = fields[field]
         let labelText = f?.name
         if (notEmptyOrUndefined(f?.caption)) {
@@ -168,16 +157,28 @@ function getEditCardInfoHtml(qr) {
         if (notEmptyOrUndefined(isPublic) && !isPublic) {
             labelText = labelText.concat(' *')
         }
-        let label = getTextLabel(labelText)
         let placeholder = f?.isStatic ? f?.placeholder : '';
         let input = getSingleInput(f?.fieldType, false, f?.id, placeholder)
         input.name = f?.name
         input.value = getDataFromForm(qr, f?.name)
         input.readOnly = edit === 'true' ? false : true
-        formFieldDiv.append(label, input)
 
-        codeDiv.append(formFieldDiv)
+        fieldsArray.push({name: labelText, input: input})
     }
+
+    let fieldHeaders = [
+        new TableHead('Название', '20%', 'name'),
+        new TableHead('Значение', '80%', 'value')
+    ]
+
+    let tableFields = getTable(
+        fieldHeaders, fieldsArray,
+        'formFieldRow',
+        'fields_table',
+        'compact_table',
+        null, null, ['input']
+    )
+    codeDiv.appendChild(tableFields)
 
     const filesDiv = document.createElement('div')
     renderCardFiles(filesDiv, qr)
@@ -386,7 +387,7 @@ function addCodeBtnListeners() {
             let formElement = document.getElementById('form_select')
 
             const collectedFiles = Field.htmlToFilesFromComplexTable(document.getElementById('files_table'), isCardFile)
-            const data = collectFormData()
+            const data = Field.htmlToFieldsFromTable(document.getElementById('fields_table'))
             qrApi().saveQr({
                 id: qrId,
                 code: qrCode,

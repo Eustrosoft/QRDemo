@@ -141,7 +141,7 @@ function printFormsList(parent, json) {
         let td4 = document.createElement('td')
         td4.innerText = new Date(json[i].updated).toLocaleString()
         let td5 = document.createElement('td')
-        let btnGo = getBigButton('Перейти', getBtnId)
+        let btnGo = getBigButton('Открыть', getBtnId)
         let btnDelete = getBigButton('Удалить', deleteBtnId)
         td5.append(btnGo, btnDelete)
         tableRow.append(td1, td2, td3, td4, td5)
@@ -456,6 +456,22 @@ export class Field {
             }
         }
         return files
+    }
+
+    static htmlToFieldsFromTable(div) {
+        const fieldRow = div.getElementsByClassName('formFieldRow')
+        if (fieldRow.length === 0) {
+            return {}
+        }
+
+        let fields = {}
+        for (let i = 0; i < fieldRow.length; i++) {
+            let row = fieldRow[i]
+            let fieldName = row.children[1].children[0].name
+            let fieldValue = row.children[1].children[0].value
+            fields[fieldName] = fieldValue
+        }
+        return fields
     }
 
     static htmlToFilesFromComplexTable(div, additionalCondition = null) {

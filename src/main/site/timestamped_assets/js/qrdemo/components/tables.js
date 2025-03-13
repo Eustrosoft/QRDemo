@@ -38,8 +38,8 @@ export function getTable(
             if (isItemsDom) {
                 td.innerHTML = items[item][rowItem]
             } else {
-                if (domItemsIndexes != null && domItemsIndexes.includes(item)) {
-                    td.innerText = items[item][rowItem]
+                if (domItemsIndexes != null && domItemsIndexes.includes(rowItem)) {
+                    td.append(items[item][rowItem])
                 } else {
                     td.innerText = items[item][rowItem]
                 }

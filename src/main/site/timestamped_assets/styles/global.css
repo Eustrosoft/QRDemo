@@ -228,7 +228,9 @@ input[type='text'],
 input[type='password'],
 input[type='number'],
 input[type='email'],
+input[type='phone'],
 input[type='date'],
+input[type='edit'],
 input[type='url'] {
     border-bottom: 2px solid var(--font-half-color);
 }
