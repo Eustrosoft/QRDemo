@@ -41,7 +41,7 @@ public class DefaultTemplateConfig {
         ff.add(getFormField("gis_long", "Долгота", true, false, FormFieldType.NUMBER, 14));
         ff.add(getFormField("gis_lat", "Широта", true, false, FormFieldType.NUMBER, 15));
         ff.add(getFormField("gis_alt", "Высота (м)", true, false, FormFieldType.NUMBER, 16));
-        ff.add(getFormField("comment", "Комментарий", true, false, FormFieldType.TEXT, 17));
+        ff.add(getFormField("comment", "Комментарий", true, false, FormFieldType.TEXTAREA, 17));
         return ff;
     }
 
