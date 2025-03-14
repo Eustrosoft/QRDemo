@@ -236,17 +236,20 @@
     URL,
     PHONE,
     EMAIL,
-    TEXTAREA
+    TEXTAREA,
+    EDIT
   }
 
 
 public static class WebApp {
   private JspWriter out = null;
   private String qrHref = null;
+  private String q = null;
 
-  public WebApp(JspWriter out, String qrHref) {
+  public WebApp(JspWriter out, String qrHref, String q) {
     this.out = out;
     this.qrHref = qrHref;
+    this.q = q;
   }
 
   private void printQRData(QRDto dto) throws IllegalArgumentException {
@@ -296,7 +299,6 @@ public static class WebApp {
     int printedLines = 0;
     startTable();
     for (FormFieldDto field : fields) {
-      startTr();
       String fieldName = field.getName();
       String fieldCaption = field.getCaption();
       FormFieldType fieldType = field.getFieldType();
@@ -312,17 +314,7 @@ public static class WebApp {
         }
       }
       if ((fieldValue != null && !fieldValue.isEmpty()) || isStatic) {
-        startTd();
-        if (fieldCaption == null || fieldCaption.isEmpty())  {
-          w(text2html(fieldName));
-        } else {
-          w(text2html(fieldCaption));
-        }
-        endTd();
-        startTd();
-        w(formatByFieldType(fieldValue, fieldType));
-        endTd();
-        endTr();
+        printTableAttributeRow(fieldType, fieldCaption, fieldName, fieldValue);
         printedLines++;
       }
     }
@@ -397,6 +389,39 @@ public static class WebApp {
   private void startTd() {
     w("<td>");
   }
+  
+  private void startTd(int colspan) {
+    w("<td colspan=\"" + colspan + "\">");
+  }
+
+  private void startTd(int colspan, String style) {
+    if (style == null) {
+      startTd();
+    }
+    w("<td colspan=\"" + colspan + "\" style=\"" + style + "\">");
+  }
+  
+  private void printTd(String value) {
+    startTd();
+    w(text2html(value));
+    endTd();
+  }
+
+  private void printTd(String value, int colspan) {
+    startTd(colspan);
+    w(text2html(value));
+    endTd();
+  }
+
+  private void printTd(String value, Boolean formatToHtml) {
+    startTd();
+    if (formatToHtml == null || formatToHtml == true) {
+      w(text2html(value));
+    } else {
+      w(value);
+    }
+    endTd();
+  }
 
   private void endTd() {
     w("</td>");
@@ -448,6 +473,10 @@ public static class WebApp {
     return translate_tokens(text, HTML_UNSAFE_CHARACTERS, HTML_UNSAFE_CHARACTERS_SUBST);
   }
 
+  public static String text2htmlStrong(String text) {
+    return "<strong>" + text2html(text) + "</strong>";
+  }
+
   public static String text2value(String text) {
     return translate_tokens(text, VALUE_CHARACTERS, VALUE_CHARACTERS_SUBST);
   }
@@ -475,19 +504,70 @@ public static class WebApp {
     return sb.toString();
   }
 
+  private void printTableAttributeRow(FormFieldType fieldType, String caption, String fieldName, String value) {
+    String finalCaption = caption;
+    if (caption == null || caption.isEmpty())  {
+      finalCaption = fieldName;
+    } else {
+      finalCaption = caption;
+    }
+    if (fieldType == null) {
+      startTr();
+      startTd();
+      w(text2htmlStrong(finalCaption));
+      endTd();
+      printTd(value);
+      endTr();
+      return;
+    }
+    switch (fieldType) {
+      case TEXTAREA: {
+        startTr();
+        startTd(2);
+        w(text2htmlStrong(finalCaption));
+        endTd();
+	endTr();
+	startTr();
+	startTd(2, "compact_table_td_textarea");
+        w(text2html(value));
+	endTd();
+	endTr();
+	break;
+      }
+      case EDIT: {
+        startTr();
+        startTd(2);
+        String linkEdit = String.format(HREF_QR_FORMAT, qrHref, q);
+	linkEdit = linkEdit.substring(linkEdit.lastIndexOf("?"));
+	w("<a target=\"_blank\" href=\"http://localhost:5173/lk/" + linkEdit + "&edit=true\">" + text2html(finalCaption) + "</a>");
+        endTd();
+	endTr();
+	break;
+      }
+      default: {
+        startTr();
+        startTd();
+        w(text2htmlStrong(finalCaption));
+        endTd();
+	printTd(formatByFieldType(value, fieldType), false);
+	endTr();
+      }
+    }
+  }
+
    private String formatByFieldType(String value, FormFieldType fieldType) {
       if (fieldType == null) {
         return text2html(value);
       }
       if (FormFieldType.URL.equals(fieldType)) {
-      String prefix = "";
-      if (value != null &&
+        String prefix = "";
+        if (value != null &&
           !(value.startsWith("http://")
           || value.startsWith("https://")
           || value.startsWith("ftp://"))
-      ) {
+        ) {
           prefix = "https://";
-      }
+        }
         return String.format("<a href='%s' target='_blank'>%s</a>", text2value(prefix + value), text2html(value));
       } else if (FormFieldType.PHONE.equals(fieldType)) {
         return String.format("<a href='tel:%s' target='_blank'>%s</a>", text2value(value), text2html(value));
@@ -524,8 +604,8 @@ public static class WebApp {
  request.setCharacterEncoding("UTF-8");
  String qrHref = getServletContext().getInitParameter(CONFIG_PARAM_QR_SERVICE);
  String thisSiteHref = request.getServerName();
- WebApp app = new WebApp(out, thisSiteHref);
  String q = request.getParameter("q");
+ WebApp app = new WebApp(out, thisSiteHref, q);
  String titleText = q == null ? "[empty]" : q;
 
 %>
@@ -611,6 +691,12 @@ public static class WebApp {
         border: none;
     }
 
+    .compact_table_td_textarea {
+       padding-top: 0;
+       white-space: pre-wrap;
+       line-height: 0.6em;
+    }
+
     .compact_table tr td {
         border-bottom: thin solid var(--table-body-bottom-border-color, #E0E0E0);
         color: var(--table-body-color, #1f1f1f);
@@ -634,6 +720,10 @@ public static class WebApp {
 
     .compact_table tr td .custom_button {
         border: thin solid var(--alpha, rgb(0, 0, 0, 1));
+    }
+    
+    .compact_table td {
+      white-space: normal;
     }
 
     tr.fileRow {
