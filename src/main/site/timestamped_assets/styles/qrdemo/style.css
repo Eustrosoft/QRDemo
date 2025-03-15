@@ -256,6 +256,10 @@ input {
     cursor: pointer;
 }
 
+.range_button {
+    font-size: large;
+}
+
 .qr_item_row {
     cursor: pointer;
 }
@@ -266,7 +270,8 @@ h3 {
 }
 
 select {
-    font-size: 2em;
+    font-size: 1.5em;
+    margin-left: 6px;
 }
 
 #form_select, #range_select {
@@ -700,6 +705,7 @@ th {
     background-color: var(--table-header-background-color);
     color: var(--table-header-color);
     text-align: left;
+    min-width: 120px;
 }
 
 .compact_table th,

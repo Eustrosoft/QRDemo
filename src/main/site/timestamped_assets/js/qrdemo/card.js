@@ -6,7 +6,7 @@ import { getBigButton, getCustomButton } from "./components/buttons.js";
 import { downloadFileUnsecured, showEditFileModal, showUploadFileModal } from "./files.js";
 import { addDeleteFileRowActions, Field } from "./form.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
-import { getInput, getSingleInput } from "./components/inputs.js";
+import { getInput, getSelect, getSingleInput } from "./components/inputs.js";
 import { booleanToString, notEmptyOrUndefined } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { formatDate } from "../commons/dateUtils.js";
@@ -90,6 +90,8 @@ function getEditCardInfoHtml(qr) {
     const fields = qr?.form?.fields
     const name = qr?.name
     const description = qr?.description
+    const action = qr?.action
+    const redirect = qr?.redirect
 
     let codeDiv = document.createElement('div')
     codeDiv.className = 'code_block'
@@ -99,6 +101,14 @@ function getEditCardInfoHtml(qr) {
     let nameInput = getInput('Название:', 'text', false, 'name_input', 'Введите имя карточки', true, false, name)
     let descriptionInput = getInput('Описание:', 'text', false, 'description_input', 'Введите описание карточки', true, false, description)
 
+    let actionInput = getSelect('Действие:', 'action_select', ['STANDARD', 'REDIRECT', 'QRSVC'], action, false, true)
+    let redirectInput = getInput('Перенаправить на:', 'text', false, 'redirect_input', 'Введите ссылку для перенаправления', true, false, redirect)
+    if (action === 'STANDARD') {
+        let redirInp = redirectInput.childNodes[1]
+        redirInp.classList.add('color-grey')
+        redirInp.readOnly = true
+    }
+
     let formLabel = document.createElement('label')
     formLabel.innerText = 'Шаблон:'
 
@@ -106,7 +116,7 @@ function getEditCardInfoHtml(qr) {
     formSelectDiv.className = 'flex'
     let formChooseElement = document.createElement('select')
     formChooseElement.id = 'form_select'
-    let formViewBtn = getCustomButton('Открыть шаблон')
+    let formViewBtn = getBigButton('Открыть шаблон', null, 'fs-14rem')
 
     const opt = document.createElement('option')
     opt.value = ''
@@ -127,13 +137,15 @@ function getEditCardInfoHtml(qr) {
                 formChooseElement.append(opt)
             }
         })
-    
+
     formSelectDiv.append(formChooseElement, formViewBtn)
 
     basicFieldsDiv.appendChild(formLabel)
     basicFieldsDiv.appendChild(formSelectDiv)
     basicFieldsDiv.appendChild(nameInput)
     basicFieldsDiv.appendChild(descriptionInput)
+    basicFieldsDiv.appendChild(actionInput)
+    basicFieldsDiv.appendChild(redirectInput)
     let accordion = getAccordion(basicFieldsDiv, get2TextLabels('QR Код: ', Number(qr?.code).toString(16)).innerText)
 
     codeDiv.appendChild(accordion)
@@ -163,7 +175,7 @@ function getEditCardInfoHtml(qr) {
         input.value = getDataFromForm(qr, f?.name)
         input.readOnly = edit === 'true' ? false : true
 
-        fieldsArray.push({name: labelText, input: input})
+        fieldsArray.push({ name: labelText, input: input })
     }
 
     let fieldHeaders = [
@@ -265,9 +277,19 @@ function renderCardFiles(parentDiv, qr) {
                 let isActive = document.getElementById('file_active')
 
                 try {
-                    qrApi().uploadQRFile(qr?.id, { name: name.value, description: description.value, file: file, public: isPublic.checked, active: isActive.checked })
-                    notify('Файл успешно загружен!')
-                    window.location.reload()
+                    userApi().getSettings()
+                        .then(resp => resp.json())
+                        .then(settingsJson => {
+                            qrApi().uploadQRFile(qr?.id, {
+                                name: name.value,
+                                description: description.value,
+                                file: file,
+                                public: isPublic.checked,
+                                active: isActive.checked
+                            }, settingsJson)
+                        }).then(resp => alert('Файл успешно загружен!'))
+                        .then(e => window.location.reload())
+                        .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify(ex)
                 }
@@ -384,7 +406,9 @@ function addCodeBtnListeners() {
         saveCodeBtn.addEventListener('click', () => {
             let nameElem = document.getElementById('name_input')
             let descriptionElem = document.getElementById('description_input')
-            let formElement = document.getElementById('form_select')
+            let formElem = document.getElementById('form_select')
+            let actionElem = document.getElementById('action_select')
+            let redirectElem = document.getElementById('redirect_input')
 
             const collectedFiles = Field.htmlToFilesFromComplexTable(document.getElementById('files_table'), isCardFile)
             const data = Field.htmlToFieldsFromTable(document.getElementById('fields_table'))
@@ -393,7 +417,9 @@ function addCodeBtnListeners() {
                 code: qrCode,
                 name: nameElem.value,
                 description: descriptionElem.value,
-                formId: Number(formElement.options[formElement.selectedIndex].id),
+                action: actionElem.value,
+                redirect: redirectElem.value,
+                formId: Number(formElem.options[formElem.selectedIndex].id),
                 filesIds: collectedFiles.map(f => f.id),
                 data: data
             }).then(resp => {
@@ -421,6 +447,18 @@ function addCodeBtnListeners() {
             modal.firstChild.style.height = '622px'
         })
     }
+
+    let actSelect = document.getElementById('action_select');
+    actSelect.addEventListener('change', (e) => {
+        let redirInp = document.getElementById('redirect_input')
+        if (e.target.value === 'STANDARD') {
+            redirInp.classList.add('color-grey')
+            redirInp.readOnly = true
+        } else {
+            redirInp.classList.remove('color-grey')
+            redirInp.readOnly = false
+        }
+    })
 }
 
 // TODO: change logic cardinally

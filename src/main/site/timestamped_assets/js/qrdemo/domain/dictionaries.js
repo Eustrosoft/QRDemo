@@ -1,4 +1,5 @@
 export const DICTIONARIES = {
     ROLES: "ROLE",
-    INPUT_TYPES: "INPUT_TYPE"
+    INPUT_TYPES: "INPUT_TYPE",
+    QR_ACTIONS: "QR_ACTION",
 }

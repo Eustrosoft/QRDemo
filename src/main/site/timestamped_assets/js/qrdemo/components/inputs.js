@@ -85,12 +85,15 @@ export function getTextArea(labelText, required, id, placeholder, inline = false
     return htmlInputDiv
 }
 
-export function getSwitch(checked = false, xSize, ySize) {
+export function getSwitch(checked = false, xSize, ySize, inputId) {
     let label = document.createElement('label')
     label.className = 'switch'
     let input = document.createElement('input')
     input.type = 'checkbox'
     input.checked = checked
+    if (inputId != null && input != undefined) {
+        input.id = inputId
+    }
 
     let span = document.createElement('span')
     span.className = 'slider round'
@@ -105,7 +108,7 @@ export function getSwitch(checked = false, xSize, ySize) {
     return label
 }
 
-export function getSelect(labelText, id = '', values, value = null, required = false) {
+export function getSelect(labelText, id = '', values, value = null, required = false, inline = false) {
     let htmlInputDiv = document.createElement('div');
 
     let htmlLabel = document.createElement('label');
@@ -126,9 +129,13 @@ export function getSelect(labelText, id = '', values, value = null, required = f
     }
 
     htmlInputDiv.appendChild(htmlLabel)
-    htmlInputDiv.appendChild(document.createElement('br'))
+    if (!inline) {
+        htmlInputDiv.appendChild(document.createElement('br'))
+    }
     htmlInputDiv.appendChild(htmlInput)
-    htmlInputDiv.appendChild(document.createElement('br'))
+    if (!inline) {
+        htmlInputDiv.appendChild(document.createElement('br'))
+    }
 
     return htmlInputDiv
 }

@@ -8,11 +8,12 @@ export class ParticipantSettings {
 
 export class Settings {
 
-    constructor(language, qrTableColumns, defaultQrPrintText, defaultQrPrintTextDown) {
+    constructor(language, qrTableColumns, defaultQrPrintText, defaultQrPrintTextDown, checkUploadSize) {
         this.language = language
         this.qrTableColumns = qrTableColumns
         this.defaultQrPrintText = defaultQrPrintText
         this.defaultQrPrintTextDown = defaultQrPrintTextDown
+        this.checkUploadSize = checkUploadSize
     }
 }
 

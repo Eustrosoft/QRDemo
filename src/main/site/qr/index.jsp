@@ -28,6 +28,8 @@
 
   public static class QRDto {
     private Long code;
+    private QRAction action;
+    private String redirect;
     private Map<String, String> data;
     private FormDto form;
     private List<FileDto> files;
@@ -63,6 +65,28 @@
     public void setFiles(List<FileDto> files) {
       this.files = files;
     }
+    
+    public QRAction getAction() {
+      return this.action;
+    }
+
+    public void setAction(QRAction action) {
+      this.action = action;
+    }
+
+    public String getRedirect() {
+      return this.redirect;
+    }
+
+    public void setRedirect(String redirect) {
+      this.redirect = redirect;
+    }
+  }
+
+  public enum QRAction {
+    STANDARD,
+    REDIRECT,
+    QRSVC
   }
 
   public static class FormDto {
@@ -245,6 +269,8 @@ public static class WebApp {
   private JspWriter out = null;
   private String qrHref = null;
   private String q = null;
+  private HttpServletRequest request;
+  private HttpServletResponse response;
 
   public WebApp(JspWriter out, String qrHref, String q) {
     this.out = out;
@@ -252,7 +278,20 @@ public static class WebApp {
     this.q = q;
   }
 
+  public WebApp(JspWriter out, String qrHref, String q, HttpServletRequest request, HttpServletResponse response) {
+    this.out = out;
+    this.qrHref = qrHref;
+    this.q = q;
+    this.request = request;
+    this.response = response;
+  }
+
   private void printQRData(QRDto dto) throws IllegalArgumentException {
+    if (!(dto.getAction() == null || dto.getAction() == QRAction.STANDARD)) {
+      sendRedirect(dto.getAction(), dto.getRedirect(), dto.getCode());
+      return;
+    }
+
     FormDto form = dto.getForm();
     Map<String, String> data = dto.getData();
 
@@ -280,6 +319,21 @@ public static class WebApp {
     // Print if no data found as files/attributes
     if (printedLines == 0 && files.isEmpty()) {
       printNoQRData();
+    }
+  }
+
+  public void sendRedirect(QRAction action, String redirect, Long code) {
+    if (action == null || redirect == null || redirect.isEmpty() || code == null) {
+      return;
+    }
+    try {
+     if (action == QRAction.REDIRECT) {
+       response.sendRedirect(redirect);
+     } else if (action == QRAction.QRSVC) {
+       response.sendRedirect(redirect + String.format("?q=%d", code));
+     }
+    } catch (Exception ex) {
+      System.err.println(ex.getLocalizedMessage());
     }
   }
 
@@ -605,7 +659,7 @@ public static class WebApp {
  String qrHref = getServletContext().getInitParameter(CONFIG_PARAM_QR_SERVICE);
  String thisSiteHref = request.getServerName();
  String q = request.getParameter("q");
- WebApp app = new WebApp(out, thisSiteHref, q);
+ WebApp app = new WebApp(out, thisSiteHref, q, request, response);
  String titleText = q == null ? "[empty]" : q;
 
 %>

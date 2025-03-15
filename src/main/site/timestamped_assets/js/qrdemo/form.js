@@ -172,7 +172,7 @@ function renderForm(parentDiv, objects, json) {
     let headers = [
         new TableHead('Тип данных', '10%'), new TableHead('Название', '20%'),
         new TableHead('Значение', '20%'), new TableHead('Статическое', '9%'),
-        new TableHead('Публичное', '8%'), new TableHead('Поз.', '6%'), 
+        new TableHead('Публичное', '8%'), new TableHead('Поз.', '6%'),
         new TableHead('FN', '8%'), new TableHead('Удалить', '8%')
     ]
     let items = []
@@ -280,17 +280,19 @@ function renderForm(parentDiv, objects, json) {
                 let isPublic = document.getElementById('file_public')
                 let isActive = document.getElementById('file_active')
 
-                qrApi().uploadFormFile(json?.id,
-                    {
-                        name: name.value,
-                        description: description.value,
-                        file: file,
-                        public: isPublic.checked,
-                        active: isActive.checked
-                    }
-                )
-                alert('Файл успешно загружен!')
-                saveFieldsAndRefreshForm(parentDiv, formFields, json)
+                userApi().getSettings()
+                    .then(resp => resp.json())
+                    .then(settingsJson => {
+                        qrApi().uploadFormFile(json?.id, {
+                            name: name.value,
+                            description: description.value,
+                            file: file,
+                            public: isPublic.checked,
+                            active: isActive.checked
+                        }, settingsJson)
+                    }).then(resp => alert('Файл успешно загружен!'))
+                    .then(e => window.location.reload())
+                    .catch(e => notify(e, 'Ошибка загрузки файла'))
             }, true,
             () => {
                 let fileSelect = document.getElementById('file_select')

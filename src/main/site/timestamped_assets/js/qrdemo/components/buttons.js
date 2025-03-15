@@ -1,10 +1,13 @@
 import { notEmptyOrUndefined } from "../../commons/common.js"
 
-export function getBigButton(text, id = null) {
+export function getBigButton(text, id = null, className = '') {
     let button = document.createElement('button')
     button.className = 'big_button'
     button.type = 'button'
     button.innerText = text
+    if (notEmptyOrUndefined(className)) {
+        button.classList.add(className)
+    }
     if (id !== null) {
         button.id = id
     }

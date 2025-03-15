@@ -3,6 +3,7 @@ package org.eustrosoft.entitites;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.eustrosoft.entitites.enums.QRAction;
 import org.eustrosoft.repositories.projections.FormWithFieldsProjection;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.hibernate.annotations.NotFound;
@@ -12,6 +13,8 @@ import org.springframework.context.annotation.Lazy;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -40,6 +43,8 @@ public class QR extends DbEntity implements QRSimpleProjection {
     @Column(name = "form_id")
     private Long formId;
 
+    // TODO: entity uses both @NotFound(action = NotFoundAction.IGNORE) and FetchType.LAZY.
+    //  The NotFoundAction.IGNORE @ManyToOne and @OneToOne associations are always fetched eagerly.
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "form_id", insertable = false, updatable = false)
     @NotFound(action = NotFoundAction.IGNORE)
@@ -54,6 +59,13 @@ public class QR extends DbEntity implements QRSimpleProjection {
     )
     @Lazy
     private List<File> files;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "action")
+    private QRAction action;
+
+    @Column(name = "redirect")
+    private String redirect;
 
     @Transient
     @JsonIgnore

@@ -1,5 +1,5 @@
 import { formatBytes } from "./utils.js";
-import { QR_DEMO_API, qrApi } from "./api.js";
+import { QR_DEMO_API, qrApi, userApi } from "./api.js";
 import { getInput } from "./components/inputs.js";
 import { getModalWindow } from "./components/modals.js";
 import { getBigButton } from "./components/buttons.js";
@@ -177,9 +177,17 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                 fileChangeDiv.append(fileInput, uploadBtn)
                 uploadBtn.addEventListener('click', () => {
                     try {
-                        qrApi().reuploadFile(json?.id, { file: document.getElementById('file_content') })
-                        alert('Файл был загружен!')
-                        window.location.reload()
+                        userApi().getSettings()
+                            .then(resp => resp.json())
+                            .then(settingsJson => {
+                                qrApi().reuploadFile(
+                                    json?.id,
+                                    { file: document.getElementById('file_content') }, 
+                                    settingsJson
+                                )
+                            }).then(resp => alert('Файл успешно загружен!'))
+                            .then(e => window.location.reload())
+                            .catch(e => notify(e, 'Ошибка загрузки файла'))
                     } catch (e) {
                         notify(e)
                     }
@@ -226,13 +234,20 @@ function setStartActions() {
                 let isActive = document.getElementById('file_active')
 
                 try {
-                    qrApi().uploadFile({
-                        name: name.value,
-                        description: description.value,
-                        file: file,
-                        public: isPublic.checked,
-                        active: isActive.checked
-                    })
+                    userApi().getSettings()
+                        .then(resp => resp.json())
+                        .then(settingsJson => {
+                            qrApi().uploadFile({
+                                name: name.value,
+                                description: description.value,
+                                file: file,
+                                public: isPublic.checked,
+                                active: isActive.checked
+                            }, settingsJson)
+                        })
+                        .then(resp => alert('Файл успешно загружен!'))
+                        .then(e => window.location.reload())
+                        .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify(e, 'Ошибка обработки файла')
                 }
@@ -248,14 +263,20 @@ function setStartActions() {
                 let isActive = document.getElementById('file_active')
 
                 try {
-                    qrApi().uploadFile({
-                        name: name.value,
-                        description: description.value,
-                        storagePath: fileLink?.value,
-                        fileStorageType: 'URL',
-                        public: isPublic.checked,
-                        active: isActive.checked
-                    })
+                    userApi().getSettings()
+                        .then(resp => resp.json())
+                        .then(settingsJson => {
+                            qrApi().uploadFile({
+                                name: name.value,
+                                description: description.value,
+                                storagePath: fileLink?.value,
+                                fileStorageType: 'URL',
+                                public: isPublic.checked,
+                                active: isActive.checked
+                            }, settingsJson)
+                        }).then(resp => alert('Файл успешно загружен!'))
+                        .then(e => window.location.reload())
+                        .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify('Ошибка обработки ссылки', e)
                 }
@@ -288,8 +309,6 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
                         if (closeOnComplete) {
                             modal.remove()
                         }
-                        alert('Файл был загружен!')
-                        window.location.reload()
                     } catch (e) {
                         if (closeOnError) {
                             modal.remove()
@@ -358,8 +377,6 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
                 if (closeOnComplete) {
                     modal.remove()
                 }
-                alert('Файл был загружен!')
-                window.location.reload()
             } catch (e) {
                 if (closeOnError) {
                     modal.remove()

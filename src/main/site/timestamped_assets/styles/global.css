@@ -132,6 +132,8 @@ main {
     display: inline-block;
     width: var(--switch-width);
     height: var(--switch-height);
+    line-height: 16px;
+    margin-left: 6px;
 }
 
 .switch input {

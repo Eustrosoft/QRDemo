@@ -37,6 +37,8 @@ public class QrMapper extends EntityMapper {
         dto.setName(qr.getName());
         dto.setDescription(qr.getDescription());
         dto.setData(qr.getData());
+        dto.setAction(qr.getAction());
+        dto.setRedirect(qr.getRedirect());
         dto.setForm(formMapper.toDto(qr.getFormWithFieldsProjection()));
         return dto;
     }
@@ -45,6 +47,8 @@ public class QrMapper extends EntityMapper {
         QRDto dto = toDto((QRSimplestProjection) qr);
         dto.setCode(qr.getCode());
         dto.setData(qr.getData());
+        dto.setAction(qr.getAction());
+        dto.setRedirect(qr.getRedirect());
         dto.setForm(formMapper.toDto(qr.getForm()));
         dto.setFiles(fileMapper.toListDto(qr.getFiles()));
         return dto;
@@ -57,6 +61,8 @@ public class QrMapper extends EntityMapper {
         }
         dto.setCode(qr.getCode());
         dto.setData(qr.getData());
+        dto.setAction(qr.getAction());
+        dto.setRedirect(qr.getRedirect());
         dto.setForm(formMapper.toDto(qr.getFormWithFieldsProjection()));
         dto.setFiles(fileMapper.toListDto(qr.getFiles()));
         return dto;
@@ -90,6 +96,12 @@ public class QrMapper extends EntityMapper {
         if (dto.getFormId() != null) {
             qr.setFormId(dto.getFormId());
         }
+        if (dto.getAction() != null) {
+            qr.setAction(dto.getAction());
+        }
+        if (dto.getRedirect() != null) {
+            qr.setRedirect(dto.getRedirect());
+        }
         qr.setRange(toEntityFromId(dto.getRangeId(), QRRange.class));
         return qr;
     }
@@ -105,6 +117,12 @@ public class QrMapper extends EntityMapper {
         }
         if (dto.getData() != null) {
             qr.setData(dto.getData().toString());
+        }
+        if (dto.getAction() != null) {
+            qr.setAction(dto.getAction());
+        }
+        if (dto.getRedirect() != null) {
+            qr.setRedirect(dto.getRedirect());
         }
         if (dto.getFilesIds() != null) {
             qr.setFiles(fileMapper.toListEntitiesFromIdsList(dto.getFilesIds(), File.class));

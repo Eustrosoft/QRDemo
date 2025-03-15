@@ -3,7 +3,7 @@ import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.j
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
 import { getModalWindow, showCreateQrModal, showGenerateRandomPasswordModal } from "./components/modals.js";
-import { getInput, getSelect, getSingleInput, getTextArea } from "./components/inputs.js";
+import { getInput, getSelect, getSingleInput, getSwitch, getTextArea } from "./components/inputs.js";
 import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
 import { getInputValue, getOrOther, notEmptyOrUndefined, processFetchError, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
@@ -94,6 +94,16 @@ function setSettings(div, settingsJson, userDetails) {
         languageSelect.appendChild(opt)
     }
 
+    let checkUploadSizeValue = settingsJson?.settings?.checkUploadSize
+
+    let uploadCheckSizeDiv = document.createElement('div')
+    let uploadCheckSizeLabel = getTextLabel('Проверять размер файла перед загрузкой')
+    let uploadCheckSizeSwitch = getSwitch(
+        checkUploadSizeValue == undefined ? true : checkUploadSizeValue, 
+        null, null, 'check_upload_size'
+    )
+    uploadCheckSizeDiv.append(uploadCheckSizeLabel, uploadCheckSizeSwitch)
+
     let qrTableSettingsDiv
     let qrPrintTextDiv
     let defaultQrPrintTextInputUp
@@ -134,6 +144,8 @@ function setSettings(div, settingsJson, userDetails) {
     divSettings.appendChild(languageLabel)
     divSettings.appendChild(languageSelect)
     divSettings.appendChild(document.createElement('br'))
+    divSettings.appendChild(uploadCheckSizeDiv)
+    divSettings.appendChild(document.createElement('br'))
 
     if (!admin) {
         divSettings.appendChild(qrPrintTextDiv)
@@ -144,7 +156,8 @@ function setSettings(div, settingsJson, userDetails) {
             divSettings.appendChild(rangesSpan)
             for (let index in ranges) {
                 let range = ranges[index]
-                let rangeSpan = getTextLabel(` - ${range?.from}-${range?.to}`)
+                let rangeName = range?.name == undefined ? `Без названия (${getRangeWithX(range)})` : `${range.name} (${getRangeWithX(range)})`
+                let rangeSpan = getTextLabel(`- ${rangeName}`)
                 divSettings.appendChild(rangeSpan)
             }
             divSettings.appendChild(getHr())
@@ -160,7 +173,8 @@ function setSettings(div, settingsJson, userDetails) {
                 languageSelect.value,
                 admin ? null : existedQrTableSettings == null ? QR_TABLE_COLUMNS : existedQrTableSettings,
                 defaultQrPrintTextInputUp?.value,
-                defaultQrPrintTextInputDown?.value
+                defaultQrPrintTextInputDown?.value,
+                document.getElementById('check_upload_size')?.checked
             )
         )
 
@@ -399,12 +413,13 @@ function getUserRangesDiv(userDetails, settings, qrsTable) {
     let rangesBtns = []
     rangesSelectDiv.appendChild(getHr("4px"))
 
-    let allRangesBtn = getBigButton('Все диапазоны', '')
+    let allRangesBtn = getBigButton('Все диапазоны', null, 'range_button')
     rangesSelectDiv.appendChild(allRangesBtn)
     rangesBtns.push(allRangesBtn)
     for (let userRange in ranges) {
         let uR = ranges[userRange]
-        let rangeBtn = getBigButton(uR?.from + ' - ' + uR?.to, uR?.id)
+        let rangeName = uR?.name == undefined ? `Без названия (${getRangeWithX(uR)})` : `${uR.name} (${getRangeWithX(uR)})`
+        let rangeBtn = getBigButton(rangeName, uR?.id, 'range_button')
         rangesSelectDiv.appendChild(rangeBtn)
         rangesBtns.push(rangeBtn)
     }
@@ -431,6 +446,19 @@ function getUserRangesDiv(userDetails, settings, qrsTable) {
         })
     }
     return rangesSelectDiv
+}
+
+function getRangeWithX(range) {
+    if (range == null || range == undefined) {
+        return ''
+    }
+    try {
+        let digits = parseInt(range?.to, 16) - parseInt(range?.from, 16)
+        let symbols = Number(digits).toString(16).length
+        return range?.to.substring(0, range?.to?.length - symbols) + 'X'.repeat(symbols)
+    } catch(e) {
+        return ''
+    }
 }
 
 function getQRRow(data, settings) {
