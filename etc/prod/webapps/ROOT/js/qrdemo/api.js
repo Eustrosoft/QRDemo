@@ -174,13 +174,13 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        uploadFormFile: (id, fileRequest) => {
+        uploadFormFile: (id, fileRequest, userSettings) => {
             const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`
-            uploadSingleFile(url, fileRequest)
+            uploadSingleFile(url, fileRequest, userSettings)
         },
-        uploadQRFile: (id, fileRequest) => {
+        uploadQRFile: (id, fileRequest, usetSettings) => {
             const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`
-            uploadSingleFile(url, fileRequest)
+            uploadSingleFile(url, fileRequest, userSettings)
         },
         // getDownloadAllQRPublicFilesLink: (id) => {
         //     return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
@@ -299,13 +299,13 @@ export function qrApi() {
             link.click()
             link.remove()
         },
-        uploadFile: (fileRequest) => {
+        uploadFile: (fileRequest, userSettings) => {
             let url = `${QR_DEMO_API}secured/files/upload`;
-            uploadSingleFile(url, fileRequest)
+            uploadSingleFile(url, fileRequest, userSettings)
         },
-        reuploadFile: (id, fileRequest) => {
+        reuploadFile: (id, fileRequest, userSettings) => {
             let url = `${QR_DEMO_API}secured/files/${id}/re-upload`;
-            uploadSingleFile(url, fileRequest)
+            uploadSingleFile(url, fileRequest, userSettings)
         },
         updateFile: (id, data) => {
             let url = `${QR_DEMO_API}secured/files/${id}`;
@@ -598,7 +598,7 @@ export function dictionaryApi() {
 
 const MAX_FILE_UPLOAD_SIZE = 10_485_760
 
-function uploadSingleFile(url, fileRequest) {
+function uploadSingleFile(url, fileRequest, userSettings) {
     let data = new FormData()
     let file = fileRequest?.file?.files[0]
     let fileSize = file?.size
@@ -606,14 +606,19 @@ function uploadSingleFile(url, fileRequest) {
     if (notEmptyOrUndefined(file) && notEmptyOrUndefined(fileSize)) {
         data.append('file', file, file.name)
 
-        if (fileSize > MAX_FILE_UPLOAD_SIZE) {
-            alert('Файл слишком большой, выберите файл менее 10 МБ!')
+        let checkUploadSizeValue = userSettings?.settings?.checkUploadSize
+        if ((checkUploadSizeValue == undefined || checkUploadSizeValue == null || checkUploadSizeValue) && fileSize > MAX_FILE_UPLOAD_SIZE) {
             throw new Error('Выберите файл менее 10 МБ!')
+        } else {
+            sendUploadRequest(url, fileRequest, data)
         }
     } else if (notEmptyOrUndefined(fileRequest.storagePath)) {
         data.append('storagePath', fileRequest.storagePath)
+        sendUploadRequest(url, fileRequest, data)
     }
+}
 
+function sendUploadRequest(url, fileRequest, data) {
     data.append('name', fileRequest.name)
     data.append('description', fileRequest.description)
     data.append('public', fileRequest.public)
