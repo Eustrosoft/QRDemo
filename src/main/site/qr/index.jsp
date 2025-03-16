@@ -334,7 +334,7 @@ public static class WebApp {
      if (action == QRAction.REDIRECT) {
        response.sendRedirect(redirect);
      } else if (action == QRAction.REDIRECT_QR_SVC) {
-       response.sendRedirect(redirect + String.format("?q=%d", code));
+       response.sendRedirect(redirect + String.format("?q=%s", Long.toHexString(code)));
      }
     } catch (Exception ex) {
       System.err.println(ex.getLocalizedMessage());
