@@ -104,7 +104,7 @@ function getEditCardInfoHtml(qr) {
 
     let actionInput = getSelect('Действие:', 'action_select', QR_ACTIONS, action, false, true, Object.values(QR_ACTIONS_TRANSLATIONS_RU))
     let redirectInput = getInput('Перенаправить на:', 'text', false, 'redirect_input', 'Введите ссылку для перенаправления', true, false, redirect)
-    if (action === 'STANDARD') {
+    if (action == 'STD' || action == 'HIDE') {
         let redirInp = redirectInput.childNodes[1]
         redirInp.classList.add('color-grey')
         redirInp.readOnly = true
@@ -484,7 +484,7 @@ function addCodeBtnListeners() {
     let actSelect = document.getElementById('action_select');
     actSelect.addEventListener('change', (e) => {
         let redirInp = document.getElementById('redirect_input')
-        if (e.target.value === 'STANDARD') {
+        if (e.target.value == 'STD' || e.target.value == 'HIDE') {
             redirInp.classList.add('color-grey')
             redirInp.readOnly = true
         } else {
