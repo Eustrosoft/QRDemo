@@ -608,7 +608,7 @@ function uploadSingleFile(url, fileRequest, userSettings) {
 
         let checkUploadSizeValue = userSettings?.settings?.checkUploadSize
         if ((checkUploadSizeValue == undefined || checkUploadSizeValue == null || checkUploadSizeValue) && fileSize > MAX_FILE_UPLOAD_SIZE) {
-            throw new Error('Выберите файл менее 10 МБ!')
+            throw new Error('Выберите файл менее 16 МБ!')
         } else {
             sendUploadRequest(url, fileRequest, data)
         }
