@@ -13,6 +13,7 @@
   private final static String JSP_VERSION = "0.0.1";
 
   private final static String CONFIG_PARAM_QR_SERVICE = "QR_SERVICE_HREF";
+  private final static String CONFIG_PARAM_QR_EDIT_HREF = "EDIT_QR_BASE_HREF";
 
   private final static String TITLE_FORMAT = "Карточка %s";
   private final static String HREF_QR_FORMAT = "%s/v1/api/unsecured/qrs?q=%s";
@@ -269,6 +270,7 @@ public static class WebApp {
   private JspWriter out = null;
   private String qrHref = null;
   private String q = null;
+  private String qrEditHref = null;
   private HttpServletRequest request;
   private HttpServletResponse response;
 
@@ -278,12 +280,13 @@ public static class WebApp {
     this.q = q;
   }
 
-  public WebApp(JspWriter out, String qrHref, String q, HttpServletRequest request, HttpServletResponse response) {
+  public WebApp(JspWriter out, String qrHref, String q, HttpServletRequest request, HttpServletResponse response, String qrEditHref) {
     this.out = out;
     this.qrHref = qrHref;
     this.q = q;
     this.request = request;
     this.response = response;
+    this.qrEditHref = qrEditHref;
   }
 
   private void printQRData(QRDto dto) throws IllegalArgumentException {
@@ -591,9 +594,7 @@ public static class WebApp {
       case EDIT: {
         startTr();
         startTd(2);
-        String linkEdit = String.format(HREF_QR_FORMAT, qrHref, q);
-	linkEdit = linkEdit.substring(linkEdit.lastIndexOf("?"));
-	w("<a target=\"_blank\" href=\"http://localhost:5173/lk/" + linkEdit + "&edit=true\">" + text2html(finalCaption) + "</a>");
+	w("<a target=\"_blank\" href=\"" + qrEditHref + "?q=" + q + "&edit=true\">" + text2html(finalCaption) + "</a>");
         endTd();
 	endTr();
 	break;
@@ -646,6 +647,10 @@ public static class WebApp {
     if (value == null || value.isEmpty()) {
       throw new IllegalArgumentException("Configure qr service url in configuration");
     }
+    String qrEditBaseHref = config.getInitParameter(CONFIG_PARAM_QR_EDIT_HREF);
+    if (qrEditBaseHref == null || qrEditBaseHref.isEmpty()) {
+      throw new IllegalArgumentException("Configure qr edit base href in configuration");
+    }
   }
 %>
 <%
@@ -657,9 +662,10 @@ public static class WebApp {
  response.setDateHeader("Expires",expire_time);
  request.setCharacterEncoding("UTF-8");
  String qrHref = getServletContext().getInitParameter(CONFIG_PARAM_QR_SERVICE);
+ String qrEditHref = getServletContext().getInitParameter(CONFIG_PARAM_QR_EDIT_HREF);
  String thisSiteHref = request.getServerName();
  String q = request.getParameter("q");
- WebApp app = new WebApp(out, thisSiteHref, q, request, response);
+ WebApp app = new WebApp(out, thisSiteHref, q, request, response, qrEditHref);
  String titleText = q == null ? "[empty]" : q;
 
 %>
