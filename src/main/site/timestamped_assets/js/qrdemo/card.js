@@ -147,7 +147,11 @@ function getEditCardInfoHtml(qr) {
     basicFieldsDiv.appendChild(descriptionInput)
     basicFieldsDiv.appendChild(actionInput)
     basicFieldsDiv.appendChild(redirectInput)
-    let accordion = getAccordion(basicFieldsDiv, `QR Код: ${qr?.name} (${QR_ACTIONS_TRANSLATIONS_RU[qr?.action]}) [${Number(qr?.code)?.toString(16)}]`)
+    let qrAction = QR_ACTIONS_TRANSLATIONS_RU[qr?.action]
+    if (qrAction == undefined || qrAction == null) {
+        qrAction = QR_ACTIONS_TRANSLATIONS_RU[STANDARD]
+    }
+    let accordion = getAccordion(basicFieldsDiv, `QR Код: ${qr?.name} (${qrAction}) [${Number(qr?.code)?.toString(16)}]`)
 
     codeDiv.appendChild(accordion)
 
