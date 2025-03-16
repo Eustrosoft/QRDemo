@@ -40,7 +40,7 @@ CREATE OR REPLACE FUNCTION qrdemo.do_h_qr() RETURNS trigger
     END;
 $$;
 
-CREATE OR REPLACE TRIGGER qrdemo_qr_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.qr FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_qr();
+CREATE TRIGGER qrdemo_qr_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.qr FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_qr();
 
 
 CREATE TABLE IF NOT EXISTS qrdemo.h_form (
@@ -69,7 +69,7 @@ CREATE OR REPLACE FUNCTION qrdemo.do_h_form() RETURNS trigger
     END;
 $$;
 
-CREATE OR REPLACE TRIGGER qrdemo_form_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.form FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_form();
+CREATE TRIGGER qrdemo_form_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.form FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_form();
 
 CREATE TABLE IF NOT EXISTS qrdemo.h_form_field (
     zsta character(1),
@@ -108,7 +108,7 @@ CREATE OR REPLACE FUNCTION qrdemo.do_h_form_field() RETURNS trigger
     END;
 $$;
 
-CREATE OR REPLACE TRIGGER qrdemo_form_field_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.form_field FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_form_field();
+CREATE TRIGGER qrdemo_form_field_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.form_field FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_form_field();
 
 CREATE TABLE IF NOT EXISTS qrdemo.h_qr_range (
     from_range	bigint,
@@ -138,7 +138,7 @@ CREATE OR REPLACE FUNCTION qrdemo.do_h_qr_range() RETURNS trigger
     END;
 $$;
 
-CREATE OR REPLACE TRIGGER qrdemo_qr_range_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.qr_range FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_qr_range();
+CREATE TRIGGER qrdemo_qr_range_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.qr_range FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_qr_range();
 
 CREATE TABLE IF NOT EXISTS qrdemo.h_file (
     file_name       character varying(256),
@@ -176,7 +176,7 @@ CREATE OR REPLACE FUNCTION qrdemo.do_h_file() RETURNS trigger
     END;
 $$;
 
-CREATE OR REPLACE TRIGGER qrdemo_file_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.file FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_file();
+CREATE TRIGGER qrdemo_file_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.file FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_file();
 
 CREATE TABLE IF NOT EXISTS qrdemo.h_participant (
     username      character varying(128),
@@ -215,4 +215,4 @@ CREATE OR REPLACE FUNCTION qrdemo.do_h_participant() RETURNS trigger
     END;
 $$;
 
-CREATE OR REPLACE TRIGGER qrdemo_participant_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.participant FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_participant();
+CREATE TRIGGER qrdemo_participant_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.participant FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_participant();
