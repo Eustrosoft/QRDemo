@@ -1,4 +1,4 @@
-CREATE TABLE qrdemo.h_entity (
+CREATE TABLE IF NOT EXISTS qrdemo.h_entity (
     zsta character(1),
     zdato timestamp without time zone,
     id bigint NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE qrdemo.h_entity (
     description character varying(512)
 );
 
-CREATE TABLE qrdemo.h_qr (
+CREATE TABLE IF NOT EXISTS qrdemo.h_qr (
     code bigint NOT NULL,
     form_id bigint,
     data character varying(65536),
@@ -18,7 +18,7 @@ CREATE TABLE qrdemo.h_qr (
     redirect character varying(2048)
 ) INHERITS (qrdemo.h_entity);
 
-CREATE FUNCTION qrdemo.do_h_qr() RETURNS trigger
+CREATE OR REPLACE FUNCTION qrdemo.do_h_qr() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
@@ -43,11 +43,11 @@ $$;
 CREATE OR REPLACE TRIGGER qrdemo_qr_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.qr FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_qr();
 
 
-CREATE TABLE qrdemo.h_form (
+CREATE TABLE IF NOT EXISTS qrdemo.h_form (
     data character varying(65536)
 ) INHERITS (qrdemo.h_entity);
 
-CREATE FUNCTION qrdemo.do_h_form() RETURNS trigger
+CREATE OR REPLACE FUNCTION qrdemo.do_h_form() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
@@ -71,7 +71,7 @@ $$;
 
 CREATE OR REPLACE TRIGGER qrdemo_form_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.form FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_form();
 
-CREATE TABLE qrdemo.h_form_field (
+CREATE TABLE IF NOT EXISTS qrdemo.h_form_field (
     zsta character(1),
     zdato timestamp without time zone,
     id bigint NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE qrdemo.h_form_field (
 	caption character varying(256)
 );
 
-CREATE FUNCTION qrdemo.do_h_form_field() RETURNS trigger
+CREATE OR REPLACE FUNCTION qrdemo.do_h_form_field() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
@@ -110,13 +110,13 @@ $$;
 
 CREATE OR REPLACE TRIGGER qrdemo_form_field_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.form_field FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_form_field();
 
-CREATE TABLE qrdemo.h_qr_range (
+CREATE TABLE IF NOT EXISTS qrdemo.h_qr_range (
     from_range	bigint,
 	to_range	bigint,
 	last_id		bigint
 ) INHERITS (qrdemo.h_entity);
 
-CREATE FUNCTION qrdemo.do_h_qr_range() RETURNS trigger
+CREATE OR REPLACE FUNCTION qrdemo.do_h_qr_range() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
@@ -140,7 +140,7 @@ $$;
 
 CREATE OR REPLACE TRIGGER qrdemo_qr_range_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.qr_range FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_qr_range();
 
-CREATE TABLE qrdemo.h_file (
+CREATE TABLE IF NOT EXISTS qrdemo.h_file (
     file_name       character varying(256),
     file_type       character varying(128),
     extension       character varying(64),
@@ -154,7 +154,7 @@ CREATE TABLE qrdemo.h_file (
     file_size       bigint
 ) INHERITS (qrdemo.h_entity);
 
-CREATE FUNCTION qrdemo.do_h_file() RETURNS trigger
+CREATE OR REPLACE FUNCTION qrdemo.do_h_file() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
@@ -178,7 +178,7 @@ $$;
 
 CREATE OR REPLACE TRIGGER qrdemo_file_audit_trig AFTER INSERT OR DELETE OR UPDATE ON qrdemo.file FOR EACH ROW EXECUTE FUNCTION qrdemo.do_h_file();
 
-CREATE TABLE qrdemo.h_participant (
+CREATE TABLE IF NOT EXISTS qrdemo.h_participant (
     username      character varying(128),
     password      character varying(256),
     email         character varying(256),
@@ -193,7 +193,7 @@ CREATE TABLE qrdemo.h_participant (
     banned_reason character varying(512)
 ) INHERITS (qrdemo.h_entity);
 
-CREATE FUNCTION qrdemo.do_h_participant() RETURNS trigger
+CREATE OR REPLACE FUNCTION qrdemo.do_h_participant() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
