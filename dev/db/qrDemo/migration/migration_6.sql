@@ -11,6 +11,7 @@ ALTER TABLE qrdemo.qr ALTER COLUMN redirect TYPE varchar(2048);
 
 -- add types of qr code/qr range in dictionary
 INSERT INTO qrdemo.dictionary (name, code, value, description)
-values ('STANDARD', 'QR_ACTION', 'STANDARD', 'Стандарт'),
-    ('REDIRECT', 'QR_ACTION', 'REDIRECT', 'Перенаправление'),
-    ('QRSVC', 'QR_ACTION', 'QRSVC', 'Перенаправление с параметром');
+values ('STD', 'QR_ACTION', 'STD', 'Стандартная обработка'),
+    ('REDIRECT', 'QR_ACTION', 'REDIRECT', 'Перенаправление на указанную страницу'),
+    ('REDIRECT_QR_SVC', 'QR_ACTION', 'REDIRECT_QR_SVC', 'Перенаправление на другой qr-сервис'),
+    ('HIDE', 'QR_ACTION', 'HIDE', 'Не показывать карточку');

@@ -1,7 +1,8 @@
 package org.eustrosoft.entitites.enums;
 
 public enum QRAction {
-    STANDARD,
+    STD,
     REDIRECT,
-    QRSVC
+    REDIRECT_QR_SVC,
+    HIDE
 }

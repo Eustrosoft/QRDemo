@@ -85,9 +85,10 @@
   }
 
   public enum QRAction {
-    STANDARD,
+    STD,
     REDIRECT,
-    QRSVC
+    REDIRECT_QR_SVC,
+    HIDE
   }
 
   public static class FormDto {
@@ -290,7 +291,7 @@ public static class WebApp {
   }
 
   private void printQRData(QRDto dto) throws IllegalArgumentException {
-    if (!(dto.getAction() == null || dto.getAction() == QRAction.STANDARD)) {
+    if (!(dto.getAction() == null || dto.getAction() == QRAction.STD)) {
       sendRedirect(dto.getAction(), dto.getRedirect(), dto.getCode());
       return;
     }
@@ -332,7 +333,7 @@ public static class WebApp {
     try {
      if (action == QRAction.REDIRECT) {
        response.sendRedirect(redirect);
-     } else if (action == QRAction.QRSVC) {
+     } else if (action == QRAction.REDIRECT_QR_SVC) {
        response.sendRedirect(redirect + String.format("?q=%d", code));
      }
     } catch (Exception ex) {
@@ -869,6 +870,9 @@ public static class WebApp {
       con = url.openConnection();
       ObjectMapper mapper = getObjectMapper();
       QRDto qrDto = mapper.readValue(con.getInputStream(), QRDto.class);
+      if (qrDto.getAction() != null && QRAction.HIDE.equals(qrDto.getAction())) {
+        throw new Exception("Card is in HIDE mode");
+      }
       app.printQRData(qrDto);
     } catch (Exception e) {
       app.printNoQRData();

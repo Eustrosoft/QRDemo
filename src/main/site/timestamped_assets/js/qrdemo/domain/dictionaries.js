@@ -4,10 +4,11 @@ export const DICTIONARIES = {
     QR_ACTIONS: "QR_ACTION",
 }
 
-export const QR_ACTIONS = ['STANDARD', 'REDIRECT', 'QRSVC']
+export const QR_ACTIONS = ['STD', 'REDIRECT', 'REDIRECT_QR_SVC', 'HIDE']
 
 export const QR_ACTIONS_TRANSLATIONS_RU = {
-    STANDARD: 'Стандарт',
-    REDIRECT: 'Перенаправление',
-    QRSVC: 'Перенаправление с параметром'
+    STD: 'Стандартная обработка',
+    REDIRECT: 'Перенаправление на указанную страницу',
+    REDIRECT_QR_SVC: 'Перенаправление на другой qr-сервис',
+    HIDE: 'Скрыть карточку'
 }
