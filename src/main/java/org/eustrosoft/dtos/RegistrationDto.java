@@ -21,7 +21,7 @@ public class RegistrationDto extends ParticipantDto {
     private String password;
     @Size(max = 128)
     private String confirmPassword;
-    @Email
+    @Size(max = 256)
     private String email;
     @Size(max = 256)
     private String lei;
