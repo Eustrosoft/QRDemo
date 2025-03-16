@@ -13,6 +13,7 @@ import { formatDate } from "../commons/dateUtils.js";
 import { getLink } from "./components/link.js";
 import { notify } from "./notifications.js";
 import { getAccordion } from "./components/accordion.js";
+import { QR_ACTIONS, QR_ACTIONS_TRANSLATIONS_RU } from "./domain/dictionaries.js";
 
 const mainBlock = document.getElementById('main_block')
 let divCard = document.createElement('div')
@@ -101,7 +102,7 @@ function getEditCardInfoHtml(qr) {
     let nameInput = getInput('Название:', 'text', false, 'name_input', 'Введите имя карточки', true, false, name)
     let descriptionInput = getInput('Описание:', 'text', false, 'description_input', 'Введите описание карточки', true, false, description)
 
-    let actionInput = getSelect('Действие:', 'action_select', ['STANDARD', 'REDIRECT', 'QRSVC'], action, false, true)
+    let actionInput = getSelect('Действие:', 'action_select', QR_ACTIONS, action, false, true, Object.values(QR_ACTIONS_TRANSLATIONS_RU))
     let redirectInput = getInput('Перенаправить на:', 'text', false, 'redirect_input', 'Введите ссылку для перенаправления', true, false, redirect)
     if (action === 'STANDARD') {
         let redirInp = redirectInput.childNodes[1]
@@ -146,7 +147,7 @@ function getEditCardInfoHtml(qr) {
     basicFieldsDiv.appendChild(descriptionInput)
     basicFieldsDiv.appendChild(actionInput)
     basicFieldsDiv.appendChild(redirectInput)
-    let accordion = getAccordion(basicFieldsDiv, get2TextLabels('QR Код: ', Number(qr?.code).toString(16)).innerText)
+    let accordion = getAccordion(basicFieldsDiv, `QR Код: ${qr?.name} (${QR_ACTIONS_TRANSLATIONS_RU[qr?.action]}) [${Number(qr?.code)?.toString(16)}]`)
 
     codeDiv.appendChild(accordion)
 
@@ -293,7 +294,7 @@ function renderCardFiles(parentDiv, qr) {
                 } catch (e) {
                     notify(ex)
                 }
-            }, true,
+            },
             () => {
                 let fileSelect = document.getElementById('file_select')
                 qrApi().connectFileToQR(qr?.id, fileSelect?.options[fileSelect?.selectedIndex]?.id)
@@ -311,7 +312,35 @@ function renderCardFiles(parentDiv, qr) {
                         notify(ex)
                     })
 
-            })
+            },
+            () => {
+                let name = document.getElementById('file_name')
+                let description = document.getElementById('file_description')
+                let fileLink = document.getElementById('file_link')
+                let isPublic = document.getElementById('file_public')
+                let isActive = document.getElementById('file_active')
+
+                try {
+                    userApi().getSettings()
+                        .then(resp => resp.json())
+                        .then(settingsJson => {
+                            qrApi().uploadQRFile(qr?.id, {
+                                name: name.value,
+                                description: description.value,
+                                storagePath: fileLink?.value,
+                                fileStorageType: 'URL',
+                                public: isPublic.checked,
+                                active: isActive.checked
+                            }, settingsJson)
+                        })
+                        .then(e => window.location.reload())
+                        .catch(e => notify(e, 'Ошибка загрузки файла'))
+                } catch (e) {
+                    notify('Ошибка обработки ссылки', e)
+                }
+            },
+            true
+        )
     })
     let fileTr = getTr(addFileButton, filesHeaders.length + 1)
     tableFiles.appendChild(fileTr)

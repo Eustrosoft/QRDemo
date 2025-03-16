@@ -293,7 +293,7 @@ function renderForm(parentDiv, objects, json) {
                     }).then(resp => alert('Файл успешно загружен!'))
                     .then(e => window.location.reload())
                     .catch(e => notify(e, 'Ошибка загрузки файла'))
-            }, true,
+            },
             () => {
                 let fileSelect = document.getElementById('file_select')
                 qrApi().connectFileToForm(json?.id, fileSelect?.options[fileSelect?.selectedIndex]?.id)
@@ -310,7 +310,35 @@ function renderForm(parentDiv, objects, json) {
                     .catch(ex => {
                         alert(ex)
                     })
-            })
+            },
+            () => {
+                let name = document.getElementById('file_name')
+                let description = document.getElementById('file_description')
+                let fileLink = document.getElementById('file_link')
+                let isPublic = document.getElementById('file_public')
+                let isActive = document.getElementById('file_active')
+
+                try {
+                    userApi().getSettings()
+                        .then(resp => resp.json())
+                        .then(settingsJson => {
+                            qrApi().uploadFormFile(json?.id, {
+                                name: name.value,
+                                description: description.value,
+                                storagePath: fileLink?.value,
+                                fileStorageType: 'URL',
+                                public: isPublic.checked,
+                                active: isActive.checked
+                            }, settingsJson)
+                        })
+                        .then(e => window.location.reload())
+                        .catch(e => notify(e, 'Ошибка загрузки файла'))
+                } catch (e) {
+                    notify('Ошибка обработки ссылки', e)
+                }
+            },
+            true
+        )
     })
 
     let fileTr = getTr(addFileButton, filesHeaders.length + 1)

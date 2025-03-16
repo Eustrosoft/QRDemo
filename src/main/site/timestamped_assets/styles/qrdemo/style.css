@@ -272,6 +272,7 @@ h3 {
 select {
     font-size: 1.5em;
     margin-left: 6px;
+    padding-right: 6px;
 }
 
 #form_select, #range_select {

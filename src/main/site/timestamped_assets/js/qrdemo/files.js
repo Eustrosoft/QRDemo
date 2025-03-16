@@ -284,21 +284,24 @@ function setStartActions() {
         })
 }
 
-export function showUploadFileModal(uploadFileCallback, chooseUploadOption = false, chooseUploadFileCallback, closeOnComplete = true, closeOnError = false) {
+export function showUploadFileModal(uploadFileCallback, chooseUploadFileCallback, addLinkCallback, chooseUploadOption = false, closeOnComplete = true, closeOnError = false) {
     let fileUploadForm = document.createElement('div')
     let fileUploadNewWindow = document.createElement('div')
+    let addFileLinkWindow = document.createElement('div')
 
     if (chooseUploadOption) {
+        addFileLinkWindow.style.display = 'none'
         fileUploadNewWindow.style.display = 'none'
         let fileChooseOldWindow = document.createElement('div')
         fileChooseOldWindow.style.display = 'none'
 
         let fileChooseOrUploadWindow = document.createElement('div')
         let chooseOldFileBtn = getBigButton('Выбрать загруженный')
-        let textLabel = getTextLabel('или')
         let uploadNewFileBtn = getBigButton('Загрузить новый')
+        let addLinkBtn = getBigButton('Добавить ссылку')
         chooseOldFileBtn.addEventListener('click', () => {
             fileChooseOrUploadWindow.style.display = 'none'
+            addFileLinkWindow.style.display = 'none'
             fileChooseOldWindow.style.display = 'block'
 
             let fileSelectBtn = getBigButton('Выбрать')
@@ -307,11 +310,11 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
                     try {
                         chooseUploadFileCallback()
                         if (closeOnComplete) {
-                            modal.remove()
+                            modalUploadFile.remove()
                         }
                     } catch (e) {
                         if (closeOnError) {
-                            modal.remove()
+                            modalUploadFile.remove()
                         }
                         notify(e, 'Ошибка обработки файла')
                     }
@@ -322,9 +325,17 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
         uploadNewFileBtn.addEventListener('click', () => {
             fileUploadNewWindow.style.display = 'block'
             fileChooseOrUploadWindow.style.display = 'none'
+            addFileLinkWindow.style.display = 'none'
         })
-        fileChooseOrUploadWindow.append(chooseOldFileBtn, textLabel, uploadNewFileBtn)
-        fileUploadForm.append(fileChooseOrUploadWindow, fileChooseOldWindow)
+        addLinkBtn.addEventListener('click', () => {
+            fileChooseOrUploadWindow.remove()
+            fileUploadNewWindow.remove()
+            fileUploadForm.remove()
+            modalUploadFile.remove()
+            showLinkFileModal(addLinkCallback, closeOnComplete, closeOnError)
+        })
+        fileChooseOrUploadWindow.append(chooseOldFileBtn, getTextLabel('или'), uploadNewFileBtn, getTextLabel('или'), addLinkBtn)
+        fileUploadForm.append(fileChooseOrUploadWindow, fileChooseOldWindow, addFileLinkWindow)
     }
 
     let fileNameInput = getInput('Название файла', 'text', true, 'file_name')
@@ -352,8 +363,13 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
 
     fileUploadNewWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, uploadFileBtn)
     fileUploadForm.append(fileUploadNewWindow)
-    let modal = getModalWindow('Загрузка файла', fileUploadForm)
-    modal.style.display = 'block'
+    let modalUploadFile = getModalWindow('Загрузка файла', fileUploadForm)
+    modalUploadFile.style.display = 'block'
+
+    //addFileLinkWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, uploadFileBtn)
+    // addFileLinkWindow.append(fileUploadNewWindow)
+    // let modalAddLink = getModalWindow('Добавление ссылки', addFileLinkWindow)
+    //modalAddLink.style.display = 'block'
 
     let fileInpElem = document.getElementById('file_content')
     let fileNameInpElem = document.getElementById('file_name')
@@ -375,11 +391,11 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadOption = fal
             try {
                 uploadFileCallback()
                 if (closeOnComplete) {
-                    modal.remove()
+                    modalUploadFile.remove()
                 }
             } catch (e) {
                 if (closeOnError) {
-                    modal.remove()
+                    modalUploadFile.remove()
                 }
                 notify(e, 'Ошибка обработки файла')
             }

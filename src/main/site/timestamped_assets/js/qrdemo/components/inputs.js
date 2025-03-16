@@ -108,7 +108,7 @@ export function getSwitch(checked = false, xSize, ySize, inputId) {
     return label
 }
 
-export function getSelect(labelText, id = '', values, value = null, required = false, inline = false) {
+export function getSelect(labelText, id = '', values, value = null, required = false, inline = false, valuesTexts) {
     let htmlInputDiv = document.createElement('div');
 
     let htmlLabel = document.createElement('label');
@@ -119,7 +119,12 @@ export function getSelect(labelText, id = '', values, value = null, required = f
 
     for (let val in values) {
         let option = document.createElement('option')
-        option.innerText = values[val]
+        if (valuesTexts == null || valuesTexts == undefined) {
+            option.innerText = values[val]
+        } else {
+            option.innerText = valuesTexts[val]
+        }
+        option.value = values[val]
         if (value !== null || value !== undefined) {
             if (values[val] === value) {
                 option.selected = true
