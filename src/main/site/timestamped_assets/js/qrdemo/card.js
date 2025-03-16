@@ -1,5 +1,5 @@
 import { emptyOrUndefined, fieldToHtml, formatBytes } from "./utils.js";
-import { QR_DEMO_API, qrApi } from "./api.js";
+import { QR_DEMO_API, qrApi, userApi } from "./api.js";
 import { getModalWindow } from "./components/modals.js";
 import { ActionColumn, getComplexTable, getTable, getTr, TableHead } from "./components/tables.js";
 import { getBigButton, getCustomButton } from "./components/buttons.js";

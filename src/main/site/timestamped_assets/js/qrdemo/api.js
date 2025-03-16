@@ -178,7 +178,7 @@ export function qrApi() {
             const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`
             uploadSingleFile(url, fileRequest, userSettings)
         },
-        uploadQRFile: (id, fileRequest, usetSettings) => {
+        uploadQRFile: (id, fileRequest, userSettings) => {
             const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`
             uploadSingleFile(url, fileRequest, userSettings)
         },
