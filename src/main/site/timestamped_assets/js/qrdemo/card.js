@@ -149,7 +149,7 @@ function getEditCardInfoHtml(qr) {
     basicFieldsDiv.appendChild(redirectInput)
     let qrAction = QR_ACTIONS_TRANSLATIONS_RU[qr?.action]
     if (qrAction == undefined || qrAction == null) {
-        qrAction = QR_ACTIONS_TRANSLATIONS_RU['STANDARD']
+        qrAction = QR_ACTIONS_TRANSLATIONS_RU['STD']
     }
     let accordion = getAccordion(basicFieldsDiv, `Карточка: ${qr?.name} (${qrAction}) [${Number(qr?.code)?.toString(16)}]`)
 
