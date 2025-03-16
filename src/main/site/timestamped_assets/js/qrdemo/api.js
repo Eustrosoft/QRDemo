@@ -596,7 +596,7 @@ export function dictionaryApi() {
     }
 }
 
-const MAX_FILE_UPLOAD_SIZE = 10_485_760
+const MAX_FILE_UPLOAD_SIZE = 16_777_216
 
 function uploadSingleFile(url, fileRequest, userSettings) {
     let data = new FormData()

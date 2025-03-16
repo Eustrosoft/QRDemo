@@ -75,14 +75,14 @@ CREATE TABLE IF NOT EXISTS qrdemo.h_form_field (
     zsta character(1),
     zdato timestamp without time zone,
     id bigint NOT NULL,
+    name character varying(128),
 	participant_id bigint,
-	name character varying(128),
 	form_id bigint,
 	field_order int,
 	placeholder character varying(1024),
 	field_type character varying(64),
-	public boolean,
 	static boolean,
+	public boolean,
 	caption character varying(256)
 );
 
