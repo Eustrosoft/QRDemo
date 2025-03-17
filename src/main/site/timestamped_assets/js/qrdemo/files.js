@@ -274,8 +274,7 @@ function setStartActions() {
                                 public: isPublic.checked,
                                 active: isActive.checked
                             }, settingsJson)
-                        }).then(resp => alert('Файл успешно загружен!'))
-                        .then(e => window.location.reload())
+                        }).then(e => window.location.reload())
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify('Ошибка обработки ссылки', e)
