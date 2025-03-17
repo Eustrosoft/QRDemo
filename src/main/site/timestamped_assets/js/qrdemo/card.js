@@ -285,6 +285,13 @@ function renderCardFiles(parentDiv, qr) {
                     userApi().getSettings()
                         .then(resp => resp.text())
                         .then(settingsJson => {
+                            if (notEmptyOrUndefined(settingsJson)) {
+                                try {
+                                    settingsJson = JSON.parse(settingsJson)
+                                } catch (e) {
+                                    console.log(e)
+                                }
+                            }
                             qrApi().uploadQRFile(qr?.id, {
                                 name: name.value,
                                 description: description.value,
@@ -326,8 +333,15 @@ function renderCardFiles(parentDiv, qr) {
 
                 try {
                     userApi().getSettings()
-                        .then(resp => resp.json())
+                        .then(resp => resp.text())
                         .then(settingsJson => {
+                            if (notEmptyOrUndefined(settingsJson)) {
+                                try {
+                                    settingsJson = JSON.parse(settingsJson)
+                                } catch (e) {
+                                    console.log(e)
+                                }
+                            }
                             qrApi().uploadQRFile(qr?.id, {
                                 name: name.value,
                                 description: description.value,

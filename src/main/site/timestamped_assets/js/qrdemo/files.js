@@ -180,6 +180,13 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                         userApi().getSettings()
                             .then(resp => resp.text())
                             .then(settingsJson => {
+                                if (notEmptyOrUndefined(settingsJson)) {
+                                    try {
+                                        settingsJson = JSON.parse(settingsJson)
+                                    } catch (e) {
+                                        console.log(e)
+                                    }
+                                }
                                 qrApi().reuploadFile(
                                     json?.id,
                                     { file: document.getElementById('file_content') },
@@ -237,6 +244,13 @@ function setStartActions() {
                     userApi().getSettings()
                         .then(resp => resp.text())
                         .then(settingsJson => {
+                            if (notEmptyOrUndefined(settingsJson)) {
+                                try {
+                                    settingsJson = JSON.parse(settingsJson)
+                                } catch (e) {
+                                    console.log(e)
+                                }
+                            }
                             qrApi().uploadFile({
                                 name: name.value,
                                 description: description.value,
@@ -266,6 +280,13 @@ function setStartActions() {
                     userApi().getSettings()
                         .then(resp => resp.text())
                         .then(settingsJson => {
+                            if (notEmptyOrUndefined(settingsJson)) {
+                                try {
+                                    settingsJson = JSON.parse(settingsJson)
+                                } catch (e) {
+                                    console.log(e)
+                                }
+                            }
                             qrApi().uploadFile({
                                 name: name.value,
                                 description: description.value,

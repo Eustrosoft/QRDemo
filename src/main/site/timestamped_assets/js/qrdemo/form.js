@@ -281,8 +281,15 @@ function renderForm(parentDiv, objects, json) {
                 let isActive = document.getElementById('file_active')
 
                 userApi().getSettings()
-                    .then(resp => resp.json())
+                    .then(resp => resp.text())
                     .then(settingsJson => {
+                        if (notEmptyOrUndefined(settingsJson)) {
+                            try {
+                                settingsJson = JSON.parse(settingsJson)
+                            } catch (e) {
+                                console.log(e)
+                            }
+                        }
                         qrApi().uploadFormFile(json?.id, {
                             name: name.value,
                             description: description.value,
