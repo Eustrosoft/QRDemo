@@ -1,7 +1,7 @@
-import {qrApi, userApi} from "./api.js";
+import { qrApi, userApi } from "./api.js";
 import { getInput, getSingleInput } from "./components/inputs.js";
 import { getTextLabel } from "./components/labels.js";
-import {LOCAL_STORAGE_USER} from "./localStorage.js";
+import { LOCAL_STORAGE_USER } from "./localStorage.js";
 
 export function setLkHeader() {
     setQueryParamAndRefresh("lk", "true")
@@ -205,9 +205,29 @@ export function isUpperCase(word) {
     }
 }
 
-export function escapeDQuotes(text){
+export function escapeDQuotes(text) {
     if (notNullOrUndefined(text)) {
         return text.replaceAll('"', '&quot;')
     }
     return ''
-  }
+}
+
+export function getRangeName(range, system = 10) {
+    if (emptyOrUndefined(range)) {
+        return '';
+    }
+    return emptyOrUndefined(range?.name) ? `Без названия (${getRangeWithX(range, system)})` : `${range.name} (${getRangeWithX(range, system)})`
+}
+
+export function getRangeWithX(range, system = 10) {
+    if (range == null || range == undefined) {
+        return ''
+    }
+    try {
+        let digits = parseInt(range?.to, system) - parseInt(range?.from, system)
+        let symbols = Number(digits).toString(16).length
+        return Number(range?.to).toString(16).substring(0, String(range?.to).length - symbols) + 'X'.repeat(symbols)
+    } catch(e) {
+        return ''
+    }
+}

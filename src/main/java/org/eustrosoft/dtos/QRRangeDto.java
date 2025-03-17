@@ -12,12 +12,4 @@ import lombok.NoArgsConstructor;
 public class QRRangeDto extends EntityDto {
     private Long from;
     private Long to;
-
-    public String getFrom() {
-        return Long.toHexString(from);
-    }
-
-    public String getTo() {
-        return Long.toHexString(to);
-    }
 }

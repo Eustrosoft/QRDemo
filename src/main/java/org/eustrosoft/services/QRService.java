@@ -15,6 +15,8 @@ import org.eustrosoft.entitites.FormField;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.QR;
 import org.eustrosoft.entitites.QRRange;
+import org.eustrosoft.exceptions.CommonException;
+import org.eustrosoft.exceptions.JsonApiError;
 import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.mappers.FormMapper;
 import org.eustrosoft.mappers.QrMapper;
@@ -33,6 +35,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -330,7 +333,13 @@ public class QRService {
             nextAvailableQR = qrRepository.nextQR(ranges.get(0).getId());
         }
         if (nextAvailableQR == null) {
-            throw new IllegalArgumentException("Next qr value not found");
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.CONFLICT,
+                            "exceptions.title.limit_exceeded",
+                            "exceptions.detail.limit_exceeded_qrs"
+                    )
+            );
         }
         return nextAvailableQR;
     }

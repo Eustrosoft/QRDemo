@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.file.AccessDeniedException;
 import java.rmi.ServerException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -54,8 +55,7 @@ public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
             Exception.class,
             ServerException.class,
             RuntimeException.class,
-            UndeclaredThrowableException.class,
-            AccessDeniedException.class
+            UndeclaredThrowableException.class
     })
     public ResponseEntity<ExceptionObject<JsonApiError>> handleAllTypeExceptions(Exception ex, WebRequest request) {
         Locale locale = request.getLocale();
@@ -96,6 +96,45 @@ public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
                 .body(new ExceptionObject<>(errors));
     }
 
+    @ExceptionHandler({CommonException.class})
+    public ResponseEntity<ExceptionObject<JsonApiError>> handleCommonExceptions(CommonException ex, WebRequest request) {
+        Locale locale = request.getLocale();
+        List<JsonApiError> localizedErrors = ex.getErrors().stream()
+                .map(err -> new JsonApiError(
+                        err.getStatus(),
+                        err.getCode(),
+                        getLocalizedMessage(err.getTitle(), locale),
+                        getLocalizedMessage(err.getDetail(), locale, err.getParameters()),
+                        err.getSource()
+                )).collect(Collectors.toList());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(new ExceptionObject<>(localizedErrors));
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<ExceptionObject<JsonApiError>> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+        List<JsonApiError> errors = new ArrayList<>();
+        JsonApiError err = new JsonApiError(HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), ex.getReason(), ex);
+        errors.add(err);
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(new ExceptionObject<>(errors));
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ExceptionObject<JsonApiError>> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        List<JsonApiError> errors = new ArrayList<>();
+        JsonApiError err = new JsonApiError(HttpStatus.FORBIDDEN, ex.getLocalizedMessage(), ex.getMessage(), ex);
+        errors.add(err);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(new ExceptionObject<>(errors));
+    }
+
     public ResponseEntity<ExceptionObject<JsonApiError>> handleDataIntegrityExceptions(
             MethodArgumentNotValidException ex, WebRequest request
     ) {
@@ -114,22 +153,5 @@ public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(new ExceptionObject<>(errors));
-    }
-
-    @ExceptionHandler({CommonException.class})
-    public ResponseEntity<ExceptionObject<JsonApiError>> handleCommonExceptions(CommonException ex, WebRequest request) {
-        Locale locale = request.getLocale();
-        List<JsonApiError> localizedErrors = ex.getErrors().stream()
-                .map(err -> new JsonApiError(
-                        err.getStatus(),
-                        err.getCode(),
-                        getLocalizedMessage(err.getTitle(), locale),
-                        getLocalizedMessage(err.getDetail(), locale, err.getParameters()),
-                        err.getSource()
-                )).collect(Collectors.toList());
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .header(HttpHeaders.CONTENT_TYPE, "application/json")
-                .body(new ExceptionObject<>(localizedErrors));
     }
 }

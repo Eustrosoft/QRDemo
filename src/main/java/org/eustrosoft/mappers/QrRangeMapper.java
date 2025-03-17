@@ -15,10 +15,12 @@ import java.util.stream.Collectors;
 public class QrRangeMapper extends EntityMapper {
 
     public QRRangeDto toDto(QRRange range) {
-        QRRangeDto dto = new QRRangeDto(range.getFrom(), range.getTo());
-        dto.setId(range.getId());
-        dto.setCreated(range.getCreated());
-        dto.setUpdated(range.getUpdated());
+        if (range == null) {
+            return null;
+        }
+        QRRangeDto dto = super.toDto(range, QRRangeDto.class);
+        dto.setFrom(range.getFrom());
+        dto.setTo(range.getTo());
         return dto;
     }
 

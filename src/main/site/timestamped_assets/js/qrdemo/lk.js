@@ -1,4 +1,4 @@
-import { emptyOrUndefined, getQRImage, hasAdminRole, isUpperCase, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, getQRImage, getRangeName, hasAdminRole, isUpperCase, toLoginIfNotAuthorized } from "./utils.js";
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
@@ -156,7 +156,7 @@ function setSettings(div, settingsJson, userDetails) {
             divSettings.appendChild(rangesSpan)
             for (let index in ranges) {
                 let range = ranges[index]
-                let rangeName = range?.name == undefined ? `Без названия (${getRangeWithX(range)})` : `${range.name} (${getRangeWithX(range)})`
+                let rangeName = getRangeName(range)
                 let rangeSpan = getTextLabel(`- ${rangeName}`)
                 divSettings.appendChild(rangeSpan)
             }
@@ -418,7 +418,7 @@ function getUserRangesDiv(userDetails, settings, qrsTable) {
     rangesBtns.push(allRangesBtn)
     for (let userRange in ranges) {
         let uR = ranges[userRange]
-        let rangeName = uR?.name == undefined ? `Без названия (${getRangeWithX(uR)})` : `${uR.name} (${getRangeWithX(uR)})`
+        let rangeName = getRangeName(uR)
         let rangeBtn = getBigButton(rangeName, uR?.id, 'range_button')
         rangesSelectDiv.appendChild(rangeBtn)
         rangesBtns.push(rangeBtn)
@@ -446,19 +446,6 @@ function getUserRangesDiv(userDetails, settings, qrsTable) {
         })
     }
     return rangesSelectDiv
-}
-
-function getRangeWithX(range) {
-    if (range == null || range == undefined) {
-        return ''
-    }
-    try {
-        let digits = parseInt(range?.to, 16) - parseInt(range?.from, 16)
-        let symbols = Number(digits).toString(16).length
-        return range?.to.substring(0, range?.to?.length - symbols) + 'X'.repeat(symbols)
-    } catch(e) {
-        return ''
-    }
 }
 
 function getQRRow(data, settings) {

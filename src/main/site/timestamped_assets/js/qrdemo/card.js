@@ -283,7 +283,7 @@ function renderCardFiles(parentDiv, qr) {
 
                 try {
                     userApi().getSettings()
-                        .then(resp => resp.json())
+                        .then(resp => resp.text())
                         .then(settingsJson => {
                             qrApi().uploadQRFile(qr?.id, {
                                 name: name.value,

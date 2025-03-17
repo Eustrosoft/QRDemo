@@ -1,7 +1,7 @@
 import { copyToClipboard, generateRandomPassword, notEmptyOrUndefined } from "../../commons/common.js"
 import { qrApi } from "../api.js"
 import { notify } from "../notifications.js"
-import { longToHex } from "../utils.js"
+import { getRangeName, longToHex } from "../utils.js"
 import { APP_VERSION } from "../version.js"
 import { getBigButton, getCustomButton } from "./buttons.js"
 import { getHr } from "./hrs.js"
@@ -206,7 +206,7 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
                 const opt = document.createElement('option')
                 opt.value = json[i].id
                 opt.id = json[i].id
-                opt.innerText = longToHex(json[i]?.from) + ' - ' + longToHex(json[i]?.to)
+                opt.innerText = getRangeName(json[i])
                 rangeSelect.append(opt)
             }
         })
@@ -230,14 +230,9 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
             if (resp.ok) {
                 notify('Карточка была создана!')
                 renderQRsTableCallback(div, settings)
-            } else if (resp.status === 500) {
-                alert("Вы достигли лимита карточек")
-            } else {
-                alert('Ошибка при создании карточки')
             }
             document.activeElement.blur()
         })
-        .catch(ex => alert(ex))
     })
 
     createQrModal.append(nameBlock, descriptionBlock, formLabel, formChooseElement, rangeLabel, rangeSelect, createBtn)

@@ -178,11 +178,11 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                 uploadBtn.addEventListener('click', () => {
                     try {
                         userApi().getSettings()
-                            .then(resp => resp.json())
+                            .then(resp => resp.text())
                             .then(settingsJson => {
                                 qrApi().reuploadFile(
                                     json?.id,
-                                    { file: document.getElementById('file_content') }, 
+                                    { file: document.getElementById('file_content') },
                                     settingsJson
                                 )
                             }).then(resp => alert('Файл успешно загружен!'))
@@ -235,7 +235,7 @@ function setStartActions() {
 
                 try {
                     userApi().getSettings()
-                        .then(resp => resp.json())
+                        .then(resp => resp.text())
                         .then(settingsJson => {
                             qrApi().uploadFile({
                                 name: name.value,
@@ -264,7 +264,7 @@ function setStartActions() {
 
                 try {
                     userApi().getSettings()
-                        .then(resp => resp.json())
+                        .then(resp => resp.text())
                         .then(settingsJson => {
                             qrApi().uploadFile({
                                 name: name.value,
