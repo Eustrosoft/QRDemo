@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -109,7 +111,7 @@ public class FileMapper extends EntityMapper {
     public File toEntity(String name, MultipartFile file) throws IOException {
         return toEntity(
                 FileUploadRequest.builder()
-                        .name(name)
+                        .name(URLDecoder.decode(name, StandardCharsets.UTF_8.name()))
                         .file(file)
                         .build()
         );
@@ -125,7 +127,7 @@ public class FileMapper extends EntityMapper {
             return null;
         }
         File entity = new File();
-        entity.setName(fur.getName());
+        entity.setName(URLDecoder.decode(fur.getName(), StandardCharsets.UTF_8.name()));
         entity.setDescription(fur.getDescription());
         if (file != null) {
             entity.setFileSize(file.getSize());

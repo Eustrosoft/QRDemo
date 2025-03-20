@@ -193,7 +193,6 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                                     settingsJson
                                 )
                             }).then(resp => alert('Файл успешно загружен!'))
-                            .then(e => window.location.reload())
                             .catch(e => notify(e, 'Ошибка загрузки файла'))
                     } catch (e) {
                         notify(e)
@@ -260,7 +259,6 @@ function setStartActions() {
                             }, settingsJson)
                         })
                         .then(resp => alert('Файл успешно загружен!'))
-                        .then(e => window.location.reload())
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify(e, 'Ошибка обработки файла')
@@ -282,11 +280,13 @@ function setStartActions() {
                         .then(settingsJson => {
                             if (notEmptyOrUndefined(settingsJson)) {
                                 try {
-                                    settingsJson = JSON.parse(settingsJson)
+                                    return JSON.parse(settingsJson)
                                 } catch (e) {
-                                    console.log(e)
+                                    return null
                                 }
                             }
+                        })
+                        .then(settingsJson => {
                             qrApi().uploadFile({
                                 name: name.value,
                                 description: description.value,
@@ -295,7 +295,7 @@ function setStartActions() {
                                 public: isPublic.checked,
                                 active: isActive.checked
                             }, settingsJson)
-                        }).then(e => window.location.reload())
+                        })
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify('Ошибка обработки ссылки', e)
