@@ -1,4 +1,5 @@
 import { notEmptyOrUndefined, processFetchError } from "../commons/common.js";
+import { DICTIONARIES, DICTIONARIES_NAMES } from "./domain/dictionaries.js";
 import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
 export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
@@ -319,6 +320,10 @@ export function qrApi() {
                 }
             )
             return authFetch(req)
+        },
+        uploadFileByBytes: (fileRequest, userSettings) => {
+            let url = `${QR_DEMO_API}secured/files/upload/blob`;
+            uploadFileByBytes(url, fileRequest, userSettings)
         }
     }
 }
@@ -581,6 +586,22 @@ export function dictionaryApi() {
                 }
             )
             return authFetch(req)
+        },
+        getByCodeAndName: (code, name) => {
+            if (emptyOrUndefined(code) || emptyOrUndefined(name)) {
+                throw Error('Illegal code or name, could not be empty or null')
+            }
+            let url = `${QR_DEMO_API}secured/dictionaries/${code}?name=${name}`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
         }
     }
 }
@@ -605,6 +626,85 @@ function uploadSingleFile(url, fileRequest, userSettings) {
         data.append('storagePath', fileRequest.storagePath)
         sendUploadRequest(url, fileRequest, data)
     }
+}
+
+function uploadFileByBytes(url, fileRequest, userSettings) {
+
+    dictionaryApi()
+        .getByCodeAndName(DICTIONARIES.FILE_UPLOAD, DICTIONARIES_NAMES.CHUNK_SIZE)
+        .then(resp => resp.json())
+        .then(json => {
+            console.log(json)
+            let chunkSize = Number(json?.value)
+            if (emptyOrUndefined(chunkSize)) {
+                throw Error('Chunk size is not defined')
+            }
+            
+            let file = fileRequest?.file?.files[0]
+            let fileSize = file?.size
+
+            const total = Math.ceil(fileSize / chunkSize);
+
+            let createdId
+            for (let i = 0; i < total; i++) {
+                const start = i * chunkSize
+                const end = Math.min(start + chunkSize, fileSize)
+                const chunk = file.slice(start, end)
+
+                const data = new FormData()
+                data.append('chunk', chunk, file.name)
+                data.append('no', i + 1)
+                data.append('total', total)
+                data.append('fileSize', fileSize)
+                data.append('chunkSize', chunk?.size)
+                data.append('name', fileRequest.name)
+                data.append('description', fileRequest.description)
+                data.append('public', fileRequest.public)
+                data.append('active', fileRequest.active)
+                if (notEmptyOrUndefined(createdId)) {
+                    data.append('id', createdId)
+                }
+                if (fileRequest.fileStorageType) {
+                    data.append('fileStorageType', fileRequest.fileStorageType)
+                }
+
+                try {
+                    const request = new XMLHttpRequest()
+                    request.open('POST', url, false)
+                    request.withCredentials = true
+                    request.send(data)
+                    if (request.status != 200 && request.status != 204) {
+                        throw new Error('Ошибка сервера')
+                    }
+                    let resp = JSON.parse(request.responseText)
+                    createdId = resp?.id
+                    if (emptyOrUndefined(createdId)) {
+                        throw new Error('Returned ID was empty or undefined for created part')
+                    }
+                } catch (err) {
+                    console.error('Failed to upload chunk', i, err)
+                    return
+                }
+            }
+
+        })
+    // let data = new FormData()
+    // let file = fileRequest?.file?.files[0]
+    // let fileSize = file?.size
+
+    // if (notEmptyOrUndefined(file) && notEmptyOrUndefined(fileSize)) {
+    //     data.append('file', file, file.name)
+
+    //     let checkUploadSizeValue = userSettings?.settings?.checkUploadSize
+    //     if ((checkUploadSizeValue == undefined || checkUploadSizeValue == null || checkUploadSizeValue) && fileSize > MAX_FILE_UPLOAD_SIZE) {
+    //         throw new Error('Выберите файл менее 16 МБ!')
+    //     } else {
+    //         sendUploadRequest(url, fileRequest, data)
+    //     }
+    // } else if (notEmptyOrUndefined(fileRequest.storagePath)) {
+    //     data.append('storagePath', fileRequest.storagePath)
+    //     sendUploadRequest(url, fileRequest, data)
+    // }
 }
 
 function sendUploadRequest(url, fileRequest, data) {

@@ -3,11 +3,14 @@ package org.eustrosoft.mappers;
 import lombok.SneakyThrows;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
 import org.eustrosoft.dtos.FileChangeDto;
 import org.eustrosoft.dtos.FileDto;
 import org.eustrosoft.entitites.File;
+import org.eustrosoft.entitites.FileBlob;
 import org.eustrosoft.entitites.subentities.FileData;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.utils.ChecksumUtils;
@@ -15,10 +18,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -110,10 +116,7 @@ public class FileMapper extends EntityMapper {
 
     public File toEntity(String name, MultipartFile file) throws IOException {
         return toEntity(
-                FileUploadRequest.builder()
-                        .name(URLDecoder.decode(name, StandardCharsets.UTF_8.name()))
-                        .file(file)
-                        .build()
+                new FileUploadRequest(URLDecoder.decode(name, StandardCharsets.UTF_8.name()), file)
         );
     }
 
@@ -143,6 +146,43 @@ public class FileMapper extends EntityMapper {
         entity.setIsActive(fur.isActive());
         entity.setIsPublic(fur.isPublic());
         return entity;
+    }
+
+    @SneakyThrows
+    public Map.Entry<File, FileBlob> toFileMap(FileWithBlobUploadRequest fur) {
+        if (fur == null) {
+            return null;
+        }
+        MultipartFile multipartFile = fur.getChunk();
+        if (multipartFile == null) {
+            throw new IllegalArgumentException("File bytes not found");
+        }
+        File file = new File();
+        file.setName(URLDecoder.decode(fur.getName(), StandardCharsets.UTF_8.name()));
+        file.setDescription(fur.getDescription());
+        if (fur.getId() != null) {
+            file.setId(fur.getId());
+        }
+        file.setFileSize(fur.getFileSize());
+        file.setExtension(FileNameUtils.getExtension(multipartFile.getOriginalFilename()));
+        file.setFileName(multipartFile.getOriginalFilename());
+        file.setIsActive(fur.isActive());
+        file.setIsPublic(fur.isPublic());
+        file.setStoragePlace(fur.getFileStorageType());
+        file.setStoragePath(fur.getStoragePath());
+
+        byte[] bytes = multipartFile.getBytes();
+
+        file.setChecksum(String.valueOf(ChecksumUtils.getCRC32Checksum(bytes)));
+        file.setFileType(URLConnection.guessContentTypeFromName(multipartFile.getOriginalFilename()));
+
+        FileBlob blob = new FileBlob();
+        blob.setNo(fur.getNo());
+        blob.setChunk(bytes);
+        blob.setCrc32(ChecksumUtils.getCRC32Checksum(bytes));
+        blob.setSize(multipartFile.getSize());
+
+        return new AbstractMap.SimpleEntry<>(file, blob);
     }
 
     @SneakyThrows

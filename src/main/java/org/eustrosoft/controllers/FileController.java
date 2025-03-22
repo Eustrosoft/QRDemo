@@ -3,8 +3,10 @@ package org.eustrosoft.controllers;
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
 import org.eustrosoft.dtos.FileChangeDto;
 import org.eustrosoft.dtos.FileDto;
+import org.eustrosoft.dtos.FileUploadResponse;
 import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.services.FileService;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,11 @@ public class FileController {
     @GetMapping("/{id}")
     public FileDto findById(@PathVariable Long id) throws IllegalAccessException {
         return mapper.toDto(service.findById(id));
+    }
+
+    @PostMapping("/upload/blob")
+    public FileUploadResponse uploadFileBlob(FileWithBlobUploadRequest fur) {
+        return service.uploadFileWithBlob(fur);
     }
 
     @PostMapping("/upload")

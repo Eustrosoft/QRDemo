@@ -342,6 +342,7 @@ function renderCardFiles(parentDiv, qr) {
                                     console.log(e)
                                 }
                             }
+                        
                             qrApi().uploadQRFile(qr?.id, {
                                 name: name.value,
                                 description: description.value,

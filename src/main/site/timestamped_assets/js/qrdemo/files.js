@@ -250,7 +250,7 @@ function setStartActions() {
                                     console.log(e)
                                 }
                             }
-                            qrApi().uploadFile({
+                            qrApi().uploadFileByBytes({
                                 name: name.value,
                                 description: description.value,
                                 file: file,

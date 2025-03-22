@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.eustrosoft.entitites.Dictionary;
 import org.eustrosoft.services.DictionaryService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,5 +20,10 @@ public class DictionaryController {
     @GetMapping
     public List<Dictionary> findListValues(@RequestParam String code) {
         return service.getDictionariesByCode(code);
+    }
+
+    @GetMapping("/{code}")
+    public Dictionary findByCodeAndName(@PathVariable String code, @RequestParam String name) {
+        return service.findByCodeAndName(code, name);
     }
 }

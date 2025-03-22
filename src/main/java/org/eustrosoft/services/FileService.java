@@ -5,7 +5,10 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
+import org.eustrosoft.dtos.FileUploadResponse;
 import org.eustrosoft.entitites.File;
+import org.eustrosoft.entitites.FileBlob;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.entitites.enums.FileStorageType;
 import org.eustrosoft.entitites.subentities.FileData;
@@ -19,6 +22,7 @@ import org.eustrosoft.repositories.sub.FileDataRepository;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.services.caches.QRCacheControlService;
 import org.eustrosoft.utils.CommonUtils;
+import org.eustrosoft.utils.JdbcBlobProcessor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +31,23 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import static org.eustrosoft.Constants.FIRST_ZLVL;
+import static org.eustrosoft.Constants.FIRST_ZPID;
+import static org.eustrosoft.Constants.FIRST_ZRID;
+import static org.eustrosoft.Constants.FIRST_ZSTA;
+import static org.eustrosoft.Constants.FIRST_ZTOV;
+import static org.eustrosoft.Constants.FIRST_ZVER;
 
 @Service
 @Transactional
@@ -45,6 +59,8 @@ public class FileService {
     private final FileMapper mapper;
     private final SecurityComponent securityComponent;
     private final QRCacheControlService qrCacheControlService;
+    private final FileBlobService fileBlobService;
+    private final JdbcBlobProcessor jdbcBlobProcessor;
 
     @SneakyThrows
     @Transactional(readOnly = true)
@@ -64,6 +80,69 @@ public class FileService {
             return file;
         }
         throw new IllegalAccessException("File is not public or yours");
+    }
+
+    @SneakyThrows
+    public FileUploadResponse uploadFileWithBlob(FileWithBlobUploadRequest fur) {
+        Map.Entry<File, FileBlob> fileMap = mapper.toFileMap(fur);
+        if (fileMap == null) {
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST,
+                            "exceptions.title.unprocessable_entity",
+                            "exceptions.detail.unprocessable_entity"
+                    )
+            );
+        }
+        File file = fileMap.getKey();
+        FileBlob blob = fileMap.getValue();
+
+        Participant current = participantService.getCurrentSimpleOrThrow();
+
+        FileUploadResponse fuResp = new FileUploadResponse();
+
+        Timestamp zdate = new Timestamp(System.currentTimeMillis());
+        if (file.getId() != null) {
+            findById(file.getId());
+
+            blob.setZOID(file.getId());
+            blob.setZRID(fur.getNo());
+            blob.setZVER(FIRST_ZVER);
+            blob.setZLVL(FIRST_ZLVL);
+            blob.setZPID(FIRST_ZPID);
+            blob.setZTOV(FIRST_ZTOV);
+            blob.setZSTA(FIRST_ZSTA);
+            blob.setZSID(current.getId());
+            blob.setZUID(current.getId());
+            blob.setZUIDO(current.getId());
+            blob.setZDATE(zdate);
+            blob.setZDATO(zdate);
+            fileBlobService.save(blob);
+            fuResp.setId(file.getId());
+        } else {
+            file.setParticipantId(current.getId());
+            File saved = repository.save(file);
+            qrCacheControlService.evictFromQrsCacheByFileId(current.getId(), saved.getId());
+
+            fuResp.setId(saved.getId());
+
+            blob.setZOID(saved.getId());
+            blob.setZRID(FIRST_ZRID);
+            blob.setZVER(FIRST_ZVER);
+            blob.setZLVL(FIRST_ZLVL);
+            blob.setZPID(FIRST_ZPID);
+            blob.setZTOV(FIRST_ZTOV);
+            blob.setZSTA(FIRST_ZSTA);
+            blob.setZSID(current.getId());
+            blob.setZUID(current.getId());
+            blob.setZUIDO(current.getId());
+            blob.setZDATE(zdate);
+            blob.setZDATO(zdate);
+            fileBlobService.save(blob);
+        }
+
+        fuResp.setNo(blob.getNo());
+        return fuResp;
     }
 
     @SneakyThrows
@@ -165,6 +244,31 @@ public class FileService {
                     .build();
         }
         byte[] fileData = getFileData(id);
+        if (fileData == null) {
+            HttpServletResponse response =
+                    ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
+                            .getResponse();
+            long i = 1;
+
+            try (OutputStream os = response.getOutputStream()) {
+                while (true) {
+                    i++;
+                    response.setHeader(HttpHeaders.CONTENT_TYPE, file.getFileType());
+                    response.setHeader(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
+                    response.setHeader(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            String.format(
+                                    "inline; filename*=UTF-8''%s",
+                                    URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
+                                            .replaceAll("\\+", "%20")
+                            )
+                    );
+                    os.write(fileBlobService.getFileChunk(id, i).getChunk());
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, file.getFileType());
         headers.add(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());

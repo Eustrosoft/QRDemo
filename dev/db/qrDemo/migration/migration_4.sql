@@ -95,4 +95,5 @@ ALTER TABLE qrdemo.file DROP CONSTRAINT file_file_size_check;
 -- SELECT NEEDED RANGE AND INSECT SEQUENCE
 -- insert into qrdemo.qrange_seq(name, start, rend, step, lastid, ts) values ('QRDEMO', 17301504, 17367039, 16, 17301792, now());
 
+CREATE OR REPLACE FUNCTION get_migration_ver() returns int as 'select 4' LANGUAGE SQL SECURITY INVOKER;
 

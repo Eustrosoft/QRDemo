@@ -13,22 +13,23 @@ import javax.validation.constraints.Size;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileUploadRequest extends EntityDto {
+public class FileWithBlobUploadRequest extends EntityDto {
+    private Long id;
+    private Long no;
+    private Long total;
+    private MultipartFile chunk;
+    private Long fileSize;
     @Size(max = 128)
     private String name;
     @Size(max = 512)
     private String description;
-    private MultipartFile file;
     @Size(max = 256)
     private String storagePath;
+
     private FileStorageType fileStorageType = FileStorageType.DB;
     private boolean isPublic = false;
     private boolean isActive = true;
-
-    public FileUploadRequest(String name, MultipartFile file) {
-        this.name = name;
-        this.file = file;
-    }
 }
