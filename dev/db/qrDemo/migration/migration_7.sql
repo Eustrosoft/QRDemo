@@ -26,6 +26,13 @@ CREATE TABLE FBlob (
         PRIMARY KEY (ZOID, ZRID, ZVER)
 -- PRIMARY KEY (ZOID,ZRID,ZVER)
 );
+--create or replace view file_blob as select * from FBlob;
+create or replace view file_blob as
+select
+ zoid, zrid, zver, ztov, zsid, zlvl, zpid, zuid,
+ 'N'::char(1) zsta,
+ zdate, zdato, zuido, chunk, no, size, crc32
+from FBlob where ZSTA = 'N';
 
 CREATE OR REPLACE FUNCTION update_file_blob()
 RETURNS TRIGGER AS
@@ -79,13 +86,7 @@ FOR EACH ROW
 EXECUTE FUNCTION update_file_blob();
 
 insert into settings(key, value) values ('files.upload.chunks.maximum', '16');
---create or replace view file_blob as select * from FBlob;
-create or replace view file_blob as
-select
- zoid, zrid, zver, ztov, zsid, zlvl, zpid, zuid,
- 'N'::char(1) zsta,
- zdate, zdato, zuido, chunk, no, size, crc32
-from FBlob where ZSTA = 'N';
+
 
 CREATE TABLE IF NOT EXISTS qrdemo.h_file_before_fblob (
     id bigint NOT NULL,
