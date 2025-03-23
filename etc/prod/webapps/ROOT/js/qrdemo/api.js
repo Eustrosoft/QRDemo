@@ -1,4 +1,6 @@
 import { notEmptyOrUndefined, processFetchError } from "../commons/common.js";
+import { DICTIONARIES, DICTIONARIES_NAMES } from "./domain/dictionaries.js";
+import { notify } from "./notifications.js";
 import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
 export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
