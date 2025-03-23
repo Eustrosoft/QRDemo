@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileWithBlobUploadRequest extends EntityDto {
-    private Long id;
+    private Long fileId;
     private Long no;
     private Long total;
     private MultipartFile chunk;

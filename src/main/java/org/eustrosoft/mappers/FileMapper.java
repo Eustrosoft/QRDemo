@@ -137,7 +137,6 @@ public class FileMapper extends EntityMapper {
             entity.setExtension(FileNameUtils.getExtension(file.getOriginalFilename()));
             entity.setFileName(file.getOriginalFilename());
             byte[] bytes = file.getBytes();
-            entity.setFileData(bytes);
             entity.setChecksum(String.valueOf(ChecksumUtils.getCRC32Checksum(bytes)));
             entity.setFileType(file.getContentType());
         }
@@ -160,8 +159,8 @@ public class FileMapper extends EntityMapper {
         File file = new File();
         file.setName(URLDecoder.decode(fur.getName(), StandardCharsets.UTF_8.name()));
         file.setDescription(fur.getDescription());
-        if (fur.getId() != null) {
-            file.setId(fur.getId());
+        if (fur.getFileId() != null) {
+            file.setId(fur.getFileId());
         }
         file.setFileSize(fur.getFileSize());
         file.setExtension(FileNameUtils.getExtension(multipartFile.getOriginalFilename()));
@@ -199,7 +198,6 @@ public class FileMapper extends EntityMapper {
         entity.setExtension(FileNameUtils.getExtension(file.getOriginalFilename()));
         entity.setFileName(file.getOriginalFilename());
         byte[] bytes = file.getBytes();
-        entity.setFileData(bytes);
         entity.setChecksum(String.valueOf(ChecksumUtils.getCRC32Checksum(bytes)));
         entity.setFileType(file.getContentType());
         return entity;

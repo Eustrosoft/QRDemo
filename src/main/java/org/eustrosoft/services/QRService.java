@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
 import org.eustrosoft.controllers.request.QRRequestFilter;
 import org.eustrosoft.dtos.FileChooseRequest;
+import org.eustrosoft.dtos.FileUploadResponse;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
@@ -28,6 +30,7 @@ import org.eustrosoft.repositories.projections.QRProjection;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
 import org.eustrosoft.security.SecurityComponent;
+import org.eustrosoft.services.caches.QRCacheControlService;
 import org.eustrosoft.utils.CommonUtils;
 import org.eustrosoft.utils.JdbcBlobProcessor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -81,6 +84,7 @@ public class QRService {
     private final FileService fileService;
     private final JdbcBlobProcessor jdbcBlobProcessor;
     private final QRRangeService qrRangeService;
+    private final QRCacheControlService qrCacheControlService;
 
     @Transactional(readOnly = true)
     public Optional<QR> get(Long id) throws IllegalAccessException {

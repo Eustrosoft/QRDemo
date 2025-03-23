@@ -299,8 +299,7 @@ function renderCardFiles(parentDiv, qr) {
                                 public: isPublic.checked,
                                 active: isActive.checked
                             }, settingsJson)
-                        }).then(resp => alert('Файл успешно загружен!'))
-                        .then(e => window.location.reload())
+                        })
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify(ex)
@@ -352,7 +351,6 @@ function renderCardFiles(parentDiv, qr) {
                                 active: isActive.checked
                             }, settingsJson)
                         })
-                        .then(e => window.location.reload())
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify('Ошибка обработки ссылки', e)

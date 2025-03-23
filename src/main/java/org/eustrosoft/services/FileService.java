@@ -7,6 +7,7 @@ import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
 import org.eustrosoft.dtos.FileUploadResponse;
+import org.eustrosoft.entitites.Dictionary;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.FileBlob;
 import org.eustrosoft.entitites.Participant;
@@ -16,13 +17,13 @@ import org.eustrosoft.exceptions.CommonException;
 import org.eustrosoft.exceptions.JsonApiError;
 import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.repositories.FileRepository;
-import org.eustrosoft.repositories.projections.FileBytesProjection;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.repositories.sub.FileDataRepository;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.services.caches.QRCacheControlService;
 import org.eustrosoft.utils.CommonUtils;
 import org.eustrosoft.utils.JdbcBlobProcessor;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.net.URLEncoder;
@@ -40,14 +40,18 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
+import static org.eustrosoft.Constants.Dictionary.CODE_CHUNK_SIZE;
+import static org.eustrosoft.Constants.Dictionary.NAME_CHUNK_SIZE;
 import static org.eustrosoft.Constants.FIRST_ZLVL;
 import static org.eustrosoft.Constants.FIRST_ZPID;
 import static org.eustrosoft.Constants.FIRST_ZRID;
 import static org.eustrosoft.Constants.FIRST_ZSTA;
 import static org.eustrosoft.Constants.FIRST_ZTOV;
 import static org.eustrosoft.Constants.FIRST_ZVER;
+import static org.eustrosoft.Constants.MAXIMUM_CHUNK_SIZE;
+import static org.eustrosoft.Constants.Properties.DEFAULT_MAXIMUM_CHUNKS;
+import static org.eustrosoft.Constants.Properties.MAXIMUM_CHUNKS;
 
 @Service
 @Transactional
@@ -61,6 +65,8 @@ public class FileService {
     private final QRCacheControlService qrCacheControlService;
     private final FileBlobService fileBlobService;
     private final JdbcBlobProcessor jdbcBlobProcessor;
+    private final Environment environment;
+    private final DictionaryService dictionaryService;
 
     @SneakyThrows
     @Transactional(readOnly = true)
@@ -84,6 +90,34 @@ public class FileService {
 
     @SneakyThrows
     public FileUploadResponse uploadFileWithBlob(FileWithBlobUploadRequest fur) {
+        if (FileStorageType.DB != fur.getFileStorageType()) {
+            FileProjection projection = uploadFile(
+                    new FileUploadRequest(
+                            fur.getName(), fur.getDescription(),
+                            null, fur.getStoragePath(), fur.getFileStorageType(),
+                            fur.isPublic(), fur.isActive()
+                    )
+            );
+            FileUploadResponse fileUploadResponse = new FileUploadResponse();
+            fileUploadResponse.setFileId(projection.getId());
+            return fileUploadResponse;
+        }
+        MultipartFile chunk = fur.getChunk();
+        Integer maximumChunks = getMaximumChunks();
+        if (fur.getTotal() > maximumChunks) {
+            throw new CommonException(
+                    new JsonApiError(
+                            HttpStatus.BAD_REQUEST, 400L,
+                            "exceptions.title.file_upload_exception",
+                            "exceptions.detail.file_upload_exception",
+                            new JsonApiError.Source("totalChunk"),
+                            maximumChunks
+                    )
+            );
+        }
+        if (chunk.getSize() > getMaximumChunkSize()) {
+            throw new IllegalArgumentException("Maximum chunks are exceed");
+        }
         Map.Entry<File, FileBlob> fileMap = mapper.toFileMap(fur);
         if (fileMap == null) {
             throw new CommonException(
@@ -118,13 +152,13 @@ public class FileService {
             blob.setZDATE(zdate);
             blob.setZDATO(zdate);
             fileBlobService.save(blob);
-            fuResp.setId(file.getId());
+            fuResp.setFileId(file.getId());
         } else {
             file.setParticipantId(current.getId());
             File saved = repository.save(file);
             qrCacheControlService.evictFromQrsCacheByFileId(current.getId(), saved.getId());
 
-            fuResp.setId(saved.getId());
+            fuResp.setFileId(saved.getId());
 
             blob.setZOID(saved.getId());
             blob.setZRID(FIRST_ZRID);
@@ -168,10 +202,6 @@ public class FileService {
 
     @SneakyThrows
     private FileProjection save(File entity) {
-        if ((entity.getFileData() == null || entity.getFileData().length == 0)
-                && StringUtils.isBlank(entity.getStoragePath())) {
-            throw new IllegalArgumentException("Content could not be found");
-        }
         Participant current = participantService.getCurrentSimpleOrThrow();
         entity.setParticipantId(current.getId());
         File saved = repository.save(entity);
@@ -185,7 +215,7 @@ public class FileService {
         securityComponent.checkUserRightById(byId::getParticipantId);
         File entity = mapper.toEntity(fur);
         repository.updateFileData(
-                id, entity.getFileData(), entity.getFileName(), entity.getFileType(),
+                id, entity.getFileName(), entity.getFileType(),
                 entity.getExtension(), entity.getChecksum(), entity.getFileSize()
         );
         qrCacheControlService.evictFromQrsCacheByFileId(byId.getParticipantId(), id);
@@ -209,7 +239,7 @@ public class FileService {
         repository.deleteById(id);
     }
 
-    public ResponseEntity<byte[]> downloadFile(Long id, String fileName) {
+    public void downloadFile(Long id, String fileName) {
         try {
             FileProjection file = repository.findById(id, FileProjection.class).get();
             if (file.getIsPublic() == null || file.getIsActive() == null) {
@@ -220,75 +250,71 @@ public class FileService {
                 throw new IllegalArgumentException("File name is not correct");
             }
             if (file.getIsActive()) {
-                return getFileResponse(id, file);
+                getFileResponse(id, file);
             }
             securityComponent.checkUserRightById(file::getParticipantId);
-            return getFileResponse(id, file);
+            getFileResponse(id, file);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new IllegalArgumentException("Request is forbidden");
         }
     }
 
     @SneakyThrows
     @Transactional(readOnly = true)
-    private ResponseEntity<byte[]> getFileResponse(Long id, FileProjection file) {
+    private void getFileResponse(Long id, FileProjection file) {
         if (FileStorageType.URL.equals(file.getStoragePlace())
                 && StringUtils.isNotBlank(file.getStoragePath())) {
-            HttpServletResponse response = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
+            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
                     .getResponse();
             // TODO: think about redirect page on js
             // response.setHeader("Redirect-url", file.getStoragePath());
             response.sendRedirect(file.getStoragePath());
-            return ResponseEntity
-                    .status(308)
-                    .build();
+            return;
         }
-        byte[] fileData = getFileData(id);
-        if (fileData == null) {
-            HttpServletResponse response =
-                    ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
-                            .getResponse();
-            long i = 1;
 
-            try (OutputStream os = response.getOutputStream()) {
-                while (true) {
-                    i++;
-                    response.setHeader(HttpHeaders.CONTENT_TYPE, file.getFileType());
-                    response.setHeader(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
-                    response.setHeader(
-                            HttpHeaders.CONTENT_DISPOSITION,
-                            String.format(
-                                    "inline; filename*=UTF-8''%s",
-                                    URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
-                                            .replaceAll("\\+", "%20")
-                            )
-                    );
-                    os.write(fileBlobService.getFileChunk(id, i).getChunk());
-                }
-            } catch (Exception e) {
-                return null;
+        HttpServletResponse response =
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                        .getResponse();
+        long i = 1;
+
+        try (OutputStream os = response.getOutputStream()) {
+            while (true) {
+                response.setHeader(HttpHeaders.CONTENT_TYPE, file.getFileType());
+                response.setHeader(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
+                response.setHeader(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        String.format(
+                                "inline; filename*=UTF-8''%s",
+                                URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
+                                        .replaceAll("\\+", "%20")
+                        )
+                );
+                os.write(fileBlobService.getFileChunk(id, i).getChunk());
+                i++;
             }
+        } catch (Exception e) {
+            // ignore
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, file.getFileType());
-        headers.add(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
-        headers.add(
-                HttpHeaders.CONTENT_DISPOSITION,
-                String.format(
-                        "inline; filename*=UTF-8''%s",
-                        URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
-                                .replaceAll("\\+", "%20")
-                )
-        );
-        return new ResponseEntity<>(
-                fileData, headers,
-                HttpStatus.OK
-        );
     }
 
-    @Transactional(readOnly = true)
-    public byte[] getFileData(Long id) {
-        return repository.findById(id, FileBytesProjection.class)
-                .get().getFileData();
+    private Integer getMaximumChunks() {
+        try {
+            String property = environment.getProperty(MAXIMUM_CHUNKS);
+            if (property == null) {
+                throw new IllegalArgumentException("Property maximum chunks can not be found in application properties");
+            }
+            return Integer.parseInt(property);
+        } catch (Exception e) {
+            return DEFAULT_MAXIMUM_CHUNKS;
+        }
+    }
+
+    private Integer getMaximumChunkSize() {
+        try {
+            Dictionary sizeDic = dictionaryService.findByCodeAndName(CODE_CHUNK_SIZE, NAME_CHUNK_SIZE);
+            return Integer.parseInt(sizeDic.getValue());
+        } catch (Exception e) {
+            return MAXIMUM_CHUNK_SIZE;
+        }
     }
 }

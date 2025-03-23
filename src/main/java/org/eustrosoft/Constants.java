@@ -19,6 +19,18 @@ public class Constants {
     public static final Long FIRST_ZPID = 0L;
     public static final Character FIRST_ZSTA = 'N';
 
+    public static final Integer MAXIMUM_CHUNK_SIZE = 1024 * 1024;
+
+    public static class Properties {
+        public static final Integer DEFAULT_MAXIMUM_CHUNKS = 16;
+        public static final String MAXIMUM_CHUNKS = "files.upload.chunks.maximum";
+    }
+
+    public static class Dictionary {
+        public static final String NAME_CHUNK_SIZE = "CHUNK_SIZE";
+        public static final String CODE_CHUNK_SIZE = "FILE_UPLOAD";
+    }
+
     // Sequence names
     public static final String QRDEMO = "QRDEMO"; // range key
 }

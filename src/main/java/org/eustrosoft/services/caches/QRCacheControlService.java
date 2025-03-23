@@ -1,6 +1,7 @@
 package org.eustrosoft.services.caches;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.repositories.QRRepository;
 import org.eustrosoft.repositories.projections.EntityProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
@@ -86,6 +87,17 @@ public class QRCacheControlService {
                     }
                 });
         return qrs;
+    }
+
+    public void evictByCode(Long code) {
+        if (code == null) {
+            return;
+        }
+        Cache qrsCache = cacheManager.getCache(QR_CACHE_NAME);
+        if (qrsCache == null) {
+            return;
+        }
+        qrsCache.evict(code);
     }
 
     public void clearCache() {

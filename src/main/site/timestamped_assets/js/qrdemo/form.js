@@ -297,8 +297,7 @@ function renderForm(parentDiv, objects, json) {
                             public: isPublic.checked,
                             active: isActive.checked
                         }, settingsJson)
-                    }).then(resp => alert('Файл успешно загружен!'))
-                    .then(e => window.location.reload())
+                    })
                     .catch(e => notify(e, 'Ошибка загрузки файла'))
             },
             () => {
@@ -327,8 +326,16 @@ function renderForm(parentDiv, objects, json) {
 
                 try {
                     userApi().getSettings()
-                        .then(resp => resp.json())
+                        .then(resp => resp.text())
                         .then(settingsJson => {
+                            if (notEmptyOrUndefined(settingsJson)) {
+                                try {
+                                    settingsJson = JSON.parse(settingsJson)
+                                } catch (e) {
+                                    console.log(e)
+                                }
+                            }
+
                             qrApi().uploadFormFile(json?.id, {
                                 name: name.value,
                                 description: description.value,
@@ -338,7 +345,6 @@ function renderForm(parentDiv, objects, json) {
                                 active: isActive.checked
                             }, settingsJson)
                         })
-                        .then(e => window.location.reload())
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify('Ошибка обработки ссылки', e)

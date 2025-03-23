@@ -7,6 +7,7 @@ import org.eustrosoft.entitites.enums.FileStorageType;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.hibernate.annotations.Type;
 
+import javax.activation.MimeType;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -57,14 +58,15 @@ public class File extends DbEntity implements FileProjection {
     @Column(name = "storage_path")
     private String storagePath;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "file_data")
-    @Type(type = "org.hibernate.type.BinaryType")
-    private byte[] fileData;
-
     @Column(name = "file_size")
     private Long fileSize;
+
+    public String getFileType() {
+        if (fileType == null) {
+            return "application/octet-stream";
+        }
+        return fileType;
+    }
 
     public File(Long id) {
         super(id);

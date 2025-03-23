@@ -16,9 +16,9 @@ public interface FileRepository extends CrudRepository<File, Long> {
     <T> Iterable<T> findAllByParticipantIdOrderByUpdatedDesc(Long participantId, Class<T> type);
 
     @Modifying
-    @Query(value = "update file set file_data = ?2, file_name = ?3, " +
-            "file_type = ?4, extension = ?5, checksum = ?6, file_size = ?7 where id = ?1",
+    @Query(value = "update file set file_name = ?2, " +
+            "file_type = ?3, extension = ?4, checksum = ?5, file_size = ?6 where id = ?1",
             nativeQuery = true
     )
-    Integer updateFileData(Long id, byte[] file_data, String fileName, String fileType, String extension, String checksum, Long fileSize);
+    Integer updateFileData(Long id, String fileName, String fileType, String extension, String checksum, Long fileSize);
 }

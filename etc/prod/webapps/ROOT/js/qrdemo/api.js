@@ -1,8 +1,8 @@
 import { notEmptyOrUndefined, processFetchError } from "../commons/common.js";
 import { emptyOrUndefined, processFetchErrorToLogin } from "./utils.js";
 
-export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
-export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
+export const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
+export const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
 export const QR_PRINTER_URL = `/printer/`
 
 export function qrApi() {
@@ -175,12 +175,22 @@ export function qrApi() {
             return authFetch(req)
         },
         uploadFormFile: (id, fileRequest, userSettings) => {
-            const url = `${QR_DEMO_API}secured/forms/${id}/files/upload`
-            uploadSingleFile(url, fileRequest, userSettings)
+            const fileUploadUrl = `${QR_DEMO_API}secured/files/upload/blob`;
+            uploadFileByBytes(fileUploadUrl, fileRequest, userSettings,
+                (fileId) => {
+                    qrApi().connectFileToForm(id, fileId)
+                        .then(r => alert('Файл был добавлен'))
+                        .then(e => window.location.reload())
+                })
         },
         uploadQRFile: (id, fileRequest, userSettings) => {
-            const url = `${QR_DEMO_API}secured/qrs/${id}/files/upload`
-            uploadSingleFile(url, fileRequest, userSettings)
+            const fileUploadUrl = `${QR_DEMO_API}secured/files/upload/blob`;
+            uploadFileByBytes(fileUploadUrl, fileRequest, userSettings,
+                (fileId) => {
+                    qrApi().connectFileToQR(id, fileId)
+                        .then(r => alert('Файл был добавлен'))
+                        .then(e => window.location.reload())
+                })
         },
         // getDownloadAllQRPublicFilesLink: (id) => {
         //     return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
@@ -301,11 +311,11 @@ export function qrApi() {
         },
         uploadFile: (fileRequest, userSettings) => {
             let url = `${QR_DEMO_API}secured/files/upload`;
-            uploadSingleFile(url, fileRequest, userSettings)
+            uploadFileByBytes(url, fileRequest, userSettings)
         },
         reuploadFile: (id, fileRequest, userSettings) => {
             let url = `${QR_DEMO_API}secured/files/${id}/re-upload`;
-            uploadSingleFile(url, fileRequest, userSettings)
+            uploadFileByBytes(url, fileRequest, userSettings)
         },
         updateFile: (id, data) => {
             let url = `${QR_DEMO_API}secured/files/${id}`;
@@ -319,6 +329,10 @@ export function qrApi() {
                 }
             )
             return authFetch(req)
+        },
+        uploadFileByBytes: (fileRequest, userSettings) => {
+            let url = `${QR_DEMO_API}secured/files/upload/blob`;
+            uploadFileByBytes(url, fileRequest, userSettings)
         }
     }
 }
@@ -581,13 +595,29 @@ export function dictionaryApi() {
                 }
             )
             return authFetch(req)
+        },
+        getByCodeAndName: (code, name) => {
+            if (emptyOrUndefined(code) || emptyOrUndefined(name)) {
+                throw Error('Illegal code or name, could not be empty or null')
+            }
+            let url = `${QR_DEMO_API}secured/dictionaries/${code}?name=${name}`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
         }
     }
 }
 
 const MAX_FILE_UPLOAD_SIZE = 16_777_216
 
-function uploadSingleFile(url, fileRequest, userSettings) {
+function uploadSingleFile(url, fileRequest, userSettings, afterAction) {
     let data = new FormData()
     let file = fileRequest?.file?.files[0]
     let fileSize = file?.size
@@ -603,11 +633,82 @@ function uploadSingleFile(url, fileRequest, userSettings) {
         }
     } else if (notEmptyOrUndefined(fileRequest.storagePath)) {
         data.append('storagePath', fileRequest.storagePath)
-        sendUploadRequest(url, fileRequest, data)
+        sendUploadRequest(url, fileRequest, data, afterAction)
     }
 }
 
-function sendUploadRequest(url, fileRequest, data) {
+function uploadFileByBytes(url, fileRequest, userSettings, afterAction) {
+    if (fileRequest.fileStorageType == 'URL') {
+        uploadSingleFile(url, fileRequest, userSettings, afterAction)
+        return
+    }
+
+    dictionaryApi()
+        .getByCodeAndName(DICTIONARIES.FILE_UPLOAD, DICTIONARIES_NAMES.CHUNK_SIZE)
+        .then(resp => resp.json())
+        .then(json => {
+        console.log(json)
+        let chunkSize = Number(json?.value)
+        if (emptyOrUndefined(chunkSize)) {
+            throw Error('Chunk size is not defined')
+        }
+
+        let file = fileRequest?.file?.files[0]
+        let fileSize = file?.size
+
+        const total = Math.ceil(fileSize / chunkSize);
+
+        let createdId
+        for (let i = 0; i < total; i++) {
+            const start = i * chunkSize
+            const end = Math.min(start + chunkSize, fileSize)
+            const chunk = file.slice(start, end)
+
+            const data = new FormData()
+            data.append('chunk', chunk, file.name)
+            data.append('no', i + 1)
+            data.append('total', total)
+            data.append('fileSize', fileSize)
+            data.append('chunkSize', chunk?.size)
+            data.append('name', fileRequest.name)
+            data.append('description', fileRequest.description)
+            data.append('public', fileRequest.public)
+            data.append('active', fileRequest.active)
+            if (notEmptyOrUndefined(createdId)) {
+                data.append('fileId', createdId)
+            }
+            if (fileRequest.fileStorageType) {
+                data.append('fileStorageType', fileRequest.fileStorageType)
+            }
+
+            const request = new XMLHttpRequest()
+            try {
+                request.open('POST', url, false)
+                request.withCredentials = true
+                request.send(data)
+                if (request.status != 200 && request.status != 204) {
+                    throw new Error('Ошибка сервера')
+                }
+                let resp = JSON.parse(request.responseText)
+                createdId = resp?.fileId
+
+                if (emptyOrUndefined(createdId)) {
+                    throw new Error('Returned ID was empty or undefined for created part')
+                }
+            } catch (err) {
+                let resp = JSON.parse(request.responseText)
+                notify(resp?.errors[0]?.detail, resp?.errors[0]?.title)
+                throw new Error(err)
+            }
+        }
+        notify('Файл был загружен!')
+        if (afterAction != null || afterAction != undefined && createdId) {
+            afterAction(createdId)
+        }
+    })
+}
+
+function sendUploadRequest(url, fileRequest, data, afterAction) {
     data.append('name', fileRequest.name)
     data.append('description', fileRequest.description)
     data.append('public', fileRequest.public)
@@ -623,6 +724,10 @@ function sendUploadRequest(url, fileRequest, data) {
     request.send(data)
     if (request.status != 200 && request.status != 204) {
         throw new Error('Ошибка сервера')
+    }
+    let respText = JSON.parse(request.responseText)
+    if (afterAction != null && afterAction != undefined && respText?.fileId) {
+        afterAction(respText?.fileId)
     }
 }
 

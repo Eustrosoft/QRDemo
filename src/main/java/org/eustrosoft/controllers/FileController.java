@@ -60,8 +60,8 @@ public class FileController {
     }
 
     @GetMapping("/{id}/download/{fileName}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id, @PathVariable String fileName) {
-        return service.downloadFile(id, fileName);
+    public void downloadFile(@PathVariable Long id, @PathVariable String fileName) {
+        service.downloadFile(id, fileName);
     }
 
     @DeleteMapping("/{id}")

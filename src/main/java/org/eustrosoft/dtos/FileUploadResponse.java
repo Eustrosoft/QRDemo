@@ -5,10 +5,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileUploadResponse extends EntityDto {
+public class FileUploadResponse {
+    private Long fileId;
     private Long no;
 }

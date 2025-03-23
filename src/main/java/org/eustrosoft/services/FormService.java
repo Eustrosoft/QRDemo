@@ -6,7 +6,9 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.configurations.DefaultTemplateConfig;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
 import org.eustrosoft.dtos.FileChooseRequest;
+import org.eustrosoft.dtos.FileUploadResponse;
 import org.eustrosoft.entitites.File;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
@@ -22,6 +24,7 @@ import org.eustrosoft.repositories.projections.QRSimplestProjection;
 import org.eustrosoft.repositories.projections.SimpleProjection;
 import org.eustrosoft.services.caches.QRCacheControlService;
 import org.eustrosoft.utils.CommonUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
 import static org.eustrosoft.services.ParticipantService.isAdmin;
 import static org.eustrosoft.utils.CommonUtils.distinctByKey;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;

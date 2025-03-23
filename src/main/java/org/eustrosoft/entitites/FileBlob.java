@@ -32,7 +32,7 @@ public class FileBlob extends DbEntityEustrosoft {
     public static final String TYPE = "FILE_BLOB";
 
     @Lob
-    @Basic(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.EAGER)
     @Column(name = "chunk")
     @Type(type = "org.hibernate.type.BinaryType")
     private byte[] chunk;

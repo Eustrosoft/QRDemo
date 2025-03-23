@@ -124,7 +124,7 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                 fileEditForm.append(fileStoragePath)
             }
 
-            fileEditForm.append(isPublicInput, isActiveInput, updateBtn, copyBtn, changeFileBtn)
+            fileEditForm.append(isPublicInput, isActiveInput, updateBtn, copyBtn) // changeFileBtn
             let modal = getModalWindow('Редактирование файла', fileEditForm)
             modal.style.display = 'block'
 
@@ -258,7 +258,6 @@ function setStartActions() {
                                 active: isActive.checked
                             }, settingsJson)
                         })
-                        .then(resp => alert('Файл успешно загружен!'))
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
                     notify(e, 'Ошибка обработки файла')
@@ -276,17 +275,15 @@ function setStartActions() {
 
                 try {
                     userApi().getSettings()
-                        .then(resp => resp.text())
-                        .then(settingsJson => {
-                            if (notEmptyOrUndefined(settingsJson)) {
+                        .then(resp => {
+                            let settingsJson = null
+                            if (notEmptyOrUndefined(resp.text())) {
                                 try {
-                                    return JSON.parse(settingsJson)
+                                    settingsJson = JSON.parse(resp.text())
                                 } catch (e) {
-                                    return null
+                                    
                                 }
                             }
-                        })
-                        .then(settingsJson => {
                             qrApi().uploadFile({
                                 name: name.value,
                                 description: description.value,
@@ -508,8 +505,7 @@ export function showLinkFileModal(uploadFileCallback, closeOnComplete = true, cl
                 if (closeOnComplete) {
                     modal.remove()
                 }
-                alert('Ссылка на файл была добавлена')
-                window.location.reload()
+                notify('Ссылка на файл была добавлена')
             } catch (e) {
                 if (closeOnError) {
                     modal.remove()

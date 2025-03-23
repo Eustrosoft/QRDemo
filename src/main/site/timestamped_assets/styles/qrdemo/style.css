@@ -891,3 +891,32 @@ tr.participantRow {
     overflow: hidden;
     transition: max-height 0.2s ease-out;
 }
+
+/* Progress bar */
+
+.progress_wrapper {
+    position: relative;
+    width: 100%;
+    height: 16px;
+}
+
+.progress_wrapper .progress {
+    background-color: #6dec6d;
+    width: 0;
+    padding: 5px 0;
+    height: 100%;
+    border-radius: 20px;
+}
+
+.progress_percent {
+    position: absolute;
+    bottom: -6px;
+
+    width: 100%;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    color: black;
+    padding: 2px 2px 2px 2px;
+    line-height: 100%;
+}

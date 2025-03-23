@@ -25,10 +25,10 @@ public class FileBlobService {
     }
 
     @Transactional
-    public FileBlob getFileChunk(Long fileId, Long no) {
+    public FileBlobRepository.BlobResponse getFileChunk(Long fileId, Long no) {
         if (fileId == null) {
             throw new IllegalArgumentException("File could not be null");
         }
-        return repository.getByZOIDAndZRID(fileId, no);
+        return repository.getByZOIDAndNo(fileId, no);
     }
 }
