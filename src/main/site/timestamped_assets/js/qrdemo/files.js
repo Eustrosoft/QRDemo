@@ -1,4 +1,4 @@
-import { formatBytes } from "./utils.js";
+import { formatBytes, sanitize } from "./utils.js";
 import { QR_DEMO_API, qrApi, userApi } from "./api.js";
 import { getInput } from "./components/inputs.js";
 import { getModalWindow } from "./components/modals.js";
@@ -7,6 +7,8 @@ import { copyToClipboard, getOrOther, notEmptyOrUndefined } from "../commons/com
 import { getNavigationMenu } from "./components/blocks.js";
 import { getTextLabel } from "./components/labels.js";
 import { notify } from "./notifications.js";
+import NiceSelect, { getSelect } from "./components/select.js";
+import { getDateWithoutTime } from "../commons/dateUtils.js";
 
 let fileSelection
 
@@ -210,7 +212,6 @@ export function deleteFile(id) {
         qrApi().deleteFile(id)
             .then(resp => resp.ok)
             .then(ok => location.reload())
-            .catch(ex => alert(ex))
     }
 }
 
@@ -428,9 +429,7 @@ function getFileChooseSelect() {
     let fileSelectDiv = document.createElement('div')
     let fileSelectElement = document.createElement('select')
     fileSelectElement.id = 'file_select'
-    fileSelectElement.style.width = '100%'
-    fileSelectElement.style.height = '100%'
-    fileSelectElement.style.fontSize = '1.2em'
+    fileSelectElement.classList.add('wide')
 
     const opt = document.createElement('option')
     opt.value = ''
@@ -442,14 +441,17 @@ function getFileChooseSelect() {
         .then(resp => resp.json())
         .then(json => {
             for (let i = 0; i < json.length; i++) {
-                const opt = document.createElement('option')
+                let date = getDateWithoutTime(new Date(json[i]?.created))
+                const opt = getSelect(json[i]?.name, date)
                 opt.value = json[i]?.name
                 opt.id = json[i]?.id
-                opt.innerText = `${json[i]?.name} (${json[i]?.description}) [${json[i]?.fileName}]`
                 fileSelectElement.append(opt)
             }
+        }).then(e => {
+            new NiceSelect(fileSelectElement, {searchable: true, placeholder: 'Выберите файл', searchtext: 'Введите название файла'})
         })
     fileSelectDiv.append(fileLabel, fileSelectElement)
+
     return fileSelectDiv
 }
 
@@ -457,11 +459,11 @@ export function showLinkFileModal(uploadFileCallback, closeOnComplete = true, cl
     let fileLinkForm = document.createElement('div')
     let fileLinkNewWindow = document.createElement('div')
 
-    let fileNameInput = getInput('Название файла', 'text', true, 'file_name')
-    let fileDescriptionInput = getInput('Описание файла', 'text', false, 'file_description')
-    let isPublicInput = getInput('Публичный', 'checkbox', true, 'file_public', '', true)
-    let isActiveInput = getInput('Доступный', 'checkbox', true, 'file_active', '', true)
-    let fileInput = getInput('Ссылка на файл', 'text', true, 'file_link', '', true)
+    let fileNameInput = getInput('Название ссылки', 'text', true, 'file_name')
+    let fileDescriptionInput = getInput('Описание ссылки', 'text', false, 'file_description')
+    let isPublicInput = getInput('Публичная', 'checkbox', true, 'file_public', '', true)
+    let isActiveInput = getInput('Доступная', 'checkbox', true, 'file_active', '', true)
+    let fileInput = getInput('Ссылка', 'text', true, 'file_link', '', true)
     let addFileLinkBtn = getBigButton('Создать')
 
     let nameInput = fileNameInput.getElementsByTagName('input')[0];
@@ -486,10 +488,13 @@ export function showLinkFileModal(uploadFileCallback, closeOnComplete = true, cl
     let fileName = document.getElementById('file_name')
 
     if (fileLink && fileName) {
-        fileLink.addEventListener('input', (e) => {
+        fileLink.addEventListener('paste', (e) => {
             try {
-                fileName.value = e.target?.value?.split("/").at(-1)
-                fileName.select()
+                let paste = (e.clipboardData || window.clipboardData).getData("text")
+                let toPaste = paste?.split("/").at(-1)
+                if (notEmptyOrUndefined(toPaste)) {
+                    fileName.value = toPaste
+                }
             } catch (e) {
                 console.log(e)
             }

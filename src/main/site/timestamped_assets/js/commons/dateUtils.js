@@ -13,3 +13,7 @@ export function formatDate(str) {
     }
     return new Date(str).toLocaleString()
 }
+
+export function getDateWithoutTime(date) {
+    return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+}

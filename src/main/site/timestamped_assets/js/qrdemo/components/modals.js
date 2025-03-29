@@ -160,7 +160,7 @@ export function showContactModal() {
     modal.style.display = 'block'
 }
 
-export function showCreateQrModal(renderQRsTableCallback, div, settings) {
+export function showCreateQrModal(renderQRsTableCallback, div, settings, userDetails) {
     const createQrModal = document.createElement('div')
 
     let nameBlock = getInput('Название', 'text', false, 'create_qr_name', 'Введите имя для карточки...', false)
@@ -194,12 +194,6 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
     let rangeSelect = document.createElement('select')
     rangeSelect.id = 'range_select'
 
-    const opt2 = document.createElement('option')
-    opt2.value = ''
-    opt2.id = ''
-    opt2.innerText = ''
-    rangeSelect.append(opt2)
-
     qrApi().getRanges().then(resp => resp.json())
         .then(json => {
             for (let i = 0; i < json.length; i++) {
@@ -229,7 +223,7 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings) {
         .then(resp => {
             if (resp.ok) {
                 notify('Карточка была создана!')
-                renderQRsTableCallback(div, settings)
+                renderQRsTableCallback(div, settings, userDetails)
             }
             document.activeElement.blur()
         })

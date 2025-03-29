@@ -1,4 +1,4 @@
-import { emptyOrUndefined, getQRImage, getRangeName, hasAdminRole, isUpperCase, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, getQRImage, getRangeName, hasAdminRole, isUpperCase, longToHex, toLoginIfNotAuthorized } from "./utils.js";
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
@@ -379,7 +379,7 @@ function renderQRsTable(div, settings, userDetails) {
 
     let createQrBtn = getBigButton('Создать карточку', 'qrs_create_part')
     createQrBtn.addEventListener('click', (e) => {
-        showCreateQrModal(renderQRsTable, div, settings)
+        showCreateQrModal(renderQRsTable, div, settings, userDetails)
     })
 
     buttonsDiv.appendChild(createQrBtn)
@@ -890,8 +890,8 @@ function setUserPanel(parenDiv, participantId) {
                 rangesBody.push(
                     {
                         id: range?.id,
-                        from: range?.from,
-                        to: range?.to,
+                        from: longToHex(range?.from),
+                        to: longToHex(range?.to),
                         created: range?.created,
                         name: range?.name,
                         description: range?.description
@@ -911,7 +911,7 @@ function setUserPanel(parenDiv, participantId) {
                 qrsBody.push(
                     {
                         id: qr?.id,
-                        code: Number(qr?.code).toString(16),
+                        code: longToHex(qr?.code),
                         name: qr?.name,
                         description: qr?.description,
                         created: qr?.created
@@ -1052,5 +1052,5 @@ function getRoleName(role) {
 }
 
 function getRangeList(range) {
-    return [Number(range?.from)?.toString(16), Number(range?.to)?.toString(16)].join(" - ")
+    return [longToHex(range?.from), longToHex(range?.to)].join(" - ")
 }

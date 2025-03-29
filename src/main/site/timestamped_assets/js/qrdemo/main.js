@@ -13,6 +13,7 @@ import { Loader } from "./components/loader.js";
 import { getSwitch } from "./components/inputs.js";
 import { getSpan, MAIN_TEXT } from "./components/texts.js";
 import { processFetchError } from "../commons/common.js";
+import NiceSelect from "./components/select.js";
 
 (function (window, document, undefined) {
     window.onload = init

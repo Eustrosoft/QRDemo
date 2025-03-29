@@ -21,4 +21,10 @@ public interface FileRepository extends CrudRepository<File, Long> {
             nativeQuery = true
     )
     Integer updateFileData(Long id, String fileName, String fileType, String extension, String checksum, Long fileSize);
+
+    @Query(value = "select count(*) from qr_file where file_id = ?1", nativeQuery = true)
+    Integer countRelatedQRs(Long id);
+
+    @Query(value = "select count(*) from form_file where file_id = ?1", nativeQuery = true)
+    Integer countRelatedForms(Long id);
 }

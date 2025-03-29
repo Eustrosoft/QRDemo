@@ -15,6 +15,7 @@ import org.eustrosoft.entitites.enums.FileStorageType;
 import org.eustrosoft.entitites.subentities.FileData;
 import org.eustrosoft.exceptions.CommonException;
 import org.eustrosoft.exceptions.JsonApiError;
+import org.eustrosoft.exceptions.custom.IllegalActionException;
 import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.repositories.FileRepository;
 import org.eustrosoft.repositories.projections.FileProjection;
@@ -26,7 +27,6 @@ import org.eustrosoft.utils.JdbcBlobProcessor;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -235,6 +235,7 @@ public class FileService {
     public void delete(Long id) {
         FileProjection file = findById(id);
         securityComponent.checkUserRightById(file::getParticipantId);
+        checkFileHasNoConnections(id);
         qrCacheControlService.evictFromQrsCacheByFileId(file.getParticipantId(), id);
         repository.deleteById(id);
     }
@@ -294,6 +295,30 @@ public class FileService {
             }
         } catch (Exception e) {
             // ignore
+        }
+    }
+
+    @Transactional(readOnly = true)
+    private void checkFileHasNoConnections(Long id) {
+        Integer relatedQRs = repository.countRelatedQRs(id);
+        if (relatedQRs != null && relatedQRs > 0) {
+            throw new IllegalActionException(
+                    new JsonApiError(
+                            HttpStatus.CONFLICT,
+                            "exceptions.title.delete_linked_file",
+                            "exceptions.detail.delete_linked_file"
+                    )
+            );
+        }
+        Integer relatedFiles = repository.countRelatedForms(id);
+        if (relatedFiles != null && relatedFiles > 0) {
+            throw new IllegalActionException(
+                    new JsonApiError(
+                            HttpStatus.CONFLICT,
+                            "exceptions.title.delete_linked_file",
+                            "exceptions.detail.delete_linked_file"
+                    )
+            );
         }
     }
 

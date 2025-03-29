@@ -2,6 +2,8 @@ package org.eustrosoft.exceptions;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.NestedExceptionUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -131,6 +133,23 @@ public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
         errors.add(err);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(new ExceptionObject<>(errors));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> conflict(DataIntegrityViolationException e) {
+        String message = NestedExceptionUtils.getMostSpecificCause(e).getMessage();
+        JsonApiError error = new JsonApiError(
+                HttpStatus.CONFLICT, 409L,
+                "exceptions.title.database_violation",
+                "exceptions.detail.database_violation",
+                new JsonApiError.Source(message)
+        );
+        List<JsonApiError> errors = new ArrayList<>();
+        errors.add(error);
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(new ExceptionObject<>(errors));
     }
