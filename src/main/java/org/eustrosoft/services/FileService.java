@@ -40,8 +40,10 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.eustrosoft.Constants.Dictionary.CODE_CHUNK_SIZE;
+import static org.eustrosoft.Constants.Dictionary.CODE_DOWNLOAD_ALLOWED_MIME_TYPE;
 import static org.eustrosoft.Constants.Dictionary.NAME_CHUNK_SIZE;
 import static org.eustrosoft.Constants.FIRST_ZLVL;
 import static org.eustrosoft.Constants.FIRST_ZPID;
@@ -278,9 +280,16 @@ public class FileService {
                         .getResponse();
         long i = 1;
 
+        List<String> allowedMimeTypes = dictionaryService.getDictionariesByCode(CODE_DOWNLOAD_ALLOWED_MIME_TYPE)
+                .stream().map(Dictionary::getValue).collect(Collectors.toList());
+
         try (OutputStream os = response.getOutputStream()) {
-            while (true) {
+            if (allowedMimeTypes.contains(file.getFileType())) {
                 response.setHeader(HttpHeaders.CONTENT_TYPE, file.getFileType());
+            } else {
+                response.setHeader(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+            }
+            while (true) {
                 response.setHeader(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
                 response.setHeader(
                         HttpHeaders.CONTENT_DISPOSITION,

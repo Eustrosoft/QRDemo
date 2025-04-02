@@ -424,8 +424,6 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadFileCallback
 }
 
 function getFileChooseSelect() {
-    let fileLabel = getTextLabel('Файл: ')
-
     let fileSelectDiv = document.createElement('div')
     let fileSelectElement = document.createElement('select')
     fileSelectElement.id = 'file_select'
@@ -450,7 +448,7 @@ function getFileChooseSelect() {
         }).then(e => {
             new NiceSelect(fileSelectElement, {searchable: true, placeholder: 'Выберите файл', searchtext: 'Введите название файла'})
         })
-    fileSelectDiv.append(fileLabel, fileSelectElement)
+    fileSelectDiv.append(fileSelectElement)
 
     return fileSelectDiv
 }

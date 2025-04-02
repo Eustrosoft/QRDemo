@@ -9,7 +9,6 @@ import org.eustrosoft.dtos.FileDto;
 import org.eustrosoft.dtos.FileUploadResponse;
 import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.services.FileService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

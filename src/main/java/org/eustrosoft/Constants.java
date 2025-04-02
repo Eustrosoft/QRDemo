@@ -28,7 +28,9 @@ public class Constants {
 
     public static class Dictionary {
         public static final String NAME_CHUNK_SIZE = "CHUNK_SIZE";
+
         public static final String CODE_CHUNK_SIZE = "FILE_UPLOAD";
+        public static final String CODE_DOWNLOAD_ALLOWED_MIME_TYPE = "DOWNLOAD_ALLOWED_MIME_TYPE";
     }
 
     // Sequence names

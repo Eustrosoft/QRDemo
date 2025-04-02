@@ -945,7 +945,7 @@ tr.participantRow {
 }
 
 .nice-select .current {
-    height: 37px;
+    height: 34px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -986,6 +986,7 @@ tr.participantRow {
     opacity: 1;
     pointer-events: auto;
     transform: scale(1) translateY(0);
+    padding: 8px;
 }
 
 .nice-select.disabled {
@@ -1067,8 +1068,6 @@ tr.participantRow {
     line-height: 40px;
     list-style: none;
     outline: none;
-    padding-left: 18px;
-    padding-right: 29px;
     text-align: left;
     transition: all 0.2s;
     display: flex;
@@ -1085,7 +1084,7 @@ tr.participantRow {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 5px;
+    padding-right: 12px;
     background-color: inherit;
 }
 

@@ -333,8 +333,14 @@ export function qrApi() {
             return authFetch(req)
         },
         uploadFileByBytes: (fileRequest, userSettings) => {
-            let url = `${QR_DEMO_API}secured/files/upload/blob`;
-            uploadFileByBytes(url, fileRequest, userSettings)
+            try {
+                let url = `${QR_DEMO_API}secured/files/upload/blob`;
+                uploadFileByBytes(url, fileRequest, userSettings)
+                alert('Файл был загружен')
+                window.location.reload()
+            } catch (ex) {
+                alert(ex)
+            }
         }
     }
 }

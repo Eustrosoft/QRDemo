@@ -5,18 +5,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.eustrosoft.entitites.enums.FileStorageType;
 import org.eustrosoft.repositories.projections.FileProjection;
-import org.hibernate.annotations.Type;
 
-import javax.activation.MimeType;
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import java.util.Date;
