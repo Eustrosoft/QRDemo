@@ -1,4 +1,4 @@
-import { emptyOrUndefined, getQRImage, getRangeName, hasAdminRole, isUpperCase, longToHex, toLoginIfNotAuthorized } from "./utils.js";
+import { emptyOrUndefined, getQRImage, getRangeName, hasAdminRole, isUpperCase, longToHex, toLoginIfNotAuthorized, toQRValue } from "./utils.js";
 import { adminApi, dictionaryApi, QR_PRINTER_URL, qrApi, userApi } from "./api.js";
 import { LOCAL_STORAGE_USER } from "./localStorage.js";
 import { getBigButton } from "./components/buttons.js";
@@ -14,10 +14,10 @@ import { DOWNRAISING_INDEX, getComplexTable, getTable, TableHead } from "./compo
 import { getNavigationMenu } from "./components/blocks.js";
 import { requestsMock } from "./mocks.js";
 import { notify } from "./notifications.js";
+import { formatDate } from "../commons/dateUtils.js";
+import { renderCardPage } from "./card.js";
 
 const mainBlock = document.getElementById('main_block')
-let divLk = document.createElement('div')
-divLk.setAttribute('id', 'my_lk')
 
 let me;
 let roles;
@@ -29,24 +29,22 @@ let createParticipant;
 let ranges;
 let settings;
 
-export function setLk() {
+export function renderLkPage(range, setting, part, createPart) {
     toLoginIfNotAuthorized()
         .then(resp => {
-            document.title = 'QRDemo - Личный кабинет'
+            document.title = 'QRDemo - Карточки'
 
-            const urlParams = new URLSearchParams(window.location.search)
-            participants = urlParams.get('participants')
-            createParticipant = urlParams.get('createParticipant')
-            ranges = urlParams.get('ranges')
-            settings = urlParams.get('settings')
+            ranges = range
+            settings = setting
+            participants = part
+            createParticipant = createPart
 
             me = localStorage.getItem(LOCAL_STORAGE_USER)
             let userDetails = JSON.parse(me)
             roles = userDetails.roles
             admin = hasAdminRole(roles)
 
-            mainBlock.appendChild(divLk)
-            setUserAccount(userDetails, divLk)
+            setUserAccount(userDetails, mainBlock)
         })
 }
 
@@ -450,7 +448,7 @@ function getUserRangesDiv(userDetails, settings, qrsTable) {
 
 function getQRRow(data, settings) {
     let qrLine = document.createElement('tr')
-    const q = Number(data?.code).toString(16);
+    const q = toQRValue(data?.code);
 
     let colSettings = settings?.qrTableColumns
     for (let cs in colSettings) {
@@ -490,7 +488,7 @@ function getQRRow(data, settings) {
                         break
                     }
                     case "date": {
-                        td.innerText = new Date(data[fieldName]).toLocaleString()
+                        td.innerText = formatDate(data[fieldName])
                         break
                     }
                 }
@@ -510,7 +508,7 @@ function getQRRow(data, settings) {
     let editBtn = getBigButton('Открыть', `edit_${q}`)
     let printBtn = getBigButton('Распечатать QR-код', `print_${q}`)
     editBtn.addEventListener('click', () => {
-        window.open(`?q=${q}&edit=true`, '_self')
+        renderCardPage(q, false, true)
     })
     printBtn.addEventListener('click', () => {
         window.open(`${QR_PRINTER_URL}?q=${q}&text=${encodeURIComponent(printFormText)}&textDown=${encodeURIComponent(printFormTextDown)}`)

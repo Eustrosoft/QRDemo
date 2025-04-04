@@ -12,13 +12,12 @@ import { getDateWithoutTime } from "../commons/dateUtils.js";
 
 let fileSelection
 
-export function setFiles(filesParam) {
+export function renderFilesPage(filesParam) {
     init()
 }
 
 function init() {
-    let files = qrApi().getAllFiles()
-    document.title = `QRDemo - My Files`
+    document.title = `QRDemo - Файлы`
 
     fileSelection = window.location.hash.substring(1)
 
@@ -31,7 +30,7 @@ function init() {
     basicCard.innerHTML = getStartPage()
     setStartActions()
 
-    files.then(resp => resp.json())
+    qrApi().getAllFiles().then(resp => resp.json())
         .then(json => printFilesList(basicCard, json))
 }
 
@@ -257,7 +256,7 @@ function setStartActions() {
                                 file: file,
                                 public: isPublic.checked,
                                 active: isActive.checked
-                            }, settingsJson)
+                            }, settingsJson, renderFilesPage)
                         })
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
@@ -292,7 +291,7 @@ function setStartActions() {
                                 fileStorageType: 'URL',
                                 public: isPublic.checked,
                                 active: isActive.checked
-                            }, settingsJson)
+                            }, settingsJson, renderFilesPage)
                         })
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {

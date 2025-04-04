@@ -986,7 +986,6 @@ tr.participantRow {
     opacity: 1;
     pointer-events: auto;
     transform: scale(1) translateY(0);
-    padding: 8px;
 }
 
 .nice-select.disabled {
@@ -1072,6 +1071,7 @@ tr.participantRow {
     transition: all 0.2s;
     display: flex;
     flex-direction: row;
+    padding: 0 8px;
 }
 
 .nice-select .option span:last-of-type {
@@ -1088,13 +1088,12 @@ tr.participantRow {
     background-color: inherit;
 }
 
-.nice-select .option:hover,
-.nice-select .option.selected.focus {
-    background-color: var(--alpha-middle);
+.nice-select .option:hover {
+    background-color: var(--hover-color);
 }
 
-.nice-select .option:hover span {
-    background-color: var(--alpha-middle);
+.nice-select .option.selected {
+    background-color: var(--hover-color);
 }
  
 .nice-select .option.selected {

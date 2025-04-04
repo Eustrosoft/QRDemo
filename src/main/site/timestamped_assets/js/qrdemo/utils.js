@@ -161,6 +161,10 @@ export function longToHex(val) {
     return Number(val).toString(16).toUpperCase();
 }
 
+export function toQRValue(val) {
+    return longToHex(val)
+}
+
 export function emptyOrUndefined(value) {
     return value === null || value === undefined || value === ''
 }
@@ -225,8 +229,8 @@ export function getRangeWithX(range, system = 10) {
     }
     try {
         let digits = parseInt(range?.to, system) - parseInt(range?.from, system)
-        let symbols = Number(digits).toString(16).length
-        return Number(range?.to).toString(16).substring(0, String(range?.to).length - symbols) + 'X'.repeat(symbols)
+        let symbols = longToHex(digits).length
+        return longToHex(range?.to).substring(0, String(range?.to).length - symbols) + 'X'.repeat(symbols)
     } catch(e) {
         return ''
     }

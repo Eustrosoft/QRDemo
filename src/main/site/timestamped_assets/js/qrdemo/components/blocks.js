@@ -1,3 +1,7 @@
+import { setURLParams } from "../../commons/common.js"
+import { renderFilesPage } from "../files.js"
+import { renderFormPage } from "../form.js"
+import { renderLkPage } from "../lk.js"
 import { getBigButton } from "./buttons.js"
 
 export function getNavigationMenu() {
@@ -11,14 +15,24 @@ export function getNavigationMenu() {
     let formsBtn = getBigButton('Шаблоны')
     let filesBtn = getBigButton('Файлы')
 
+    let mainBlock = document.getElementById('main_block')
+    if (mainBlock) {
+        mainBlock.innerHTML = ''
+    }
+
+    let url = new URL(window.location.href);
+
     cardsBtn.addEventListener('click', () => {
-        window.location = "?lk=true"
+        setURLParams('page=lk')
+        renderLkPage()
     })
     formsBtn.addEventListener('click', () => {
-        window.location = "?form=true"
+        setURLParams('page=forms')
+        renderFormPage()
     })
     filesBtn.addEventListener('click', () => {
-        window.location = "?files=true"
+        setURLParams('page=files')
+        renderFilesPage()
     })
 
     navButtons.append(cardsBtn, formsBtn, filesBtn)
