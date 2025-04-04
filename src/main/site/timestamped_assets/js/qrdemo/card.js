@@ -1,4 +1,4 @@
-import { emptyOrUndefined, fieldToHtml, formatBytes } from "./utils.js";
+import { emptyOrUndefined, fieldToHtml, formatBytes, longToHex, toQRValue } from "./utils.js";
 import { QR_DEMO_API, qrApi, userApi } from "./api.js";
 import { getModalWindow } from "./components/modals.js";
 import { ActionColumn, getComplexTable, getTable, getTr, TableHead } from "./components/tables.js";
@@ -16,30 +16,18 @@ import { getAccordion } from "./components/accordion.js";
 import { QR_ACTIONS, QR_ACTIONS_TRANSLATIONS_RU } from "./domain/dictionaries.js";
 
 const mainBlock = document.getElementById('main_block')
-let divCard = document.createElement('div')
 let edit = false
 let create = false
 
 var qrId
 var qrCode
-
-divCard.setAttribute('id', 'my_lk')
-
-export function setCard(q, creating = false) {
+export function renderCardPage(q, creating = false, editing = false) {
     document.title = `QRDemo - Карточка ${q}`
     const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('edit')) {
-        edit = urlParams.get('edit')
-    }
-    if (urlParams.get('create') || creating) {
-        create = true
-    }
-    if (!edit) {
-        document.getElementsByClassName('header')[0].style.display = 'none'
-    }
+    edit = editing
+    create = creating
 
-    mainBlock.appendChild(divCard)
-    setQRCard(q, divCard)
+    setQRCard(q, mainBlock)
 }
 
 function setQRCard(q, div) {
@@ -151,7 +139,7 @@ function getEditCardInfoHtml(qr) {
     if (qrAction == undefined || qrAction == null) {
         qrAction = QR_ACTIONS_TRANSLATIONS_RU['STD']
     }
-    let accordion = getAccordion(basicFieldsDiv, `Карточка: ${qr?.name} (${qrAction}) [${Number(qr?.code)?.toString(16)}]`)
+    let accordion = getAccordion(basicFieldsDiv, `Карточка: ${qr?.name} (${qrAction}) [${longToHex(qr?.code)}]`)
 
     codeDiv.appendChild(accordion)
 
@@ -178,7 +166,6 @@ function getEditCardInfoHtml(qr) {
         let input = getSingleInput(f?.fieldType, false, f?.id, placeholder)
         input.name = f?.name
         input.value = getDataFromForm(qr, f?.name)
-        input.readOnly = edit === 'true' ? false : true
 
         fieldsArray.push({ name: labelText, input: input })
     }
@@ -298,7 +285,7 @@ function renderCardFiles(parentDiv, qr) {
                                 file: file,
                                 public: isPublic.checked,
                                 active: isActive.checked
-                            }, settingsJson)
+                            }, settingsJson, getNewQRFilesAndRenderFilesList, qr, parentDiv)
                         })
                         .catch(e => notify(e, 'Ошибка загрузки файла'))
                 } catch (e) {
@@ -315,8 +302,8 @@ function renderCardFiles(parentDiv, qr) {
                         return resp.text()
                     })
                     .then(text => {
-                        notify('Файл успешно загружен!')
-                        window.location.reload()
+                        notify('Файл успешно прикреплен!')
+                        getNewQRFilesAndRenderFilesList(qr, parentDiv)
                     })
                     .catch(ex => {
                         notify(ex)
@@ -349,9 +336,9 @@ function renderCardFiles(parentDiv, qr) {
                                 fileStorageType: 'URL',
                                 public: isPublic.checked,
                                 active: isActive.checked
-                            }, settingsJson)
+                            }, settingsJson, getNewQRFilesAndRenderFilesList, qr, parentDiv)
                         })
-                        .catch(e => notify(e, 'Ошибка загрузки файла'))
+                        .catch(e => notify(e, 'Ошибка создания ссылки'))
                 } catch (e) {
                     notify('Ошибка обработки ссылки', e)
                 }
@@ -470,10 +457,10 @@ function addCodeBtnListeners() {
                 data: data
             }).then(resp => {
                 if (resp.ok) {
-                    alert('Карточка была обновлена!')
-                    location.reload()
+                    notify('Карточка была обновлена!')
+                    renderCardPage(toQRValue(qrCode), false, true)
                 } else {
-                    alert(resp.json())
+                    notify(resp.json())
                 }
             })
         })
@@ -484,7 +471,7 @@ function addCodeBtnListeners() {
         showPublicPhoneBtn.addEventListener('click', () => {
             let iframe = document.createElement('iframe')
             iframe.id = 'phone_iframe'
-            iframe.src = `/qr?q=${Number(qrCode).toString(16)}`
+            iframe.src = `/qr?q=${toQRValue(qrCode)}`
             iframe.style.width = '436px'
             iframe.style.height = '567px'
             let modal = getModalWindow('Просмотр с телефона', iframe)
@@ -505,6 +492,15 @@ function addCodeBtnListeners() {
             redirInp.readOnly = false
         }
     })
+}
+
+function getNewQRFilesAndRenderFilesList(qr, filesTableDiv) {
+    if (emptyOrUndefined(qr?.code)) {
+        return
+    }
+    qrApi().getQr(toQRValue(qr.code))
+        .then(resp => resp.json())
+        .then(json => renderCardFiles(filesTableDiv, json))
 }
 
 // TODO: change logic cardinally

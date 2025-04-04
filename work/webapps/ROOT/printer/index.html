@@ -1,0 +1,110 @@
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <meta name="google" content="notranslate">
+    <style>
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content:center;
+            align-items: center;
+        }
+        .content-box {
+            max-width: 300px;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            text-align: center;
+        }
+        .up {
+            height:10px;
+        }
+        span {
+            text-align: center;
+        }
+    </style>
+    <link href="/2025-04-02-03.46/logos/logo.svg"
+          rel="icon"
+          type="image/x-icon"/>
+</head>
+<body>
+<div class="up"></div>
+<div class="content">
+    <div class="content-box">
+        <span id="content-text"></span>
+        <div id="mainBlock"><a class="qr_link" target="_"><img id="qr_image"></a></div>
+        <span id="content-text-down"></span>
+    </div>
+</div>
+</body>
+<script>
+    const urlParams = new URLSearchParams(window.location.search)
+    const q = urlParams.get('q')
+    const text = urlParams.get('text')
+    const textDown = urlParams.get('textDown')
+
+    const schema = 'https://'
+    const baseQrHref = 'qr.qxyz.ru'
+    const queryQ = '/?q='
+    const queryQCompact = '?q='
+
+    const linkStart = '{{'
+    const linkEnd = '}}'
+    const getLinkHref = (href) => {
+        return `<a href="${href}">${href}</a>`
+    };
+
+    const getLinkHrefCompact = (href, text) => {
+        return `<a href="${href}">${text}</a>`
+    };
+
+    const contentText = document.getElementById('content-text')
+    const contentTextDown = document.getElementById('content-text-down')
+
+    if (!q) {
+        alert('Не предоставлен параметр q')
+    } else {
+        let qr_links = document.getElementsByClassName('qr_link')
+        for (let i in qr_links) {
+            qr_links[i].href = schema + baseQrHref + queryQ + q
+        }
+
+        const baseGenerateHref = 'https://qrgen.qxyz.ru/generate?q='
+        let qr_image = document.getElementById('qr_image')
+        if (qr_image) {
+            qr_image.src = baseGenerateHref + q + '&color=%23000000&background=%23ffffff&x=165&fileType=SVG&correctionLevel=L&site=' + schema + baseQrHref
+        }
+        if (text != null && text != '') {
+            contentText.innerHTML = getProcessedText(text)
+        }
+        if (textDown != null && textDown != '') {
+            contentTextDown.innerHTML = getProcessedText(textDown)
+        }
+    }
+
+    function getProcessedText(text) {
+        if (text == null || text == undefined || text == '') {
+            return
+        }
+        let processedText = text
+        let hrefRegex = /\{\{(.*?)\}\}/g;
+        let qrLinkRegex = /\{\{(qr-link)\}\}/g;
+        let qrCodeRegex = /\{\{(qr-code)\}\}/g;
+
+        var found;
+
+        while(found = qrLinkRegex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, getLinkHrefCompact(`${schema}${baseQrHref}${queryQ}${q}`, `${baseQrHref}${queryQCompact}${q}`))
+        };
+        while(found = qrCodeRegex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, q)
+        };
+        while(found = hrefRegex.exec(text)) {
+            processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(found[1]))
+        };
+        return processedText
+    }
+</script>
+</html>

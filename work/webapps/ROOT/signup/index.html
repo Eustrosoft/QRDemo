@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Регистрация</title>
+    <link
+      href="/2025-04-02-03.46/styles/landing/fonts.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="/2025-04-02-03.46/styles/landing/reset.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="/2025-04-02-03.46/styles/landing/styles.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="/2025-04-02-03.46/styles/landing/vars.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="/2025-04-02-03.46/styles/landing/header-footer.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+    <link
+      href="/2025-04-02-03.46/styles/landing/signup.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div><yandex.metrika/></div>
+    <div class="background"></div>
+    <header>
+      <div class="block">
+        <div class="header-content">
+          <a href="/">
+            <div>
+              <img
+                src="/2025-04-02-03.46/assets/img/logo.jpg"
+                alt="logo"
+                width="55"
+              />
+              <span>QR коды для бизнеса</span>
+            </div>
+          </a>
+          <div>
+            <svg
+              class="menu-toggle"
+              id="menuToggle"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 10 10"
+              stroke="black"
+              stroke-width=".6"
+              fill="rgba(0,0,0,0)"
+              stroke-linecap="round"
+            >
+              <path d="M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7">
+                <animate
+                  dur="0.2s"
+                  attributeName="d"
+                  values="M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7;M3,3L5,5L7,3M5,5L5,5M3,7L5,5L7,7"
+                  fill="freeze"
+                  begin="start.begin"
+                />
+                <animate
+                  dur="0.2s"
+                  attributeName="d"
+                  values="M3,3L5,5L7,3M5,5L5,5M3,7L5,5L7,7;M2,3L5,3L8,3M2,5L8,5M2,7L5,7L8,7"
+                  fill="freeze"
+                  begin="reverse.begin"
+                />
+              </path>
+              <rect width="10" height="10" stroke="none">
+                <animate
+                  dur="2s"
+                  id="reverse"
+                  attributeName="width"
+                  begin="click"
+                />
+              </rect>
+              <rect width="10" height="10" stroke="none">
+                <animate
+                  dur="0.001s"
+                  id="start"
+                  attributeName="width"
+                  values="10;0"
+                  fill="freeze"
+                  begin="click"
+                />
+                <animate
+                  dur="0.001s"
+                  attributeName="width"
+                  values="0;10"
+                  fill="freeze"
+                  begin="reverse.begin"
+                />
+              </rect>
+            </svg>
+            <div class="menu" id="menu">
+              <a href="/lk/"><button filled>Войти</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <section id="signup">
+        <div class="block">
+          <div class="sign-up-content">
+            <form id="signupForm">
+              <h1>Регистрация</h1>
+              <label>
+                Имя
+                <input type="text" name="name" />
+              </label>
+              <label>
+                Электронная почта
+                <input type="email" name="email" />
+              </label>
+              <label>
+                Пароль
+                <input type="password" name="password" />
+              </label>
+              <label>
+                Подтверждение пароля
+                <input type="password" name="rePassword" />
+              </label>
+              <button filled type="submit">Отправить</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="block">
+        <div class="footer-content">
+          <div>
+            <div class="footer-logo">
+              <a href="/">
+                <img
+                  src="/2025-04-02-03.46/assets/img/logo.jpg"
+                  alt="logo"
+                  width="55"
+                />
+                <div>
+                  <h3>QR DEMO</h3>
+                  <p>QR-коды для всех</p>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3>QR DEMO</h3>
+            <a href="/help/">Обучающее видео</a>
+            <a href="/lk/">Вход</a>
+          </div>
+          <div>
+            <h3>Сервисы</h3>
+            <a href="https://qxyz.ru" target="_blank"> QXYZ </a>
+            <a href="https://qrdemo.qxyz.ru" target="_blank"> QRDEMO </a>
+          </div>
+          <div>
+            <h3>Контакты</h3>
+            <a href="mailto:qrdemo@eustrosoft.org"> qrdemo@eustrosoft.org </a>
+            <a href="tel:+7(995)116-16-01"> +7(995)116-16-01 </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="/2025-04-02-03.46/js/commons/header.js"></script>
+    <script src="/2025-04-02-03.46/js/signup/signup.js"></script>
+  </body>
+</html>

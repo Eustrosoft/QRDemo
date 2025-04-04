@@ -1,0 +1,4 @@
+spring.datasource.driver-class-name: org.postgresql.Driver
+spring.datasource.username: qrdemo
+spring.datasource.password: <put_password_here>
+spring.datasource.url: jdbc:postgresql://qxyz-pg-server/qrdemo

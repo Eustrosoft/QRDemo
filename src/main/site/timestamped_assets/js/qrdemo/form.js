@@ -9,21 +9,29 @@ import { showEditFileModal, showUploadFileModal } from "./files.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { formatDate } from "../commons/dateUtils.js";
 import { getBigButton } from "./components/buttons.js";
+import { notify } from "./notifications.js";
 
 var formFields = []
 var fieldTypes = []
-var formId = ''
 var lastElementIndex = 0
 
-export function setForm(formId) {
+var formId = ''
+var creating = false
+var updating = false
+
+export function renderFormPage(id, create = false, update = false) {
+    formId = id
+    creating = create
+    updating = update
+
     dictionaryApi().getDictionariesByCode(DICTIONARIES.INPUT_TYPES)
         .then(resp => resp.json())
         .then(json => fieldTypes = json)
-        .then(x => init(formId))
+        .then(x => init())
 }
 
-function init(formId) {
-    document.title = `QRDemo - Form ${formId}`
+function init() {
+    document.title = `QRDemo - Шаблоны`
     formFields = []
 
     const mainBlock = document.getElementById('main_block')
@@ -35,11 +43,7 @@ function init(formId) {
     basicCard.appendChild(getStartPage())
     setStartActions()
 
-    const urlParams = new URLSearchParams(window.location.search)
-    const create = urlParams.get('create')
-    const id = urlParams.get('id')
-
-    if (create || id) {
+    if (formId || creating) {
         basicCard.appendChild(getTextLabel('Название шаблона'))
         basicCard.appendChild(getInput(null, 'text', false, 'formName', 'Шаблон без имени'))
         basicCard.appendChild(getTextLabel('Описание шаблона'))
@@ -62,12 +66,12 @@ function init(formId) {
             const collectedFields = Field.htmlToFields(formDiv);
             const collectedFiles = Field.htmlToFilesFromComplexTable(formDiv);
 
-            if (id !== null) {
+            if (formId != null) {
                 qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles, formId))
                     .then((resp) => {
                         if (resp.ok) {
                             alert('Шаблон был обновлен!')
-                            window.location.reload()
+                            renderFormPage(formId)
                         } else {
                             throw Error('unexpected error')
                         }
@@ -75,7 +79,7 @@ function init(formId) {
                     .catch(() => {
                         alert('Ошибка при обновлении шаблона, проверьте одинаковые поля')
                     })
-            } else if (create) {
+            } else {
                 qrApi().saveForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles))
                     .then(resp => {
                         if (resp.ok) {
@@ -92,8 +96,8 @@ function init(formId) {
         })
         basicCard.appendChild(saveFormBtn)
 
-        if (id) {
-            qrApi().getFormById(id)
+        if (formId) {
+            qrApi().getFormById(formId)
                 .then(resp => resp.json())
                 .then(json => {
                     formId = json.id
@@ -109,8 +113,6 @@ function init(formId) {
                     formFields = Field.sortFields(formFields)
                     renderForm(formDiv, formFields, json)
                 })
-
-
         }
     } else {
         qrApi().getAllForms().then(resp => resp.json())
@@ -151,7 +153,7 @@ function printFormsList(parent, json) {
             deleteForm(json[i].id)
         })
         document.getElementById(getBtnId).addEventListener('click', () => {
-            location.href = `?form=true&id=${json[i].id}`
+            renderFormPage(json[i].id, false, true)
         })
     }
 }
@@ -161,7 +163,7 @@ export function deleteForm(id) {
     if (toDelete) {
         qrApi().deleteForm(id)
             .then(resp => resp.ok)
-            .then(ok => location.reload())
+            .then(ok => renderFormPage())
             .catch(ex => alert(ex))
     }
 }
@@ -222,7 +224,16 @@ function renderForm(parentDiv, objects, json) {
         }
     }
     // end processing same field names
+    const filesDiv = document.createElement('div')
+    renderFormFiles(json, filesDiv)
+    parentDiv.appendChild(filesDiv)
 
+    addDeleteRowActions(parentDiv, objects, json)
+    addDeleteFileRowActions()
+}
+
+function renderFormFiles(form, parentDiv) {
+    parentDiv.innerHTML = ''
     parentDiv.appendChild(getTextLabel('Файлы:'))
 
     let filesHeaders = [
@@ -234,7 +245,7 @@ function renderForm(parentDiv, objects, json) {
         new TableHead('Публичный', '8%', 'isPublic', booleanToString)
     ]
 
-    let files = json?.files
+    let files = form?.files
 
     let fileItems = []
     for (let index in files) {
@@ -290,19 +301,19 @@ function renderForm(parentDiv, objects, json) {
                                 console.log(e)
                             }
                         }
-                        qrApi().uploadFormFile(json?.id, {
+                        qrApi().uploadFormFile(form?.id, {
                             name: name.value,
                             description: description.value,
                             file: file,
                             public: isPublic.checked,
                             active: isActive.checked
-                        }, settingsJson)
+                        }, settingsJson, getNewFormFilesAndRenderFilesList, form, parentDiv)
                     })
                     .catch(e => notify(e, 'Ошибка загрузки файла'))
             },
             () => {
                 let fileSelect = document.getElementById('file_select')
-                qrApi().connectFileToForm(json?.id, fileSelect?.options[fileSelect?.selectedIndex]?.id)
+                qrApi().connectFileToForm(form?.id, fileSelect?.options[fileSelect?.selectedIndex]?.id)
                     .then(resp => {
                         if (!resp.ok) {
                             throw new Error('Ошибка при приклеплении файла. Возможно, такой файл уже прикреплен')
@@ -310,11 +321,11 @@ function renderForm(parentDiv, objects, json) {
                         return resp.text()
                     })
                     .then(text => {
-                        alert('Файл успешно прикреплен!')
-                        saveFieldsAndRefreshForm(parentDiv, formFields, json)
+                        notify('Файл успешно прикреплен!')
+                        getNewFormFilesAndRenderFilesList(form, parentDiv)
                     })
                     .catch(ex => {
-                        alert(ex)
+                        notify(ex)
                     })
             },
             () => {
@@ -336,18 +347,18 @@ function renderForm(parentDiv, objects, json) {
                                 }
                             }
 
-                            qrApi().uploadFormFile(json?.id, {
+                            qrApi().uploadFormFile(form?.id, {
                                 name: name.value,
                                 description: description.value,
                                 storagePath: fileLink?.value,
                                 fileStorageType: 'URL',
                                 public: isPublic.checked,
                                 active: isActive.checked
-                            }, settingsJson)
+                            }, settingsJson, getNewFormFilesAndRenderFilesList, form, parentDiv)
                         })
-                        .catch(e => notify(e, 'Ошибка загрузки файла'))
+                        .catch(e => notify(e, 'Ошибка добавления ссылки'))
                 } catch (e) {
-                    notify('Ошибка обработки ссылки', e)
+                    notify('Ошибка добавления ссылки', e)
                 }
             },
             true
@@ -358,9 +369,15 @@ function renderForm(parentDiv, objects, json) {
     tableFiles.appendChild(fileTr)
 
     parentDiv.appendChild(tableFiles)
+}
 
-    addDeleteRowActions(parentDiv, objects, json)
-    addDeleteFileRowActions()
+function getNewFormFilesAndRenderFilesList(form, filesTableDiv) {
+    if (emptyOrUndefined(form?.id)) {
+        return
+    }
+    qrApi().getFormById(form.id)
+        .then(resp => resp.json())
+        .then(json => renderFormFiles(json, filesTableDiv))
 }
 
 function saveFieldsAndRefreshForm(parentDiv, formFields, json) {
@@ -411,7 +428,7 @@ function getStartPage() {
 function setStartActions() {
     document.getElementById('create_form_button')
         .addEventListener('click', () => {
-            location.href = '?form=true&create=true'
+            renderFormPage(null, true, false)
         })
     document.getElementById('create_default_form_button')
         .addEventListener('click', () => {
@@ -421,7 +438,7 @@ function setStartActions() {
                         return resp.json()
                     }
                     throw new Error("Неизвестная ошибка при создании шаблона");
-                }).then(json => location.reload())
+                }).then(json => renderFormPage())
                 .catch(ex => alert(ex))
         })
 }

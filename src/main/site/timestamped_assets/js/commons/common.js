@@ -131,6 +131,11 @@ export function getInputValue(input) {
     return val
 }
 
+export function setURLParams(queryParams) {
+    var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + queryParams;
+    window.history.pushState({ path: newurl }, '', newurl);
+}
+
 // Structures
 export const USER_ROLES = {
     ADMIN: "ROLE_ADMIN",

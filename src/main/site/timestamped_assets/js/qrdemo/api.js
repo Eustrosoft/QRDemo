@@ -176,27 +176,22 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        uploadFormFile: (id, fileRequest, userSettings) => {
+        uploadFormFile: (id, fileRequest, userSettings, refreshCallback, ...callBackArgsArr) => {
             const fileUploadUrl = `${QR_DEMO_API}secured/files/upload/blob`;
             uploadFileByBytes(fileUploadUrl, fileRequest, userSettings, 
                 (fileId) => {
                     qrApi().connectFileToForm(id, fileId)
-                        .then(r => alert('Файл был добавлен'))
-                        .then(e => window.location.reload())
+                        .then(e => refreshCallback(...callBackArgsArr))
                 })
         },
-        uploadQRFile: (id, fileRequest, userSettings) => {
+        uploadQRFile: (id, fileRequest, userSettings, refreshCallback, ...callBackArgsArr) => {
             const fileUploadUrl = `${QR_DEMO_API}secured/files/upload/blob`;
             uploadFileByBytes(fileUploadUrl, fileRequest, userSettings, 
                 (fileId) => {
                     qrApi().connectFileToQR(id, fileId)
-                        .then(r => alert('Файл был добавлен'))
-                        .then(e => window.location.reload())
+                        .then(e => refreshCallback(...callBackArgsArr))
                 })
         },
-        // getDownloadAllQRPublicFilesLink: (id) => {
-        //     return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
-        // },
         connectFileToQR: (id, fileId) => {
             let url = `${QR_DEMO_API}secured/qrs/${id}/files/choose`;
 
@@ -311,9 +306,9 @@ export function qrApi() {
             link.click()
             link.remove()
         },
-        uploadFile: (fileRequest, userSettings) => {
+        uploadFile: (fileRequest, userSettings, callback) => {
             let url = `${QR_DEMO_API}secured/files/upload`;
-            uploadFileByBytes(url, fileRequest, userSettings)
+            uploadFileByBytes(url, fileRequest, userSettings, callback)
         },
         reuploadFile: (id, fileRequest, userSettings) => {
             let url = `${QR_DEMO_API}secured/files/${id}/re-upload`;
@@ -332,14 +327,12 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        uploadFileByBytes: (fileRequest, userSettings) => {
+        uploadFileByBytes: (fileRequest, userSettings, callback) => {
             try {
                 let url = `${QR_DEMO_API}secured/files/upload/blob`;
-                uploadFileByBytes(url, fileRequest, userSettings)
-                alert('Файл был загружен')
-                window.location.reload()
+                uploadFileByBytes(url, fileRequest, userSettings, callback)
             } catch (ex) {
-                alert(ex)
+                notify(ex)
             }
         }
     }
@@ -734,7 +727,7 @@ function sendUploadRequest(url, fileRequest, data, afterAction) {
         throw new Error('Ошибка сервера')
     }
     let respText = JSON.parse(request.responseText)
-    if (afterAction != null && afterAction != undefined && respText?.fileId) {
+    if (afterAction != null && afterAction != undefined) {
         afterAction(respText?.fileId)
     }
 }

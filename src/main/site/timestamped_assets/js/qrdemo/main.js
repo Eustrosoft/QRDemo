@@ -1,11 +1,11 @@
-import { setLk } from "./lk.js";
-import { setCard } from "./card.js";
+import { renderLkPage as renderLkPage } from "./lk.js";
+import { renderCardPage } from "./card.js";
 import { emptyOrUndefined, notNullOrUndefined, processFetchErrorToLogin } from "./utils.js";
-import { setForm } from "./form.js";
+import { renderFormPage as renderFormPage } from "./form.js";
 import { userApi } from "./api.js";
 import { LOCAL_STORAGE_USER, LOCAL_STORAGE_USER_THEME } from "./localStorage.js";
-import { setFiles } from "./files.js";
-import { getLink } from "./components/link.js";
+import { renderFilesPage as renderFilesPage } from "./files.js";
+import { getLink, getLinkWithAction } from "./components/link.js";
 import { getTextLabel } from "./components/labels.js";
 import { getHr } from "./components/hrs.js";
 import { showAboutModal, showContactModal } from "./components/modals.js";
@@ -13,7 +13,6 @@ import { Loader } from "./components/loader.js";
 import { getSwitch } from "./components/inputs.js";
 import { getSpan, MAIN_TEXT } from "./components/texts.js";
 import { processFetchError } from "../commons/common.js";
-import NiceSelect from "./components/select.js";
 
 (function (window, document, undefined) {
     window.onload = init
@@ -24,32 +23,29 @@ import NiceSelect from "./components/select.js";
 
         // Url params
         const urlParams = new URLSearchParams(window.location.search)
-        const lk = urlParams.get('lk')
         const q = urlParams.get('q')
-        const form = urlParams.get('form')
-        const files = urlParams.get('files')
-        const login = urlParams.get('login')
+        const page = urlParams.get('page')
 
         // Basic listeners
         initBasicListeners()
         // Init user settings
         initUserSettings()
 
-        if (login) {
+        if (page === 'login') {
             if (mainBlock) {
-                setLoginForm(mainBlock);
+                renderLoginForm(mainBlock);
             }
-        } else if (lk) {
-            setLk(lk)
+        } else if (page === 'lk') {
+            renderLkPage()
         } else if (q) {
-            setCard(q)
-        } else if (form) {
-            setForm(form)
-        } else if (files) {
-            setFiles(files)
+            renderCardPage(q)
+        } else if (page === 'forms') {
+            renderFormPage()
+        } else if (page === 'files') {
+            renderFilesPage()
         } else {
             if (mainBlock) {
-                setLk(lk)
+                renderLkPage()
             }
         }
     }
@@ -112,9 +108,9 @@ function showAvatarDropdownContentListener() {
             personDataSection.className = 'dropdown__content__section'
             let usernameLabel = getTextLabel(json?.username)
             let emailLabel = getTextLabel(json?.email, 'color-grey')
-            let cardsLink = getLink('Карточки', '?lk=true', '')
-            let templatesLink = getLink('Шаблоны', '?form=true', '')
-            let filesLink = getLink('Загруженные файлы', '?files=true', '')
+            let cardsLink = getLinkWithAction('Карточки', '?page=lk', '', renderLkPage)
+            let templatesLink = getLinkWithAction('Шаблоны', '?page=forms', '', renderFormPage)
+            let filesLink = getLinkWithAction('Загруженные файлы', '?page=files', '', renderFilesPage)
 
             personDataSection.appendChild(usernameLabel)
             personDataSection.appendChild(emailLabel)
@@ -128,10 +124,8 @@ function showAvatarDropdownContentListener() {
             let settingsSection = document.createElement('div')
             settingsSection.className = 'dropdown__content__section'
 
-            let settingsLink = getLink('Настройки', '', '')
-            settingsLink.addEventListener('click', (e) => {
-                e.preventDefault()
-                window.location.href = '?lk=true&settings=true'
+            let settingsLink = getLinkWithAction('Настройки', '', '', () => {
+                renderLkPage(null, true)
             })
             settingsSection.appendChild(settingsLink)
 
@@ -219,7 +213,7 @@ function getHelpSection() {
     return helpSection
 }
 
-function setLoginForm(parent) {
+function renderLoginForm(parent) {
     let loginPart = document.createElement('div')
     loginPart.id = 'main_page'
 

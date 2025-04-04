@@ -272,7 +272,7 @@ NiceSelect.prototype._renderItem = function (option) {
 
     let spanElement = document.createElement('span');
     spanElement.classList.add('text-overflow-hidden');
-    spanElement.innerText = option.data.text;
+    spanElement.innerText = option.data.value;
     el.append(spanElement);
 
     if (option.data.extra != undefined) {
