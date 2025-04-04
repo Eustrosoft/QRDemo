@@ -50,3 +50,5 @@ dev/docker-compose.yml
 dev/db/qrDemo/default_data.sql
 
 *.mp4
+
+work/
