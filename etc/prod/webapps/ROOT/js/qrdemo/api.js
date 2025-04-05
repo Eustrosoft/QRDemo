@@ -27,6 +27,32 @@ export function qrApi() {
             )
             return fetch(req)
         },
+        getAppVersions: () => {
+            let url = `${QR_DEMO_API}unsecured/dev-log/versions`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return fetch(req)
+        },
+        getAppVersionsContent: (version) => {
+            let url = `${QR_DEMO_API}unsecured/dev-log/versions/${version}`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return fetch(req)
+        },
         saveForm: (form) => {
             let url = `${QR_DEMO_API}secured/forms`;
 
@@ -176,27 +202,22 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        uploadFormFile: (id, fileRequest, userSettings) => {
+        uploadFormFile: (id, fileRequest, userSettings, refreshCallback, ...callBackArgsArr) => {
             const fileUploadUrl = `${QR_DEMO_API}secured/files/upload/blob`;
             uploadFileByBytes(fileUploadUrl, fileRequest, userSettings,
                 (fileId) => {
                     qrApi().connectFileToForm(id, fileId)
-                        .then(r => alert('Файл был добавлен'))
-                        .then(e => window.location.reload())
+                        .then(e => refreshCallback(...callBackArgsArr))
                 })
         },
-        uploadQRFile: (id, fileRequest, userSettings) => {
+        uploadQRFile: (id, fileRequest, userSettings, refreshCallback, ...callBackArgsArr) => {
             const fileUploadUrl = `${QR_DEMO_API}secured/files/upload/blob`;
             uploadFileByBytes(fileUploadUrl, fileRequest, userSettings,
                 (fileId) => {
                     qrApi().connectFileToQR(id, fileId)
-                        .then(r => alert('Файл был добавлен'))
-                        .then(e => window.location.reload())
+                        .then(e => refreshCallback(...callBackArgsArr))
                 })
         },
-        // getDownloadAllQRPublicFilesLink: (id) => {
-        //     return `${QR_DEMO_API}unsecured/qrs/files/all/download?q=${id}`
-        // },
         connectFileToQR: (id, fileId) => {
             let url = `${QR_DEMO_API}secured/qrs/${id}/files/choose`;
 
@@ -311,9 +332,9 @@ export function qrApi() {
             link.click()
             link.remove()
         },
-        uploadFile: (fileRequest, userSettings) => {
+        uploadFile: (fileRequest, userSettings, callback) => {
             let url = `${QR_DEMO_API}secured/files/upload`;
-            uploadFileByBytes(url, fileRequest, userSettings)
+            uploadFileByBytes(url, fileRequest, userSettings, callback)
         },
         reuploadFile: (id, fileRequest, userSettings) => {
             let url = `${QR_DEMO_API}secured/files/${id}/re-upload`;
@@ -332,14 +353,12 @@ export function qrApi() {
             )
             return authFetch(req)
         },
-        uploadFileByBytes: (fileRequest, userSettings) => {
+        uploadFileByBytes: (fileRequest, userSettings, callback) => {
             try {
                 let url = `${QR_DEMO_API}secured/files/upload/blob`;
-                uploadFileByBytes(url, fileRequest, userSettings)
-                alert('Файл был загружен')
-                window.location.reload()
+                uploadFileByBytes(url, fileRequest, userSettings, callback)
             } catch (ex) {
-                alert(ex)
+                notify(ex)
             }
         }
     }
@@ -655,65 +674,65 @@ function uploadFileByBytes(url, fileRequest, userSettings, afterAction) {
         .getByCodeAndName(DICTIONARIES.FILE_UPLOAD, DICTIONARIES_NAMES.CHUNK_SIZE)
         .then(resp => resp.json())
         .then(json => {
-        console.log(json)
-        let chunkSize = Number(json?.value)
-        if (emptyOrUndefined(chunkSize)) {
-            throw Error('Chunk size is not defined')
-        }
-
-        let file = fileRequest?.file?.files[0]
-        let fileSize = file?.size
-
-        const total = Math.ceil(fileSize / chunkSize);
-
-        let createdId
-        for (let i = 0; i < total; i++) {
-            const start = i * chunkSize
-            const end = Math.min(start + chunkSize, fileSize)
-            const chunk = file.slice(start, end)
-
-            const data = new FormData()
-            data.append('chunk', chunk, file.name)
-            data.append('no', i + 1)
-            data.append('total', total)
-            data.append('fileSize', fileSize)
-            data.append('chunkSize', chunk?.size)
-            data.append('name', fileRequest.name)
-            data.append('description', fileRequest.description)
-            data.append('public', fileRequest.public)
-            data.append('active', fileRequest.active)
-            if (notEmptyOrUndefined(createdId)) {
-                data.append('fileId', createdId)
-            }
-            if (fileRequest.fileStorageType) {
-                data.append('fileStorageType', fileRequest.fileStorageType)
+            console.log(json)
+            let chunkSize = Number(json?.value)
+            if (emptyOrUndefined(chunkSize)) {
+                throw Error('Chunk size is not defined')
             }
 
-            const request = new XMLHttpRequest()
-            try {
-                request.open('POST', url, false)
-                request.withCredentials = true
-                request.send(data)
-                if (request.status != 200 && request.status != 204) {
-                    throw new Error('Ошибка сервера')
+            let file = fileRequest?.file?.files[0]
+            let fileSize = file?.size
+
+            const total = Math.ceil(fileSize / chunkSize);
+
+            let createdId
+            for (let i = 0; i < total; i++) {
+                const start = i * chunkSize
+                const end = Math.min(start + chunkSize, fileSize)
+                const chunk = file.slice(start, end)
+
+                const data = new FormData()
+                data.append('chunk', chunk, file.name)
+                data.append('no', i + 1)
+                data.append('total', total)
+                data.append('fileSize', fileSize)
+                data.append('chunkSize', chunk?.size)
+                data.append('name', fileRequest.name)
+                data.append('description', fileRequest.description)
+                data.append('public', fileRequest.public)
+                data.append('active', fileRequest.active)
+                if (notEmptyOrUndefined(createdId)) {
+                    data.append('fileId', createdId)
                 }
-                let resp = JSON.parse(request.responseText)
-                createdId = resp?.fileId
-
-                if (emptyOrUndefined(createdId)) {
-                    throw new Error('Returned ID was empty or undefined for created part')
+                if (fileRequest.fileStorageType) {
+                    data.append('fileStorageType', fileRequest.fileStorageType)
                 }
-            } catch (err) {
-                let resp = JSON.parse(request.responseText)
-                notify(resp?.errors[0]?.detail, resp?.errors[0]?.title)
-                throw new Error(err)
+
+                const request = new XMLHttpRequest()
+                try {
+                    request.open('POST', url, false)
+                    request.withCredentials = true
+                    request.send(data)
+                    if (request.status != 200 && request.status != 204) {
+                        throw new Error('Ошибка сервера')
+                    }
+                    let resp = JSON.parse(request.responseText)
+                    createdId = resp?.fileId
+
+                    if (emptyOrUndefined(createdId)) {
+                        throw new Error('Returned ID was empty or undefined for created part')
+                    }
+                } catch (err) {
+                    let resp = JSON.parse(request.responseText)
+                    notify(resp?.errors[0]?.detail, resp?.errors[0]?.title)
+                    throw new Error(err)
+                }
             }
-        }
-        notify('Файл был загружен!')
-        if (afterAction != null || afterAction != undefined && createdId) {
-            afterAction(createdId)
-        }
-    })
+            notify('Файл был загружен!')
+            if (afterAction != null || afterAction != undefined && createdId) {
+                afterAction(createdId)
+            }
+        })
 }
 
 function sendUploadRequest(url, fileRequest, data, afterAction) {
@@ -734,7 +753,7 @@ function sendUploadRequest(url, fileRequest, data, afterAction) {
         throw new Error('Ошибка сервера')
     }
     let respText = JSON.parse(request.responseText)
-    if (afterAction != null && afterAction != undefined && respText?.fileId) {
+    if (afterAction != null && afterAction != undefined) {
         afterAction(respText?.fileId)
     }
 }
@@ -744,18 +763,17 @@ class RequestDecorators {
         return function (req) {
             const response = fetch(req);
             return response.then(resp => {
-                if (!resp.ok) {
-                    return Promise.reject(resp)
-                }
-                return resp
-            })
-                .catch(resp => {
-                if (resp.status == 401) {
-                    processFetchErrorToLogin()
-                } else {
-                    processFetchError(resp)
-                }
-            })
+                    if (!resp.ok) {
+                        return Promise.reject(resp)
+                    }
+                    return resp
+                }).catch(resp => {
+                    if (resp.status == 401) {
+                        processFetchErrorToLogin()
+                    } else {
+                        processFetchError(resp)
+                    }
+                })
         }
     }
 }

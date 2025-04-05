@@ -17,7 +17,7 @@ export function getModalWindow(modalName, modalInner) {
 
     modalContent.className = 'modal-content'
     modalContent.prepend(getModalHeader(modalWindow, modalName))
-    modalInner.className = 'modal-content-inner'
+    modalInner.classList.add('modal-content-inner')
     modalContent.append(modalInner)
 
     modalWindow.appendChild(modalContent)

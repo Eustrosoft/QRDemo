@@ -289,21 +289,21 @@ public class FileService {
             } else {
                 response.setHeader(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
             }
+            response.setHeader(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
+            response.setHeader(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    String.format(
+                            "inline; filename*=UTF-8''%s",
+                            URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
+                                    .replaceAll("\\+", "%20")
+                    )
+            );
             while (true) {
-                response.setHeader(HttpHeaders.CONTENT_LENGTH, file.getFileSize().toString());
-                response.setHeader(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        String.format(
-                                "inline; filename*=UTF-8''%s",
-                                URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8.name())
-                                        .replaceAll("\\+", "%20")
-                        )
-                );
                 os.write(fileBlobService.getFileChunk(id, i).getChunk());
                 i++;
             }
         } catch (Exception e) {
-            // ignore
+            // ignore, file was fully downloaded
         }
     }
 

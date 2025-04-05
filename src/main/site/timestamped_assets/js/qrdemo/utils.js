@@ -31,10 +31,7 @@ export function toLoginIfNotAuthorized() {
 }
 
 export const processFetchErrorToLogin = (error) => {
-    if (error !== undefined) {
-        // alert('Login to start using system!')
-    }
-    window.location.href = '?login=true'
+    window.location.href = '?page=login'
 }
 
 export function getQRImage(code, x = 300) {

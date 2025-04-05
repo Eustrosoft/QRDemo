@@ -13,6 +13,7 @@ import { Loader } from "./components/loader.js";
 import { getSwitch } from "./components/inputs.js";
 import { getSpan, MAIN_TEXT } from "./components/texts.js";
 import { processFetchError } from "../commons/common.js";
+import { renderVersionHistory } from "./components/versions.js";
 
 (function (window, document, undefined) {
     window.onload = init
@@ -202,6 +203,12 @@ function getHelpSection() {
         showAboutModal()
     })
     helpSection.appendChild(aboutLink)
+    let versionsLink = getLink('История версий', '', '')
+    versionsLink.addEventListener('click', (e) => {
+        e.preventDefault()
+        renderVersionHistory()
+    })
+    helpSection.appendChild(versionsLink)
     let contactLink = getLink('Связаться с нами', '', '')
     contactLink.addEventListener('click', (e) => {
         e.preventDefault()

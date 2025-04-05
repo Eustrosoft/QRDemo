@@ -27,6 +27,32 @@ export function qrApi() {
             )
             return fetch(req)
         },
+        getAppVersions: () => {
+            let url = `${QR_DEMO_API}unsecured/dev-log/versions`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return fetch(req)
+        },
+        getAppVersionsContent: (version) => {
+            let url = `${QR_DEMO_API}unsecured/dev-log/versions/${version}`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return fetch(req)
+        },
         saveForm: (form) => {
             let url = `${QR_DEMO_API}secured/forms`;
 
@@ -178,7 +204,7 @@ export function qrApi() {
         },
         uploadFormFile: (id, fileRequest, userSettings, refreshCallback, ...callBackArgsArr) => {
             const fileUploadUrl = `${QR_DEMO_API}secured/files/upload/blob`;
-            uploadFileByBytes(fileUploadUrl, fileRequest, userSettings, 
+            uploadFileByBytes(fileUploadUrl, fileRequest, userSettings,
                 (fileId) => {
                     qrApi().connectFileToForm(id, fileId)
                         .then(e => refreshCallback(...callBackArgsArr))
@@ -186,7 +212,7 @@ export function qrApi() {
         },
         uploadQRFile: (id, fileRequest, userSettings, refreshCallback, ...callBackArgsArr) => {
             const fileUploadUrl = `${QR_DEMO_API}secured/files/upload/blob`;
-            uploadFileByBytes(fileUploadUrl, fileRequest, userSettings, 
+            uploadFileByBytes(fileUploadUrl, fileRequest, userSettings,
                 (fileId) => {
                     qrApi().connectFileToQR(id, fileId)
                         .then(e => refreshCallback(...callBackArgsArr))
@@ -653,7 +679,7 @@ function uploadFileByBytes(url, fileRequest, userSettings, afterAction) {
             if (emptyOrUndefined(chunkSize)) {
                 throw Error('Chunk size is not defined')
             }
-            
+
             let file = fileRequest?.file?.files[0]
             let fileSize = file?.size
 
@@ -737,12 +763,11 @@ class RequestDecorators {
         return function (req) {
             const response = fetch(req);
             return response.then(resp => {
-                if (!resp.ok) {
-                    return Promise.reject(resp)
-                }
-                return resp
-            })
-                .catch(resp => {
+                    if (!resp.ok) {
+                        return Promise.reject(resp)
+                    }
+                    return resp
+                }).catch(resp => {
                     if (resp.status == 401) {
                         processFetchErrorToLogin()
                     } else {
