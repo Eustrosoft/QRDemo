@@ -138,12 +138,14 @@ public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<?> conflict(DataIntegrityViolationException e) {
+    public ResponseEntity<?> conflict(DataIntegrityViolationException e, WebRequest request) {
+        Locale locale = request.getLocale();
+
         String message = NestedExceptionUtils.getMostSpecificCause(e).getMessage();
         JsonApiError error = new JsonApiError(
                 HttpStatus.CONFLICT, 409L,
-                "exceptions.title.database_violation",
-                "exceptions.detail.database_violation",
+                getLocalizedMessage("exceptions.title.database_violation", locale),
+                getLocalizedMessage("exceptions.detail.database_violation", locale),
                 new JsonApiError.Source(message)
         );
         List<JsonApiError> errors = new ArrayList<>();

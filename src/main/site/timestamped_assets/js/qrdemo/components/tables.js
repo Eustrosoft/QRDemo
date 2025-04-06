@@ -107,7 +107,12 @@ export function getComplexTable(
                 td.innerText = k
             } else {
                 if (notNullOrUndefined(headItems[k]?.itemCallback)) {
-                    td.innerText = headItems[k]?.itemCallback(item?.[headItemKey])
+                    let isItemHtml = headItems[k]?.isItemHtml
+                    if (isItemHtml) {
+                        td.appendChild(headItems[k]?.itemCallback(item?.[headItemKey]))
+                    } else {
+                        td.innerText = headItems[k]?.itemCallback(item?.[headItemKey])
+                    }
                 } else {
                     td.innerText = item?.[headItemKey]
                 }
@@ -136,11 +141,12 @@ export function getTr(element, colSpan) {
 }
 
 export class TableHead {
-    constructor(name, width, key, itemCallback) {
+    constructor(name, width, key, itemCallback, isItemHtml) {
         this.name = name
         this.width = width
         this.key = key
         this.itemCallback = itemCallback
+        this.isItemHtml = isItemHtml
     }
 }
 

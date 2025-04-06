@@ -14,6 +14,7 @@ import { getLink } from "./components/link.js";
 import { notify } from "./notifications.js";
 import { getAccordion } from "./components/accordion.js";
 import { QR_ACTIONS, QR_ACTIONS_TRANSLATIONS_RU } from "./domain/dictionaries.js";
+import { createHoverableIcon, ICONS } from "./components/icons.js";
 
 const mainBlock = document.getElementById('main_block')
 let edit = false
@@ -139,7 +140,16 @@ function getEditCardInfoHtml(qr) {
     if (qrAction == undefined || qrAction == null) {
         qrAction = QR_ACTIONS_TRANSLATIONS_RU['STD']
     }
-    let accordion = getAccordion(basicFieldsDiv, `Карточка: ${qr?.name} (${qrAction}) [${longToHex(qr?.code)}]`)
+    let accordionCapture = document.createElement('div')
+    accordionCapture.style.alignItems = 'center'
+    accordionCapture.style.textAlign = 'center'
+    accordionCapture.style.lineHeight = '1'
+    accordionCapture.innerText = `Карточка: ${qr?.name} (${qrAction}) [${longToHex(qr?.code)}]`
+    if (!qr?.form) {
+        createHoverableIcon(ICONS.WARNING, 'Не прикреплен шаблон', accordionCapture)
+    }
+    let accordion = getAccordion(basicFieldsDiv, accordionCapture, true)
+
     codeDiv.appendChild(accordion)
 
     formViewBtn.addEventListener('click', () => {

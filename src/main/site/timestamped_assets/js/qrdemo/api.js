@@ -372,6 +372,19 @@ export function adminApi() {
     const authFetch = RequestDecorators.withAuth(fetch)
 
     return {
+        getRegistrationRequests: () => {
+            let url = `${QR_DEMO_API}admin/panel/registrations`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
+        },
         getParticipants: () => {
             let url = `${QR_DEMO_API}admin/panel/participants`;
 

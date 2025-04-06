@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.eustrosoft.entitites.enums.QRAction;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -20,6 +19,7 @@ public class QRCreationDto extends EntityDto {
     private List<Long> filesIds;
     private Long formId;
     private QRAction action;
+    @Size(max = 2048)
     private String redirect;
 
     // Range or code needed for creating, or will be used default range

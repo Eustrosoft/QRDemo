@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.eustrosoft.entitites.QRRange;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

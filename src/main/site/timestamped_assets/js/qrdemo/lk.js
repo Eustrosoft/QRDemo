@@ -16,6 +16,7 @@ import { requestsMock } from "./mocks.js";
 import { notify } from "./notifications.js";
 import { formatDate } from "../commons/dateUtils.js";
 import { renderCardPage } from "./card.js";
+import { getStatusLine } from "./components/statuses.js";
 
 const mainBlock = document.getElementById('main_block')
 
@@ -996,30 +997,38 @@ function setUsersPanel(parentDiv) {
 function setRequestsPanel(parentDiv) {
     parentDiv.innerHTML = ''
 
-    let headers = [
-        new TableHead('№', '3%', DOWNRAISING_INDEX),
-        new TableHead('Имя', '10%', 'username'),
-        new TableHead('Почта', '10%', 'email'),
-        new TableHead('Организация', '10%', 'organization'),
-        new TableHead('Создана', '10%', 'created', getDateCallback)
-    ]
+    adminApi().getRegistrationRequests()
+        .then(resp => resp.json())
+        .then(json => {
+            let headers = [
+                new TableHead('№', '3%', DOWNRAISING_INDEX),
+                new TableHead('Имя', '10%', 'username'),
+                new TableHead('Почта', '10%', 'email'),
+                new TableHead('Создана', '10%', 'created', getDateCallback),
+                new TableHead('Статус', '10%', 'status', getStatusCallback, true)
+            ]
+        
+            let table = getComplexTable(
+                headers,
+                json,
+                'participantRow',
+                'participantsTable',
+                'compact_table',
+                'id',
+                (e) => {
+                    let pId = e.currentTarget.getAttribute('key')
+                    let selection = document.getSelection()
+                    if (selection.type !== "Range") {
+                        // setUserPanel(parentDiv, pId)
+                    }
+                }
+            )
+            parentDiv.append(table)  
+        })
+}
 
-    let table = getComplexTable(
-        headers,
-        requestsMock,
-        'participantRow',
-        'participantsTable',
-        'compact_table',
-        'id',
-        (e) => {
-            let pId = e.currentTarget.getAttribute('key')
-            let selection = document.getSelection()
-            if (selection.type !== "Range") {
-                // setUserPanel(parentDiv, pId)
-            }
-        }
-    )
-    parentDiv.append(table)
+function getStatusCallback(status) {
+    return getStatusLine(['PENDING', 'IN_WORK', 'ACCEPTED', 'REJECTED'], status)
 }
 
 function getRangesCallback(ranges) {

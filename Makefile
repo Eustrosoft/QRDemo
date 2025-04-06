@@ -80,6 +80,12 @@ ROOT:
 	install -m 644 src/main/site/timestamped_assets/icons/lk-icon.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/lk-icon.svg
 	install -m 644 src/main/site/timestamped_assets/icons/lk-icon-black.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/lk-icon-black.svg
 	install -m 644 src/main/site/timestamped_assets/icons/y-icon.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/y-icon.svg
+	install -m 644 src/main/site/timestamped_assets/icons/Papirus-Team-Papirus-Status-User-trash-full.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/Papirus-Team-Papirus-Status-User-trash-full.svg
+	install -m 644 src/main/site/timestamped_assets/icons/Papirus-Team-Papirus-Status-Dialog-warning.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/Papirus-Team-Papirus-Status-Dialog-warning.svg
+	install -m 644 src/main/site/timestamped_assets/icons/Papirus-Team-Papirus-Status-Dialog-question.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/Papirus-Team-Papirus-Status-Dialog-question.svg
+	install -m 644 src/main/site/timestamped_assets/icons/Papirus-Team-Papirus-Status-Dialog-information.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/Papirus-Team-Papirus-Status-Dialog-information.svg
+	install -m 644 src/main/site/timestamped_assets/icons/Papirus-Team-Papirus-Status-Dialog-error.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/Papirus-Team-Papirus-Status-Dialog-error.svg
+	install -m 644 src/main/site/timestamped_assets/icons/Papirus-Team-Papirus-Status-Changes-prevent.svg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons/Papirus-Team-Papirus-Status-Changes-prevent.svg
 #
 	install -m 644 etc/prod/webapps/qrCodeDemo/WEB-INF/web.xml work/webapps/ROOT/WEB-INF/web.xml
 
@@ -105,6 +111,7 @@ ROOT:
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/loader.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/loader.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/accordion.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/accordion.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/select.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/select.js
+	install -m 644 src/main/site/timestamped_assets/js/qrdemo/components/statuses.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/statuses.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/domain/participantSettings.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/domain/participantSettings.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/domain/dictionaries.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/domain/dictionaries.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/form.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/form.js
@@ -138,3 +145,5 @@ ROOT:
 	install -m 644 src/main/site/timestamped_assets/assets/img/section-1-background.jpg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/img/section-1-background.jpg
 	install -m 644 src/main/site/timestamped_assets/assets/img/section-2-background.jpg work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/assets/img/section-2-background.jpg
 	install -m 644 src/main/site/timestamped_assets/styles/vars.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/vars.css
+
+	cat src/main/site/timestamped_assets/js/qrdemo/components/icons.js | sed "s/timestamped_assets/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components/icons.js
