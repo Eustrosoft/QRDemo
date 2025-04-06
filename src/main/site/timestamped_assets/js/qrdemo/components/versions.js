@@ -49,7 +49,7 @@ export function renderVersionHistory() {
     container.appendChild(content)
 
     let modal = getModalWindow('История версий', container)
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
 
     // Привязываем DOM-элементы после генерации
     versionListEl = document.getElementById('versionList')

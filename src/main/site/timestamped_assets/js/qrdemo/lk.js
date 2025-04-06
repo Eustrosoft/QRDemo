@@ -5,7 +5,7 @@ import { getBigButton } from "./components/buttons.js";
 import { getModalWindow, showCreateQrModal, showGenerateRandomPasswordModal } from "./components/modals.js";
 import { getInput, getSelect, getSingleInput, getSwitch, getTextArea } from "./components/inputs.js";
 import { Column, LANGUAGES, ParticipantSettings, QR_TABLE_COLUMNS, Settings } from "./domain/participantSettings.js";
-import { getInputValue, getOrOther, notEmptyOrUndefined, processFetchError, USER_ROLES } from "../commons/common.js";
+import { getInputValue, getOrOther, notEmptyOrUndefined, processFetchError, setURLParams, USER_ROLES } from "../commons/common.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
 import { getHr } from "./components/hrs.js";
@@ -179,11 +179,11 @@ function setSettings(div, settingsJson, userDetails) {
         userApi().updateSettings(stgs)
             .then(resp => {
                 if (resp.ok) {
-                    alert('Настройки обновлены')
+                    notify('Настройки обновлены')
                     location.reload()
                 }
             })
-            .catch(ex => alert(ex))
+            .catch(ex => notify(ex))
     })
 
     let changePasswordButton = getBigButton('Изменить пароль')
@@ -208,8 +208,8 @@ function setSettings(div, settingsJson, userDetails) {
                     if (!resp.ok)
                         throw new Error('Ошибка при обновлении пароля')
                 }).then(resp => {
-                    alert('Пароль обновлен!')
-                }).catch(ex => alert(ex))
+                    notify('Пароль обновлен!')
+                }).catch(ex => notify(ex))
         })
 
         let passGenerateBtn = getBigButton('Сгенерировать пароль')
@@ -218,7 +218,7 @@ function setSettings(div, settingsJson, userDetails) {
         innerDiv.append(oldPassword, passw1, passw2, saveBtn, passGenerateBtn)
 
         const modal = getModalWindow('Изменение пароля', innerDiv);
-        modal.style.display = 'block'
+        modal.style.display = 'flex'
     })
 
     divSettings.appendChild(changePasswordButton)
@@ -294,7 +294,7 @@ function printSettingsTableAttribute(parent, existedQrTableSettings, settingsJso
         let attributesLoader = new Loader()
         attributeChooseDiv.appendChild(attributesLoader.get())
 
-        chooseAttributeModal.style.display = 'block'
+        chooseAttributeModal.style.display = 'flex'
         attributesLoader.showLoader()
         qrApi().getAllFormFields()
             .then(resp => {
@@ -337,7 +337,7 @@ function printSettingsTableAttribute(parent, existedQrTableSettings, settingsJso
                 }
             }).catch(e => {
                 attributesLoader.hideLoader()
-                alert(e)
+                notify(e)
             })
     })
 }
@@ -396,7 +396,7 @@ function renderQRsTable(div, settings, userDetails) {
                 const qrLine = getQRRow(json[i], settings?.settings)
                 qrsTable.appendChild(qrLine)
             }
-        }).catch(ex => alert(ex))
+        }).catch(ex => notify(ex))
     divQrsPart.appendChild(qrsTable)
     div.appendChild(divQrsPart)
 }
@@ -440,7 +440,7 @@ function getUserRangesDiv(userDetails, settings, qrsTable) {
                         qrsTable.appendChild(qrLine)
                     }
                     btn.classList.add('active')
-                }).catch(ex => alert(ex))
+                }).catch(ex => notify(ex))
         })
     }
     return rangesSelectDiv
@@ -625,7 +625,7 @@ function setupAdminPanel(div) {
                         return Promise.reject(resp)
                     return resp.json()
                 }).then(json => {
-                    alert('Пользователь был создан!')
+                    notify('Пользователь был создан!')
                 }).catch(processFetchError)
         })
 
@@ -639,7 +639,7 @@ function setupAdminPanel(div) {
                 swtch = getSelect('Роль', 'role', roles.map((role => role.name)), USER_ROLES.USER)
                 innerDiv.append(username, passw1, email, lei, address, organization, website, swtch, tariff, saveBtn, passGenerateBtn)
                 const modal = getModalWindow('Создание нового пользователя', innerDiv);
-                modal.style.display = 'block'
+                modal.style.display = 'flex'
             })
     })
 
@@ -687,7 +687,7 @@ function setUserPanel(parenDiv, participantId) {
                             adminApi().unblockUser(json?.id)
                                 .then(resp => {
                                     if (resp.ok) {
-                                        alert('Пользователь разблокирован')
+                                        notify('Пользователь разблокирован')
                                         setUserPanel(parenDiv, participantId)
                                         return
                                     }
@@ -695,7 +695,7 @@ function setUserPanel(parenDiv, participantId) {
                                 })
                                 .then(json => {
                                     if (json) {
-                                        alert(JSON.stringify(json))
+                                        notify(JSON.stringify(json))
                                     }
                                 })
                         }
@@ -711,7 +711,7 @@ function setUserPanel(parenDiv, participantId) {
                         blockContent.appendChild(blockBtn)
 
                         let modal = getModalWindow('Блокировка пользователя пользователя', blockContent)
-                        modal.style.display = 'block'
+                        modal.style.display = 'flex'
 
                         blockBtn.addEventListener('click', () => {
                             const cf = confirm('Заблокировать пользователя?')
@@ -719,7 +719,7 @@ function setUserPanel(parenDiv, participantId) {
                                 adminApi().blockUser(json?.id, reasonInput?.value)
                                     .then(resp => {
                                         if (resp.ok) {
-                                            alert('Пользователь заблокирован')
+                                            notify('Пользователь заблокирован')
                                             setUserPanel(parenDiv, participantId)
                                             modal.remove()
                                             return
@@ -728,7 +728,7 @@ function setUserPanel(parenDiv, participantId) {
                                     })
                                     .then(json => {
                                         if (json) {
-                                            alert(JSON.stringify(json))
+                                            notify(JSON.stringify(json))
                                         }
                                     })
                             }
@@ -755,7 +755,7 @@ function setUserPanel(parenDiv, participantId) {
                 blockContent.appendChild(passGenerateBtn)
 
                 let modal = getModalWindow('Смена пароля пользователю', blockContent)
-                modal.style.display = 'block'
+                modal.style.display = 'flex'
 
                 changePasswordBtn.addEventListener('click', () => {
                     const cf = confirm('Сменить пароль пользователю?')
@@ -763,7 +763,7 @@ function setUserPanel(parenDiv, participantId) {
                         adminApi().changeParticipantPassword(json?.id, passwordInput?.value, confirmPasswordInput?.value)
                             .then(resp => {
                                 if (resp.ok) {
-                                    alert('Пароль изменен')
+                                    notify('Пароль изменен')
                                     setUserPanel(parenDiv, participantId)
                                     modal.remove()
                                     return
@@ -772,7 +772,7 @@ function setUserPanel(parenDiv, participantId) {
                             })
                             .then(json => {
                                 if (json) {
-                                    alert(JSON.stringify(json))
+                                    notify(JSON.stringify(json))
                                 }
                             })
                     }
@@ -798,7 +798,7 @@ function setUserPanel(parenDiv, participantId) {
                 blockContent.appendChild(changeDataBtn)
 
                 let modal = getModalWindow('Смена данных пользователя', blockContent)
-                modal.style.display = 'block'
+                modal.style.display = 'flex'
 
                 changeDataBtn.addEventListener('click', () => {
                     const cf = confirm('Сменить данные пользователя?')
@@ -816,7 +816,7 @@ function setUserPanel(parenDiv, participantId) {
                             }
                         ).then(resp => {
                             if (resp.ok) {
-                                alert('Данные изменены')
+                                notify('Данные изменены')
                                 setUserPanel(parenDiv, participantId)
                                 modal.remove()
                                 return
@@ -824,7 +824,7 @@ function setUserPanel(parenDiv, participantId) {
                             return resp?.json()
                         }).then(json => {
                             if (json) {
-                                alert(JSON.stringify(json))
+                                notify(JSON.stringify(json))
                             }
                         })
                     }
@@ -873,7 +873,7 @@ function setUserPanel(parenDiv, participantId) {
                 })
 
                 let modal = getModalWindow('Добавление диапазона пользователю', blockContent)
-                modal.style.display = 'block'
+                modal.style.display = 'flex'
             })
 
             let rangesLabel = getTextLabel('Диапазоны: ')
@@ -945,12 +945,12 @@ function setUserPanel(parenDiv, participantId) {
                     if (qrCode) {
                         window.open(`/qr?q=${qrCode}`)
                     } else {
-                        alert('Ошибка при получении qr кода')
+                        notify('Ошибка при получении qr кода')
                     }
                 })
             }
         })
-        .catch(ex => alert(ex))
+        .catch(ex => notify(ex))
 }
 
 function setUsersPanel(parentDiv) {
@@ -990,7 +990,7 @@ function setUsersPanel(parentDiv) {
             )
             parentDiv.append(table)
         })
-        .catch(ex => alert(ex))
+        .catch(ex => notify(ex))
 }
 
 function setRequestsPanel(parentDiv) {
@@ -1020,17 +1020,6 @@ function setRequestsPanel(parentDiv) {
         }
     )
     parentDiv.append(table)
-
-    // adminApi().getParticipants()
-    //     .then(resp => {
-    //         if (!resp.ok)
-    //             throw new Error('Ошибка при получении участников')
-    //         return resp.json()
-    //     })
-    //     .then(json => {
-
-    //     })
-    //     .catch(ex => alert(ex))
 }
 
 function getRangesCallback(ranges) {

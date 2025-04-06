@@ -167,7 +167,7 @@ export function emptyOrUndefined(value) {
 }
 
 export const processFetchError = (error) => {
-    alert(error)
+    notify(error)
 }
 
 export function notNullOrUndefined(value) {

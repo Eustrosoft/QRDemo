@@ -125,10 +125,13 @@ input {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
-    height: 100%;
+    z-index: 10000;
+    height: 100vh;
     width: 100%;
     overflow: auto;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
     background-color: rgba(0, 0, 0, 0.4);
 
     .modal-header {
@@ -155,9 +158,9 @@ input {
             color: var(--font-half-color);
             font-weight: bold;
 
-            font-size: 3em;
+            font-size: 2.4em;
             line-height: 20px;
-            padding: 0 2px 4px 8px;
+            padding: 2px 4px 4px 8px;
         }
 
         .close:hover,
@@ -170,9 +173,9 @@ input {
 
     .modal-content {
         background-color: var(--bg-color);
-        margin: 15% auto;
         border: 1px solid var(--border-color);
         width: 80%;
+        margin: 5% 0;
         box-shadow: 0 7px 20px 5px var(--box-shadow);
         border-radius: .7rem;
 
@@ -195,8 +198,8 @@ input {
 
         .modal-content-inner {
             padding: 6px;
-            border-bottom-right-radius: 50%;
-            border-bottom-left-radius: 50%;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
         }
     }
 }

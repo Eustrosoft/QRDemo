@@ -140,14 +140,13 @@ function getEditCardInfoHtml(qr) {
         qrAction = QR_ACTIONS_TRANSLATIONS_RU['STD']
     }
     let accordion = getAccordion(basicFieldsDiv, `Карточка: ${qr?.name} (${qrAction}) [${longToHex(qr?.code)}]`)
-
     codeDiv.appendChild(accordion)
 
     formViewBtn.addEventListener('click', () => {
         let formElement = document.getElementById('form_select')
         let formId = formElement.options[formElement.selectedIndex].id
         if (formId) {
-            window.open(`?form=true&id=${formId}`, '_blank')
+            window.open(`?page=forms&id=${formId}`, '_blank')
         }
     })
 
@@ -219,7 +218,7 @@ function renderCardFiles(parentDiv, qr) {
             })
             let editBtn = getBigButton('Открыть')
             editBtn.addEventListener('click', () => {
-                showEditFileModal(file?.id, true)
+                showEditFileModal(file?.id, false, getNewQRFilesAndRenderFilesList, qr, parentDiv)
             })
             actionCol.append(editBtn, openBtn)
             file['actions'] = actionCol
@@ -236,7 +235,7 @@ function renderCardFiles(parentDiv, qr) {
         })
         let editBtn = getBigButton('Открыть')
         editBtn.addEventListener('click', () => {
-            showEditFileModal(file?.id, true)
+            showEditFileModal(file?.id, false, getNewQRFilesAndRenderFilesList, qr, parentDiv)
         })
         let removeBtn = getBigButton('Открепить')
         removeBtn.addEventListener('click', () => {
@@ -475,7 +474,7 @@ function addCodeBtnListeners() {
             iframe.style.width = '436px'
             iframe.style.height = '567px'
             let modal = getModalWindow('Просмотр с телефона', iframe)
-            modal.style.display = 'block'
+            modal.style.display = 'flex'
             modal.firstChild.style.width = '440px'
             modal.firstChild.style.height = '622px'
         })

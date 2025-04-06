@@ -25,7 +25,9 @@ import { renderVersionHistory } from "./components/versions.js";
         // Url params
         const urlParams = new URLSearchParams(window.location.search)
         const q = urlParams.get('q')
+        const id = urlParams.get('id')
         const page = urlParams.get('page')
+        const edit = urlParams.get('edit')
 
         // Basic listeners
         initBasicListeners()
@@ -39,9 +41,14 @@ import { renderVersionHistory } from "./components/versions.js";
         } else if (page === 'lk') {
             renderLkPage()
         } else if (q) {
-            renderCardPage(q)
+            let isEdit = edit ? true : false
+            renderCardPage(q, false, isEdit)
         } else if (page === 'forms') {
-            renderFormPage()
+            if (id) {
+                renderFormPage(id)
+            } else {
+                renderFormPage()
+            }
         } else if (page === 'files') {
             renderFilesPage()
         } else {
@@ -252,7 +259,7 @@ async function login(e) {
     const login = document.getElementById('login').value
     const password = document.getElementById('password').value
     if (emptyOrUndefined(login) || emptyOrUndefined(password)) {
-        alert("Заполните все поля")
+        notify("Заполните все поля")
         return
     }
 
@@ -265,7 +272,7 @@ async function login(e) {
         processToLk()
         return
     } catch (e) {
-        alert(e?.message)
+        notify(e?.message)
     }
 }
 
@@ -276,6 +283,6 @@ async function processToLk() {
         .then(data => {
             localStorage.setItem(LOCAL_STORAGE_USER, JSON.stringify(data))
         })
-        .then(rsp => window.location.href = '?lk=true')
+        .then(rsp => window.location.href = '?page=lk')
         .catch(processFetchErrorToLogin)
 }

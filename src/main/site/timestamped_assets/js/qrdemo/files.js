@@ -101,7 +101,7 @@ function printFilesList(parent, json) {
     }
 }
 
-export function showEditFileModal(id, reloadAfterEdit = true) {
+export function showEditFileModal(id, reloadAfterEdit = true, actionAfterUpdate = null, ...actionArgs) {
     qrApi().getById(id)
         .then(resp => resp.json())
         .then(json => {
@@ -127,7 +127,7 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
 
             fileEditForm.append(isPublicInput, isActiveInput, updateBtn, copyBtn) // changeFileBtn
             let modal = getModalWindow('Редактирование файла', fileEditForm)
-            modal.style.display = 'block'
+            modal.style.display = 'flex'
 
             updateBtn.addEventListener('click', () => {
                 qrApi().updateFile(
@@ -144,11 +144,13 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                         return resp.json
                     throw new Error('Неизвестная ошибка')
                 }).then(json => {
-                    alert('Файл был обновлен')
+                    notify('Файл был обновлен')
                     if (reloadAfterEdit) {
                         window.location.reload()
+                    } else {
+                        actionAfterUpdate(...actionArgs)
                     }
-                }).catch(ex => alert('Неизвестная ошибка при обновлении файла'))
+                }).catch(ex => notify('Неизвестная ошибка при обновлении файла'))
             })
 
             copyBtn.addEventListener('click', () => {
@@ -193,14 +195,14 @@ export function showEditFileModal(id, reloadAfterEdit = true) {
                                     { file: document.getElementById('file_content') },
                                     settingsJson
                                 )
-                            }).then(resp => alert('Файл успешно загружен!'))
+                            }).then(resp => notify('Файл успешно загружен!'))
                             .catch(e => notify(e, 'Ошибка загрузки файла'))
                     } catch (e) {
                         notify(e)
                     }
                 })
                 let modal = getModalWindow('Замена файла', fileChangeDiv)
-                modal.style.display = 'block'
+                modal.style.display = 'flex'
             })
         })
 }
@@ -381,7 +383,7 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadFileCallback
     fileUploadNewWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, uploadFileBtn)
     fileUploadForm.append(fileUploadNewWindow)
     let modalUploadFile = getModalWindow('Загрузка файла', fileUploadForm)
-    modalUploadFile.style.display = 'block'
+    modalUploadFile.style.display = 'flex'
 
     //addFileLinkWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, uploadFileBtn)
     // addFileLinkWindow.append(fileUploadNewWindow)
@@ -479,7 +481,7 @@ export function showLinkFileModal(uploadFileCallback, closeOnComplete = true, cl
     fileLinkNewWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, addFileLinkBtn)
     fileLinkForm.append(fileLinkNewWindow)
     let modal = getModalWindow('Привязка ссылки на файл', fileLinkForm)
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
 
     let fileLink = document.getElementById('file_link')
     let fileName = document.getElementById('file_name')

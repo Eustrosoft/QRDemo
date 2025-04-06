@@ -60,7 +60,7 @@ function init() {
         saveFormBtn.innerText = 'Сохранить'
         saveFormBtn.addEventListener('click', () => {
             if (formName.value === null || formName.value === undefined || formName.value === '') {
-                alert("Название шаблона не может быть пустое")
+                notify("Название шаблона не может быть пустое")
                 return
             }
             const collectedFields = Field.htmlToFields(formDiv);
@@ -70,14 +70,14 @@ function init() {
                 qrApi().updateForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles, formId))
                     .then((resp) => {
                         if (resp.ok) {
-                            alert('Шаблон был обновлен!')
+                            notify('Шаблон был обновлен!')
                             renderFormPage(formId)
                         } else {
                             throw Error('unexpected error')
                         }
                     })
                     .catch(() => {
-                        alert('Ошибка при обновлении шаблона, проверьте одинаковые поля')
+                        notify('Ошибка при обновлении шаблона, проверьте одинаковые поля')
                     })
             } else {
                 qrApi().saveForm(Field.fieldsToSaveForm(formName.value, formDescription.value, collectedFields, collectedFiles))
@@ -90,8 +90,8 @@ function init() {
                     .then(json => {
                         setQueryParamsAndRefresh([{ name: 'form', value: true }, { name: 'id', value: json.id }])
                     })
-                    .then(() => alert('Шаблон был создан!'))
-                    .catch(() => alert('Ошибка при создании шаблона'))
+                    .then(() => notify('Шаблон был создан!'))
+                    .catch(() => notify('Ошибка при создании шаблона'))
             }
         })
         basicCard.appendChild(saveFormBtn)
@@ -117,7 +117,7 @@ function init() {
     } else {
         qrApi().getAllForms().then(resp => resp.json())
             .then(json => printFormsList(basicCard, json))
-            .catch(ex => alert(ex))
+            .catch(ex => notify(ex))
     }
 }
 
@@ -164,7 +164,7 @@ export function deleteForm(id) {
         qrApi().deleteForm(id)
             .then(resp => resp.ok)
             .then(ok => renderFormPage())
-            .catch(ex => alert(ex))
+            .catch(ex => notify(ex))
     }
 }
 
@@ -257,7 +257,7 @@ function renderFormFiles(form, parentDiv) {
         })
         let editBtn = getBigButton('Открыть')
         editBtn.addEventListener('click', () => {
-            showEditFileModal(file?.id, true)
+            showEditFileModal(file?.id, false, getNewFormFilesAndRenderFilesList, form, parentDiv)
         })
         let removeBtn = getBigButton('Открепить')
         removeBtn.addEventListener('click', () => {
@@ -439,7 +439,7 @@ function setStartActions() {
                     }
                     throw new Error("Неизвестная ошибка при создании шаблона");
                 }).then(json => renderFormPage())
-                .catch(ex => alert(ex))
+                .catch(ex => notify(ex))
         })
 }
 

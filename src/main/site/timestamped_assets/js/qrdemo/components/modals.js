@@ -80,12 +80,12 @@ export function showGenerateRandomPasswordModal() {
                 }, 1_000)
                 return
             }
-            alert('Нечего копировать')
+            notify('Нечего копировать')
         }
     })
 
     let modal = getModalWindow('Генерация случайного пароля', generatePasswordBlock)
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
     let rndPassInput = document.getElementById('random_password_input')
     if (rndPassInput) {
         const randomPassword = generateRandomPassword()
@@ -124,7 +124,7 @@ export function showAboutModal() {
 
     aboutBlock.appendChild(versionSpan)
     let modal = getModalWindow('О сервисе', aboutBlock)
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
 }
 
 export function showContactModal() {
@@ -157,7 +157,7 @@ export function showContactModal() {
     contactBlock.appendChild(contactPhoneParagraph)
 
     let modal = getModalWindow('Связаться с нами', contactBlock)
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
 }
 
 export function showCreateQrModal(renderQRsTableCallback, div, settings, userDetails) {
@@ -231,5 +231,5 @@ export function showCreateQrModal(renderQRsTableCallback, div, settings, userDet
 
     createQrModal.append(nameBlock, descriptionBlock, formLabel, formChooseElement, rangeLabel, rangeSelect, createBtn)
     let modal = getModalWindow('Создание карточки', createQrModal)
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
 }
