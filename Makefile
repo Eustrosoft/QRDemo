@@ -44,6 +44,7 @@ ROOT:
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/icons
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/commons
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo
+	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/signup
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/components
 	mkdir -p  work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/domain
 #
@@ -125,6 +126,7 @@ ROOT:
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/package.json work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/package.json
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/utils.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/utils.js
 	install -m 644 src/main/site/timestamped_assets/js/qrdemo/files.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/files.js
+	install -m 644 src/main/site/timestamped_assets/js/signup/signup.js work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/js/qrdemo/signup.js
 	install -m 644 src/main/site/timestamped_assets/styles/animations.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/animations.css
 	install -m 644 src/main/site/timestamped_assets/styles/dop.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/dop.css
 	install -m 644 src/main/site/timestamped_assets/styles/global.css work/webapps/ROOT/${TIME_STAMP_BLA_BLA}/styles/global.css
