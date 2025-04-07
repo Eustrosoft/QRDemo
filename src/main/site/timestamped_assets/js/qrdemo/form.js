@@ -32,6 +32,7 @@ export function renderFormPage(id, create = false, update = false) {
 
 function init() {
     document.title = `QRDemo - Шаблоны`
+    window.scrollTo(0, 0);
     formFields = []
 
     const mainBlock = document.getElementById('main_block')

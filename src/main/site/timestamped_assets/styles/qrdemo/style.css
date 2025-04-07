@@ -1276,7 +1276,7 @@ tr.participantRow {
 
 .tooltip {
     position: absolute;
-    top: 100%;
+    bottom: 80%;
     left: 50%;
     transform: translateX(-50%);
     background: var(--bg-secondary-color);

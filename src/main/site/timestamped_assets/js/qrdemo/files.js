@@ -18,6 +18,7 @@ export function renderFilesPage(filesParam) {
 
 function init() {
     document.title = `QRDemo - Файлы`
+    window.scrollTo(0, 0);
 
     fileSelection = window.location.hash.substring(1)
 

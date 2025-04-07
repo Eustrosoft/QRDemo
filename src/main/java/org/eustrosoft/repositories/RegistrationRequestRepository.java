@@ -2,8 +2,10 @@ package org.eustrosoft.repositories;
 
 import org.eustrosoft.entitites.RegistrationRequest;
 import org.eustrosoft.entitites.enums.RegistrationStatus;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -13,6 +15,13 @@ import java.util.UUID;
 public interface RegistrationRequestRepository extends CrudRepository<RegistrationRequest, Long> {
 
     <T> Iterable<T> findAllByCreatedBeforeOrderByCreatedDesc(Date before, Class<T> type);
+
+    @Modifying
+    @Query(value = "UPDATE RegistrationRequest SET status = :status WHERE id = :id")
+    Integer changeState(
+            @Param("id") Long id,
+            @Param("status") RegistrationStatus status
+    );
 
     // TODO: error with processing UUID from postgresql (type error 1111)
     @Query(nativeQuery = true, value = "SELECT save_registration_request(?1, ?2, ?3, CAST(?4 AS INET), ?5, ?6)")

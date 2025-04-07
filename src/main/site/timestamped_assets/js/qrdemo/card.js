@@ -24,6 +24,7 @@ var qrId
 var qrCode
 export function renderCardPage(q, creating = false, editing = false) {
     document.title = `QRDemo - Карточка ${q}`
+    window.scrollTo(0, 0);
     const urlParams = new URLSearchParams(window.location.search)
     edit = editing
     create = creating

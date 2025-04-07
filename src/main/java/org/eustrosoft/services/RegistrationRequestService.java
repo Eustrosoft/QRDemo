@@ -24,14 +24,13 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class RegistrationRequestService {
-
-    private final RegistrationRequestRepository registrationRequestRepository;
+    private final RegistrationRequestRepository repository;
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<RegistrationRequest> getAllRegistrationRequests() {
+    public List<RegistrationRequest> findAll() {
         return CommonUtils.iterableToList(
-                registrationRequestRepository.findAllByCreatedBeforeOrderByCreatedDesc(
+                repository.findAllByCreatedBeforeOrderByCreatedDesc(
                         new Date(),
                         RegistrationRequest.class
                 )
@@ -39,11 +38,17 @@ public class RegistrationRequestService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public RegistrationRequest findById(Long id) {
+        return repository.findById(id).get();
+    }
+
+    @Transactional(readOnly = true)
     public RegistrationRequestRepository.RegistrationRequestDetails getRegistrationRequestDetails(
             UUID requestIdentifier
     ) {
         RegistrationRequestRepository.RegistrationRequestDetails registrationRequestDetails
-                = registrationRequestRepository.getRegistrationRequestDetails(requestIdentifier);
+                = repository.getRegistrationRequestDetails(requestIdentifier);
         if (registrationRequestDetails == null) {
             throw new CommonException(
                     new JsonApiError(
@@ -62,7 +67,7 @@ public class RegistrationRequestService {
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
         try {
-            return UUID.fromString(registrationRequestRepository.saveRegistrationRequest(
+            return UUID.fromString(repository.saveRegistrationRequest(
                     registrationRequest.getUsername(),
                     registrationRequest.getPassword(),
                     registrationRequest.getEmail(),

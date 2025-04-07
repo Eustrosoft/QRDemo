@@ -385,6 +385,58 @@ export function adminApi() {
             )
             return authFetch(req)
         },
+        getRegistrationRequest: (id) => {
+            let url = `${QR_DEMO_API}admin/panel/registrations/${id}`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'GET',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
+        },
+        startRegistrationRequest: (id) => {
+            let url = `${QR_DEMO_API}admin/panel/registrations/${id}/start-processing`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
+        },
+        acceptRegistrationRequest: (id, reasonMsg) => {
+            let url = `${QR_DEMO_API}admin/panel/registrations/${id}/accept`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
+        },
+        rejectRegistrationRequest: (id, reasonMsg) => {
+            let url = `${QR_DEMO_API}admin/panel/registrations/${id}/reject`;
+
+            const req = new Request(
+                url,
+                {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include'
+                }
+            )
+            return authFetch(req)
+        },
         getParticipants: () => {
             let url = `${QR_DEMO_API}admin/panel/participants`;
 

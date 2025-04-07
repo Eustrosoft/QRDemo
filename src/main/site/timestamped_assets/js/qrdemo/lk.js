@@ -16,7 +16,7 @@ import { requestsMock } from "./mocks.js";
 import { notify } from "./notifications.js";
 import { formatDate } from "../commons/dateUtils.js";
 import { renderCardPage } from "./card.js";
-import { getStatusLine } from "./components/statuses.js";
+import { getStatusLine, REGISTRATION_STATUSES } from "./components/statuses.js";
 
 const mainBlock = document.getElementById('main_block')
 
@@ -34,6 +34,7 @@ export function renderLkPage(range, setting, part, createPart) {
     toLoginIfNotAuthorized()
         .then(resp => {
             document.title = 'QRDemo - Карточки'
+            window.scrollTo(0, 0);
 
             ranges = range
             settings = setting
@@ -98,7 +99,7 @@ function setSettings(div, settingsJson, userDetails) {
     let uploadCheckSizeDiv = document.createElement('div')
     let uploadCheckSizeLabel = getTextLabel('Проверять размер файла перед загрузкой')
     let uploadCheckSizeSwitch = getSwitch(
-        checkUploadSizeValue == undefined ? true : checkUploadSizeValue, 
+        checkUploadSizeValue == undefined ? true : checkUploadSizeValue,
         null, null, 'check_upload_size'
     )
     uploadCheckSizeDiv.append(uploadCheckSizeLabel, uploadCheckSizeSwitch)
@@ -655,6 +656,46 @@ function setupAdminPanel(div) {
     div.appendChild(adminDiv)
 }
 
+function setUsersPanel(parentDiv) {
+    parentDiv.innerHTML = ''
+
+    let headers = [
+        new TableHead('№', '3%', DOWNRAISING_INDEX),
+        new TableHead('Имя', '10%', 'username'),
+        new TableHead('Почта', '10%', 'email'),
+        new TableHead('Организация', '10%', 'organization'),
+        new TableHead('Роли', '10%', 'roles', getRolesCallback),
+        new TableHead('Создан', '10%', 'created', getDateCallback),
+        new TableHead('Диапазоны', '15%', 'ranges', getRangesCallback)
+    ]
+
+    adminApi().getParticipants()
+        .then(resp => {
+            if (!resp.ok)
+                throw new Error('Ошибка при получении участников')
+            return resp.json()
+        })
+        .then(json => {
+            let table = getComplexTable(
+                headers,
+                json,
+                'participantRow',
+                'participantsTable',
+                'compact_table',
+                'id',
+                (e) => {
+                    let pId = e.currentTarget.getAttribute('key')
+                    let selection = document.getSelection()
+                    if (selection.type !== "Range") {
+                        setUserPanel(parentDiv, pId)
+                    }
+                }
+            )
+            parentDiv.append(table)
+        })
+        .catch(ex => notify(ex))
+}
+
 function setUserPanel(parenDiv, participantId) {
     parenDiv.innerHTML = ''
 
@@ -954,46 +995,6 @@ function setUserPanel(parenDiv, participantId) {
         .catch(ex => notify(ex))
 }
 
-function setUsersPanel(parentDiv) {
-    parentDiv.innerHTML = ''
-
-    let headers = [
-        new TableHead('№', '3%', DOWNRAISING_INDEX),
-        new TableHead('Имя', '10%', 'username'),
-        new TableHead('Почта', '10%', 'email'),
-        new TableHead('Организация', '10%', 'organization'),
-        new TableHead('Роли', '10%', 'roles', getRolesCallback),
-        new TableHead('Создан', '10%', 'created', getDateCallback),
-        new TableHead('Диапазоны', '15%', 'ranges', getRangesCallback)
-    ]
-
-    adminApi().getParticipants()
-        .then(resp => {
-            if (!resp.ok)
-                throw new Error('Ошибка при получении участников')
-            return resp.json()
-        })
-        .then(json => {
-            let table = getComplexTable(
-                headers,
-                json,
-                'participantRow',
-                'participantsTable',
-                'compact_table',
-                'id',
-                (e) => {
-                    let pId = e.currentTarget.getAttribute('key')
-                    let selection = document.getSelection()
-                    if (selection.type !== "Range") {
-                        setUserPanel(parentDiv, pId)
-                    }
-                }
-            )
-            parentDiv.append(table)
-        })
-        .catch(ex => notify(ex))
-}
-
 function setRequestsPanel(parentDiv) {
     parentDiv.innerHTML = ''
 
@@ -1007,7 +1008,7 @@ function setRequestsPanel(parentDiv) {
                 new TableHead('Создана', '10%', 'created', getDateCallback),
                 new TableHead('Статус', '10%', 'status', getStatusCallback, true)
             ]
-        
+
             let table = getComplexTable(
                 headers,
                 json,
@@ -1019,16 +1020,93 @@ function setRequestsPanel(parentDiv) {
                     let pId = e.currentTarget.getAttribute('key')
                     let selection = document.getSelection()
                     if (selection.type !== "Range") {
-                        // setUserPanel(parentDiv, pId)
+                        setRequestPanel(parentDiv, pId)
                     }
                 }
             )
-            parentDiv.append(table)  
+            parentDiv.append(table)
         })
 }
 
+
+function setRequestPanel(parenDiv, registrationId) {
+    parenDiv.innerHTML = ''
+
+    adminApi().getRegistrationRequest(registrationId)
+        .then(resp => resp.json())
+        .then(json => {
+            let username = get2TextLabels('Имя: ', json?.username)
+            let email = get2TextLabels('Email: ', json?.email)
+            let ipAddress = get2TextLabels('IP адрес: ', json?.ipAddress)
+            let userAgent = get2TextLabels('Браузер: ', json?.userAgent)
+            let referrerUrl = get2TextLabels('Пришли со ссылки: ', json?.referrerUrl)
+            let uniqueRegistrationCode = get2TextLabels('Регистрационный ID: ', json?.registrationId)
+
+            let statusDiv = document.createElement('div')
+            statusDiv.style.display = 'flex'
+            let status = getTextLabel('Статус: ')
+            let statusLine = getStatusLine(REGISTRATION_STATUSES, json?.status)
+            statusDiv.append(status, statusLine)
+
+            parenDiv.appendChild(username)
+            parenDiv.appendChild(email)
+            parenDiv.appendChild(uniqueRegistrationCode)
+            parenDiv.appendChild(ipAddress)
+            parenDiv.appendChild(userAgent)
+            parenDiv.appendChild(referrerUrl)
+            parenDiv.appendChild(document.createElement('br'))
+            parenDiv.appendChild(statusDiv)
+
+            const keys = Object.keys(REGISTRATION_STATUSES)
+            if (json?.status == keys[0]) {
+                let processInWorkBtn = getBigButton('Взять в работу')
+                processInWorkBtn.addEventListener('click', () => {
+                    adminApi().startRegistrationRequest(json?.id)
+                        .then(resp => {
+                            if (!resp.ok)
+                                return Promise.reject(resp)
+                            return resp.json()
+                        }).then(json => {
+                            setRequestPanel(parenDiv, registrationId)
+                            notify('Заявка была принята в работу!')
+                        }).catch(processFetchError)
+                })
+                parenDiv.appendChild(processInWorkBtn)
+            } else if (json?.status == keys[1]) {
+                let acceptBtn = getBigButton('Принять заявку')
+                let rejectBtn = getBigButton('Отклонить заявку')
+                acceptBtn.addEventListener('click', () => {
+                    
+                    adminApi().acceptRegistrationRequest(json?.id)
+                        .then(resp => {
+                            if (!resp.ok)
+                                return Promise.reject(resp)
+                            return resp.json()
+                        }).then(json => {
+                            setRequestPanel(parenDiv, registrationId)
+                            notify('Заявка была принята!')
+                        }).catch(processFetchError)
+                })
+                rejectBtn.addEventListener('click', () => {
+                    adminApi().rejectRegistrationRequest(json?.id)
+                        .then(resp => {
+                            if (!resp.ok)
+                                return Promise.reject(resp)
+                            return resp.json()
+                        }).then(json => {
+                            setRequestPanel(parenDiv, registrationId)
+                            notify('Заявка была отклонена!')
+                        }).catch(processFetchError)
+                })
+                parenDiv.appendChild(acceptBtn)
+                parenDiv.appendChild(rejectBtn)
+            }
+        })
+        .catch(ex => notify(ex))
+}
+
 function getStatusCallback(status) {
-    return getStatusLine(['PENDING', 'IN_WORK', 'ACCEPTED', 'REJECTED'], status)
+    return getStatusLine(REGISTRATION_STATUSES, status)
 }
 
 function getRangesCallback(ranges) {
