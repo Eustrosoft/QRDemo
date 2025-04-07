@@ -30,8 +30,9 @@ export function toLoginIfNotAuthorized() {
         })
 }
 
-export const processFetchErrorToLogin = (error) => {
-    window.location.href = '?page=login'
+export const processFetchErrorToLogin = (error, urlParams) => {
+    let params = urlParams != null ? '&' + urlParams.toString() : ''
+    window.location.href = '?page=login' + params
 }
 
 export function getQRImage(code, x = 300) {

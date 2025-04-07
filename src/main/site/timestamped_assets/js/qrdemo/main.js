@@ -12,7 +12,7 @@ import { showAboutModal, showContactModal } from "./components/modals.js";
 import { Loader } from "./components/loader.js";
 import { getSwitch } from "./components/inputs.js";
 import { getSpan, MAIN_TEXT } from "./components/texts.js";
-import { processFetchError } from "../commons/common.js";
+import { notEmptyOrUndefined, processFetchError } from "../commons/common.js";
 import { renderVersionHistory } from "./components/versions.js";
 
 (function (window, document, undefined) {
@@ -39,7 +39,12 @@ import { renderVersionHistory } from "./components/versions.js";
                 renderLoginForm(mainBlock);
             }
         } else if (page === 'lk') {
-            renderLkPage()
+            if (q) {
+                let isEdit = edit ? true : false
+                renderCardPage(q, false, isEdit)
+            } else {
+                renderLkPage()
+            }
         } else if (q) {
             let isEdit = edit ? true : false
             renderCardPage(q, false, isEdit)
@@ -283,6 +288,12 @@ async function processToLk() {
         .then(data => {
             localStorage.setItem(LOCAL_STORAGE_USER, JSON.stringify(data))
         })
-        .then(rsp => window.location.href = '?page=lk')
+        .then(rsp => {
+            const urlParams = new URLSearchParams(window.location.search)
+            let q = notEmptyOrUndefined(urlParams.get('q')) ? urlParams.get('q') : ''
+            let edit = notEmptyOrUndefined(urlParams.get('edit')) ? urlParams.get('edit') : ''
+            let val = `q=${q}&edit=${edit}`
+            window.location.href = '?page=lk&' + val
+        })
         .catch(processFetchErrorToLogin)
 }

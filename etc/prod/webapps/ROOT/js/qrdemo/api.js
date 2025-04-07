@@ -834,7 +834,8 @@ class RequestDecorators {
                     return resp
                 }).catch(resp => {
                     if (resp.status == 401) {
-                        processFetchErrorToLogin()
+                        const urlParams = new URLSearchParams(window.location.search)
+                        processFetchErrorToLogin(null, urlParams)
                     } else {
                         processFetchError(resp)
                     }
