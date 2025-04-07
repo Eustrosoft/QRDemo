@@ -383,7 +383,7 @@ export function showUploadFileModal(uploadFileCallback, chooseUploadFileCallback
 
     fileUploadNewWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, uploadFileBtn)
     fileUploadForm.append(fileUploadNewWindow)
-    let modalUploadFile = getModalWindow('Загрузка файла', fileUploadForm)
+    let modalUploadFile = getModalWindow('Загрузка файла', fileUploadForm, false)
     modalUploadFile.style.display = 'flex'
 
     //addFileLinkWindow.append(fileNameInput, fileDescriptionInput, isPublicInput, isActiveInput, fileInput, uploadFileBtn)

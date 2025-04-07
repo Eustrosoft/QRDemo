@@ -9,7 +9,7 @@ import { getInput } from "./inputs.js"
 import { getTextLabel } from "./labels.js"
 import { getParagraph, getSpan } from "./texts.js"
 
-export function getModalWindow(modalName, modalInner) {
+export function getModalWindow(modalName, modalInner, makeInnerScrollable = true) {
     let modalWindow = document.createElement('div')
     modalWindow.className = 'modal'
 
@@ -18,6 +18,10 @@ export function getModalWindow(modalName, modalInner) {
     modalContent.className = 'modal-content'
     modalContent.prepend(getModalHeader(modalWindow, modalName))
     modalInner.classList.add('modal-content-inner')
+    if (makeInnerScrollable) {
+        modalInner.style.maxHeight = '80vh'
+        modalInner.style.overflowY = 'auto'
+    }
     modalContent.append(modalInner)
 
     modalWindow.appendChild(modalContent)

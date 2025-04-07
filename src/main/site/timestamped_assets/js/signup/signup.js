@@ -1,5 +1,5 @@
-const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
-const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
+const QR_DEMO_API_DEV = `${window.location.protocol}//${window.location.hostname}:9983/qr/v1/api/`
+const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
 
 const form = document.getElementById("signupForm");
 form.addEventListener("submit", function (event) {

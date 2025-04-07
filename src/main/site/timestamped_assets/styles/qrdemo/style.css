@@ -175,6 +175,7 @@ input {
         background-color: var(--bg-color);
         border: 1px solid var(--border-color);
         width: 80%;
+        max-height: 80vh;
         margin: 5% 0;
         box-shadow: 0 7px 20px 5px var(--box-shadow);
         border-radius: .7rem;
