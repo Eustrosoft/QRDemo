@@ -146,10 +146,13 @@ function getEditCardInfoHtml(qr) {
     accordionCapture.style.textAlign = 'center'
     accordionCapture.style.lineHeight = '1'
     accordionCapture.innerText = `Карточка: ${qr?.name} (${qrAction}) [${longToHex(qr?.code)}]`
+    let expanded = false
     if (!qr?.form) {
         createHoverableIcon(ICONS.WARNING, 'Не прикреплен шаблон', accordionCapture)
+        expanded = true
     }
-    let accordion = getAccordion(basicFieldsDiv, accordionCapture, true)
+
+    let accordion = getAccordion(basicFieldsDiv, accordionCapture, true, expanded)
 
     codeDiv.appendChild(accordion)
 
