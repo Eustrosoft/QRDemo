@@ -9,6 +9,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.net.IDN;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Objects;
 
 @Component
@@ -36,6 +39,16 @@ public final class HttpUtils {
         cookieBuilder.sameSite("Lax");
         ResponseCookie cookie = cookieBuilder.build();
         response.addHeader("Set-Cookie", cookie.toString());
+    }
+
+    public static String getASCIIUrl(final String url) throws MalformedURLException {
+        if (StringUtils.isBlank(url)) {
+            return "";
+        }
+        URL urlObj = new URL(url);
+        String protocol = urlObj.getProtocol();
+        String idn = IDN.toASCII(urlObj.getHost());
+        return String.format("%s://%s", protocol, idn);
     }
 
     public Cookie[] getCookies() {

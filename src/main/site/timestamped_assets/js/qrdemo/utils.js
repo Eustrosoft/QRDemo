@@ -226,9 +226,9 @@ export function getRangeWithX(range, system = 10) {
         return ''
     }
     try {
-        let digits = parseInt(range?.to, system) - parseInt(range?.from, system)
+        let digits = parseInt(range?.to, system) - parseInt(range?.from, system) - 1
         let symbols = longToHex(digits).length
-        return longToHex(range?.to).substring(0, String(range?.to).length - symbols) + 'X'.repeat(symbols)
+        return longToHex(range?.to).substring(0, String(longToHex(range?.to)).length - symbols) + 'X'.repeat(symbols)
     } catch(e) {
         return ''
     }

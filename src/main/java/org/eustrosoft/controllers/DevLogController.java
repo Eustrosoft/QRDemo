@@ -126,7 +126,7 @@ public class DevLogController {
                 Date date1 = simpleDateFormat.parse(version1Date);
                 Date date2 = simpleDateFormat.parse(version2Date);
 
-                return date1.compareTo(date2);
+                return date2.compareTo(date1);
             } catch (Exception e) {
                 return 0;
             }

@@ -54,6 +54,7 @@ import static org.eustrosoft.Constants.FIRST_ZVER;
 import static org.eustrosoft.Constants.MAXIMUM_CHUNK_SIZE;
 import static org.eustrosoft.Constants.Properties.DEFAULT_MAXIMUM_CHUNKS;
 import static org.eustrosoft.Constants.Properties.MAXIMUM_CHUNKS;
+import static org.eustrosoft.utils.HttpUtils.getASCIIUrl;
 
 @Service
 @Transactional
@@ -271,7 +272,7 @@ public class FileService {
                     .getResponse();
             // TODO: think about redirect page on js
             // response.setHeader("Redirect-url", file.getStoragePath());
-            response.sendRedirect(file.getStoragePath());
+            response.sendRedirect(getASCIIUrl(file.getStoragePath()));
             return;
         }
 
