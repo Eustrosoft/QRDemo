@@ -1,5 +1,8 @@
 package org.eustrosoft.controllers;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
@@ -18,6 +21,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Success"),
+        @ApiResponse(code = 401, message = "Unauthorized"),
+        @ApiResponse(code = 403, message = "Unallowed to use this endpoint"),
+        @ApiResponse(code = 500, message = "Error on server")
+})
 @RestController
 @RequestMapping("/v1/api/unsecured/dev-log")
 public class DevLogController {
@@ -27,6 +36,7 @@ public class DevLogController {
     public static final String SPLIT_SYMBOL = "_";
     public static final String FILE_DATE_PATTERN = "dd.MM.yyyy";
 
+    @ApiOperation(value = "Get versions list with changes")
     @GetMapping("/versions")
     public List<VersionDto> getVersionsList() {
         try {
@@ -59,6 +69,7 @@ public class DevLogController {
         }
     }
 
+    @ApiOperation(value = "Get version info by version string")
     @GetMapping("/versions/{version}")
     public VersionDto getDevLog(@PathVariable("version") String version) {
         if (StringUtils.isBlank(version)) {
