@@ -68,9 +68,14 @@ public class RegistrationRequestService {
 
         try {
             return UUID.fromString(repository.saveRegistrationRequest(
-                    registrationRequest.getUsername(),
-                    registrationRequest.getPassword(),
+                    registrationRequest.getFirstName(),
+                    registrationRequest.getLastName(),
                     registrationRequest.getEmail(),
+                    registrationRequest.getPhoneNumber(),
+                    registrationRequest.getWebsite(),
+                    registrationRequest.getOrganization(),
+                    registrationRequest.getCountry(),
+                    registrationRequest.getCity(),
                     request.getRemoteAddr(),
                     request.getHeader(HttpHeaders.USER_AGENT),
                     request.getHeader(HttpHeaders.REFERER)

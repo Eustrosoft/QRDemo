@@ -46,17 +46,7 @@ public class RegistrationController {
                             HttpStatus.BAD_REQUEST, -1L,
                             "exceptions.title.parameter_not_provided",
                             "exceptions.detail.username_not_provided",
-                            new JsonApiError.Source("username, email, password, rePassword")
-                    )
-            );
-        }
-        if (!dto.getPassword().equals(dto.getRePassword())) {
-            throw new CommonException(
-                    new JsonApiError(
-                            HttpStatus.BAD_REQUEST, -1L,
-                            "exceptions.title.passwords_are_not_same",
-                            "exceptions.detail.passwords_are_not_same",
-                            new JsonApiError.Source("password")
+                            new JsonApiError.Source("firstName, lastName, email, phoneNumber, organization")
                     )
             );
         }

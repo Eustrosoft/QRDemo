@@ -2,8 +2,8 @@
 CREATE TABLE IF NOT EXISTS qrdemo.registration_request
 (
     -- form registration data
-    username      VARCHAR(128) NOT NULL UNIQUE,
-    password      VARCHAR(256) NOT NULL,
+    username      VARCHAR(128) UNIQUE,
+    password      VARCHAR(256),
     email         VARCHAR(256) NOT NULL UNIQUE,
 
     -- user metadata

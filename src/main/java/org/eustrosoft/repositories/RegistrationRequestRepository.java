@@ -24,11 +24,19 @@ public interface RegistrationRequestRepository extends CrudRepository<Registrati
     );
 
     // TODO: error with processing UUID from postgresql (type error 1111)
-    @Query(nativeQuery = true, value = "SELECT save_registration_request(?1, ?2, ?3, CAST(?4 AS INET), ?5, ?6)")
+    @Query(
+            nativeQuery = true,
+            value = "SELECT save_registration_request(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, CAST(?9 AS INET), ?10, ?11)"
+    )
     String saveRegistrationRequest(
-            String username,
-            String password,
+            String firstName,
+            String lastName,
             String email,
+            String phoneNumber,
+            String website,
+            String organization,
+            String country,
+            String city,
             String inet,
             String userAgent,
             String referrerUrl

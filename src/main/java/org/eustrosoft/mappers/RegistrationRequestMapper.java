@@ -18,9 +18,14 @@ public class RegistrationRequestMapper extends EntityMapper {
 
     public RegistrationRequest toModel(RegistrationRequestCreationDto dto) {
         RegistrationRequest request = new RegistrationRequest();
-        request.setUsername(dto.getUsername());
-        request.setPassword(dto.getPassword());
+        request.setFirstName(dto.getFirstName());
+        request.setLastName(dto.getLastName());
         request.setEmail(dto.getEmail());
+        request.setCity(dto.getCity());
+        request.setCountry(dto.getCountry());
+        request.setPhoneNumber(dto.getPhoneNumber());
+        request.setOrganization(dto.getOrganization());
+        request.setWebsite(dto.getWebsite());
         return request;
     }
 

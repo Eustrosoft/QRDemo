@@ -16,19 +16,29 @@ import javax.validation.constraints.Size;
 public class RegistrationRequestCreationDto extends EntityDto {
     @NotBlank
     @Size(max = 128)
-    private String username;
+    private String firstName;
     @NotBlank
-    @Size(max = 256)
-    private String password;
-    @NotBlank
-    @Size(max = 256)
-    private String rePassword;
+    @Size(max = 128)
+    private String lastName;
     @NotBlank
     @Size(max = 256)
     private String email;
+    @NotBlank
+    @Size(max = 32)
+    private String phoneNumber;
+    @Size(max = 2048)
+    private String website;
+    @NotBlank
+    @Size(max = 2048)
+    private String organization;
+    @Size(max = 128)
+    private String country;
+    @Size(max = 128)
+    private String city;
 
     public boolean hasEmptyFields() {
-        return StringUtils.isBlank(username) || StringUtils.isBlank(password)
-                || StringUtils.isBlank(rePassword) || StringUtils.isBlank(email);
+        return StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName)
+                || StringUtils.isBlank(email) || StringUtils.isBlank(phoneNumber)
+                || StringUtils.isBlank(organization);
     }
 }

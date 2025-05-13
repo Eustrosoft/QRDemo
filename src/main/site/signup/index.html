@@ -120,19 +120,35 @@
               <h1>Регистрация</h1>
               <label>
                 Имя
-                <input type="text" name="username" />
+                <input type="text" name="firstName" max="128"/>
+              </label>
+              <label>
+                Фамилия
+                <input type="text" name="lastName" max="128"/>
               </label>
               <label>
                 Электронная почта
-                <input type="email" name="email" />
+                <input type="email" name="email" max="256"/>
               </label>
               <label>
-                Пароль
-                <input type="password" name="password" />
+                Номер телефона
+                <input type="phone" name="phoneNumber" max="32"/>
               </label>
               <label>
-                Подтверждение пароля
-                <input type="password" name="rePassword" />
+                Веб-сайт
+                <input type="url" name="website" max="2048"/>
+              </label>
+              <label>
+                Организация
+                <input type="text" name="organization" max="256"/>
+              </label>
+              <label>
+                Страна
+                <input type="text" name="country" max="128"/>
+              </label>
+              <label>
+                Город
+                <input type="text" name="city" max="128"/>
               </label>
               <button filled type="submit">Отправить</button>
             </form>
