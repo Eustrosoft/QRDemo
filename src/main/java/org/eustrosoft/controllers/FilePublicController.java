@@ -1,28 +1,30 @@
 package org.eustrosoft.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.services.FileService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Success"),
-        @ApiResponse(code = 403, message = "Unallowed to use this endpoint"),
-        @ApiResponse(code = 500, message = "Error on server")
+        @ApiResponse(responseCode = "200", description = "Success"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Unallowed to use this endpoint"),
+        @ApiResponse(responseCode = "500", description = "Error on server")
 })
 @RestController
 @RequestMapping("/v1/api/unsecured/files")
 @RequiredArgsConstructor
+@Tag(name = "Public files API")
 public class FilePublicController {
     private final FileService service;
 
-    @ApiOperation(value = "Download file by ID and Filename")
+    @Operation(summary = "Download file by ID and Filename")
     @GetMapping("/{id}/download/{fileName}")
     public void downloadFile(@PathVariable Long id, @PathVariable String fileName) {
         service.downloadFile(id, fileName);

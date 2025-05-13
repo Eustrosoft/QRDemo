@@ -1,8 +1,9 @@
 package org.eustrosoft.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.entitites.QRRange;
 import org.eustrosoft.services.QRRangeService;
@@ -13,18 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 
 @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Success"),
-        @ApiResponse(code = 401, message = "Unauthorized"),
-        @ApiResponse(code = 403, message = "Unallowed to use this endpoint"),
-        @ApiResponse(code = 500, message = "Error on server")
+        @ApiResponse(responseCode = "200", description = "Success"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Unallowed to use this endpoint"),
+        @ApiResponse(responseCode = "500", description = "Error on server")
 })
 @RestController
 @RequestMapping("/v1/api/secured/ranges")
 @RequiredArgsConstructor
+@Tag(name = "QR Ranges API")
 public class QRRangeController {
     private final QRRangeService service;
 
-    @ApiOperation(value = "Get all available ranges to create QRs for current user")
+    @Operation(summary = "Get all available ranges to create QRs for current user")
     @GetMapping
     public Collection<QRRange> getMyRanges() throws IllegalAccessException {
         return service.getMyRanges();

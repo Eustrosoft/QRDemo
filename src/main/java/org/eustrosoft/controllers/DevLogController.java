@@ -1,8 +1,9 @@
 package org.eustrosoft.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
@@ -22,13 +23,14 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Success"),
-        @ApiResponse(code = 401, message = "Unauthorized"),
-        @ApiResponse(code = 403, message = "Unallowed to use this endpoint"),
-        @ApiResponse(code = 500, message = "Error on server")
+        @ApiResponse(responseCode = "200", description = "Success"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Unallowed to use this endpoint"),
+        @ApiResponse(responseCode = "500", description = "Error on server")
 })
 @RestController
 @RequestMapping("/v1/api/unsecured/dev-log")
+@Tag(name = "Development Log API")
 public class DevLogController {
     private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
@@ -36,7 +38,7 @@ public class DevLogController {
     public static final String SPLIT_SYMBOL = "_";
     public static final String FILE_DATE_PATTERN = "dd.MM.yyyy";
 
-    @ApiOperation(value = "Get versions list with changes")
+    @Operation(summary = "Get versions list with changes")
     @GetMapping("/versions")
     public List<VersionDto> getVersionsList() {
         try {
@@ -69,7 +71,7 @@ public class DevLogController {
         }
     }
 
-    @ApiOperation(value = "Get version info by version string")
+    @Operation(summary = "Get version info by version string")
     @GetMapping("/versions/{version}")
     public VersionDto getDevLog(@PathVariable("version") String version) {
         if (StringUtils.isBlank(version)) {

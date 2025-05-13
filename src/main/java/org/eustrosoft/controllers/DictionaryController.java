@@ -1,8 +1,9 @@
 package org.eustrosoft.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.entitites.Dictionary;
 import org.eustrosoft.services.DictionaryService;
@@ -15,24 +16,25 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Success"),
-        @ApiResponse(code = 401, message = "Unauthorized"),
-        @ApiResponse(code = 403, message = "Unallowed to use this endpoint"),
-        @ApiResponse(code = 500, message = "Error on server")
+        @ApiResponse(responseCode = "200", description = "Success"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Unallowed to use this endpoint"),
+        @ApiResponse(responseCode = "500", description = "Error on server")
 })
 @RestController("Dictionary")
 @RequestMapping("/v1/api/secured/dictionaries")
 @RequiredArgsConstructor
+@Tag(name = "Dictionary API")
 public class DictionaryController {
     private final DictionaryService service;
 
-    @ApiOperation(value = "Get list of available dictionaries")
+    @Operation(summary = "Get list of available dictionaries")
     @GetMapping
     public List<Dictionary> findListValues(@RequestParam String code) {
         return service.getDictionariesByCode(code);
     }
 
-    @ApiOperation(value = "Get dictionary by code")
+    @Operation(summary = "Get dictionary by code")
     @GetMapping("/{code}")
     public Dictionary findByCodeAndName(@PathVariable String code, @RequestParam String name) {
         return service.findByCodeAndName(code, name);
