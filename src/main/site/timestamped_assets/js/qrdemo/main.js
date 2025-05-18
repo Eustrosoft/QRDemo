@@ -243,6 +243,9 @@ function renderLoginForm(parent) {
         <label>Пароль: </label>
         <input type="password" id="password" placeholder="Введите пароль">
         <button class="big_button" id="login_submit">Войти</button>
+        <!-- <br> Или <br>
+        <a class="big_button" id="register" href="/signup/">Регистрация</a>
+        -->
     `
     parent.appendChild(loginPart)
     document.getElementById("login_submit")

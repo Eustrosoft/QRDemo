@@ -17,7 +17,6 @@ public class RegistrationRequestCreationDto extends EntityDto {
     @NotBlank
     @Size(max = 128)
     private String firstName;
-    @NotBlank
     @Size(max = 128)
     private String lastName;
     @NotBlank
@@ -37,8 +36,7 @@ public class RegistrationRequestCreationDto extends EntityDto {
     private String city;
 
     public boolean hasEmptyFields() {
-        return StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName)
-                || StringUtils.isBlank(email) || StringUtils.isBlank(phoneNumber)
+        return StringUtils.isBlank(firstName) || StringUtils.isBlank(email) || StringUtils.isBlank(phoneNumber)
                 || StringUtils.isBlank(organization);
     }
 }

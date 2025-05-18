@@ -24,18 +24,22 @@
   background-color: var(--secondary-color-variant);
 }
 
-.sign-up-content > form {
+.sign-up-content > form, .sign-up-content > div {
   display: flex;
   gap: 0.5rem;
   flex-direction: column;
   align-items: center;
 }
 
+#registrationSuccess {
+  display: none;
+}
+
 .sign-up-content > form > label {
   width: 50%;
 }
 
-.sign-up-content > form > label > input {
+.sign-up-content > form > label > input, textarea {
   display: block;
   border-radius: 0.25rem;
   padding: 0.75rem;

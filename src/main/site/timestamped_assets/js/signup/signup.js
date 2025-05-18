@@ -2,6 +2,8 @@ const QR_DEMO_API = `${window.location.protocol}//${window.location.hostname}:99
 const QR_DEMO_API_PROD = `${window.location.protocol}//${window.location.hostname}/qrCodeDemo/v1/api/`
 
 const form = document.getElementById("signupForm");
+const registrationSuccess = document.getElementById("registrationSuccess");
+
 form.addEventListener("submit", function (event) {
     event.preventDefault();
     const formData = new FormData(form);
@@ -14,7 +16,11 @@ form.addEventListener("submit", function (event) {
                 return Promise.reject(resp)
             }
             return resp.text()
-        }).then(text => alert(`Ваш уникальный регистрационный ID: ${text}, сохраните его, чтобы проверить статус заявки`))
+        }).then(text => {
+            // alert(`Ваш уникальный регистрационный ID: ${text}, сохраните его, чтобы проверить статус заявки`)
+            form.style.display = 'none'
+            registrationSuccess.style.display = 'block'
+        })
         .catch(resp => {
             return resp.json()
         }).then(json => {
