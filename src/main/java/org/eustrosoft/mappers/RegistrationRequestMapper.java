@@ -41,6 +41,7 @@ public class RegistrationRequestMapper extends EntityMapper {
         dto.setRegistrationId(model.getRegistrationId());
         dto.setFirstName(model.getFirstName());
         dto.setLastName(model.getLastName());
+        dto.setWebSite(model.getWebsite());
         dto.setReferrerUrl(model.getReferrerUrl());
         dto.setPhoneNumber(model.getPhoneNumber());
         dto.setReviewedAt(model.getReviewedAt());
