@@ -89,7 +89,7 @@ function init() {
                         throw new Error('Ошибка при сохранении')
                     })
                     .then(json => {
-                        setQueryParamsAndRefresh([{ name: 'form', value: true }, { name: 'id', value: json.id }])
+                        renderFormPage(json.id)
                     })
                     .then(() => notify('Шаблон был создан!'))
                     .catch(() => notify('Ошибка при создании шаблона'))
