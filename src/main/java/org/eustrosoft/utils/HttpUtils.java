@@ -53,6 +53,7 @@ public final class HttpUtils {
             try {
                 finalPath = finalPath.concat(IDN.toASCII(urlObj.getPath()));
             } catch (Exception e) {
+                finalPath = finalPath.concat(urlObj.getPath());
                 e.printStackTrace();
             }
         }
@@ -60,6 +61,7 @@ public final class HttpUtils {
             try {
                 finalPath = finalPath.concat(IDN.toASCII(urlObj.getQuery()));
             } catch (Exception e) {
+                finalPath = finalPath.concat(urlObj.getQuery());
                 e.printStackTrace();
             }
         }
