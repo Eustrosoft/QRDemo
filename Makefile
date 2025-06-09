@@ -53,6 +53,7 @@ ROOT:
 	install -m 644 src/main/site/printer/index.html work/webapps/ROOT/printer/index.html
 	install -m 644 src/main/site/tariffs/index.html work/webapps/ROOT/tariffs/index.html
 	install -m 644 src/main/site/signup/index.html work/webapps/ROOT/signup/index.html
+	install -m 644 src/main/site/signup/index2.html work/webapps/ROOT/signup/index2.html
 	install -m 644 src/main/site/help/index.html work/webapps/ROOT/help/index.html
 
 # substitutions
@@ -62,6 +63,7 @@ ROOT:
 	cat src/main/site/printer/index.html | sed "s/timestamped_assets/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/printer/index.html
 	cat src/main/site/tariffs/index.html | sed "s/timestamped_assets/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/tariffs/index.html
 	cat src/main/site/signup/index.html | sed "s/timestamped_assets/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/signup/index.html
+	cat src/main/site/signup/index2.html | sed "s/timestamped_assets/${TIME_STAMP_BLA_BLA}/g" > work/webapps/ROOT/signup/index2.html
 
 #Metrica
 	install -m 644 etc/prod/metrika/yandex_0f9e1cec15665a62.html work/webapps/ROOT/yandex_0f9e1cec15665a62.html
