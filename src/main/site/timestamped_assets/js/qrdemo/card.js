@@ -7,7 +7,7 @@ import { downloadFileUnsecured, showEditFileModal, showUploadFileModal } from ".
 import { addDeleteFileRowActions, Field } from "./form.js";
 import { get2TextLabels, getTextLabel } from "./components/labels.js";
 import { getInput, getSelect, getSingleInput } from "./components/inputs.js";
-import { booleanToString, notEmptyOrUndefined } from "../commons/common.js";
+import { booleanToString, notEmptyOrUndefined, setURLParams } from "../commons/common.js";
 import { getNavigationMenu } from "./components/blocks.js";
 import { formatDate } from "../commons/dateUtils.js";
 import { getLink } from "./components/link.js";
@@ -28,6 +28,7 @@ export function renderCardPage(q, creating = false, editing = false) {
     const urlParams = new URLSearchParams(window.location.search)
     edit = editing
     create = creating
+    setURLParams(`q=${q}&edit=${edit}`)
 
     setQRCard(q, mainBlock)
 }

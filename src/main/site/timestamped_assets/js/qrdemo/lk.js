@@ -182,7 +182,7 @@ function setSettings(div, settingsJson, userDetails) {
             .then(resp => {
                 if (resp.ok) {
                     notify('Настройки обновлены')
-                    location.reload()
+                    // location.reload()
                 }
             })
             .catch(ex => notify(ex))

@@ -1,6 +1,6 @@
 import { emptyOrUndefined, fieldToHtmlItems, formatBytes, setQueryParamsAndRefresh } from "./utils.js";
 import { dictionaryApi, qrApi, userApi } from "./api.js";
-import { booleanToString, getOrOther, notEmptyOrUndefined } from "../commons/common.js";
+import { booleanToString, getOrOther, notEmptyOrUndefined, setURLParams } from "../commons/common.js";
 import { getTextLabel } from "./components/labels.js";
 import { getInput } from "./components/inputs.js";
 import { DICTIONARIES } from "./domain/dictionaries.js";
@@ -23,6 +23,11 @@ export function renderFormPage(id, create = false, update = false) {
     formId = id
     creating = create
     updating = update
+    if (notEmptyOrUndefined(id)) {
+        setURLParams(`page=forms&id=${id}`)
+    } else {
+        setURLParams(`page=forms`)
+    }
 
     dictionaryApi().getDictionariesByCode(DICTIONARIES.INPUT_TYPES)
         .then(resp => resp.json())

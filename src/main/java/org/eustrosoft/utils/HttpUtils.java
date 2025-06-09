@@ -48,7 +48,22 @@ public final class HttpUtils {
         URL urlObj = new URL(url);
         String protocol = urlObj.getProtocol();
         String idn = IDN.toASCII(urlObj.getHost());
-        return String.format("%s://%s", protocol, idn);
+        String finalPath = String.format("%s://%s", protocol, idn);
+        if (urlObj.getPath() != null) {
+            try {
+                finalPath = finalPath.concat(IDN.toASCII(urlObj.getPath()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (urlObj.getQuery() != null) {
+            try {
+                finalPath = finalPath.concat(IDN.toASCII(urlObj.getQuery()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return finalPath;
     }
 
     public Cookie[] getCookies() {

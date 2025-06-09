@@ -77,10 +77,10 @@
             qr_image.src = baseGenerateHref + q + '&color=%23000000&background=%23ffffff&x=165&fileType=SVG&correctionLevel=L&site=' + schema + baseQrHref
         }
         if (text != null && text != '') {
-            contentText.innerHTML = getProcessedText(text)
+            contentText.innerHTML = getProcessedText(sanitize(text))
         }
         if (textDown != null && textDown != '') {
-            contentTextDown.innerHTML = getProcessedText(textDown)
+            contentTextDown.innerHTML = getProcessedText(sanitize(textDown))
         }
     }
 
@@ -105,6 +105,19 @@
             processedText = processedText.replace(`{{${found[1]}}}`, getLinkHref(found[1]))
         };
         return processedText
+    }
+
+    function sanitize(string) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;',
+            "/": '&#x2F;',
+        };
+        const reg = /[&<>"'/]/ig;
+        return string.replace(reg, (match)=>(map[match]));
     }
 </script>
 </html>
