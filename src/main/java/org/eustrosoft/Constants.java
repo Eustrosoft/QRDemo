@@ -3,7 +3,7 @@ package org.eustrosoft;
 public class Constants {
 
     public static class Version {
-        public static final String APPLICATION_VERSION = "v0.2.5";
+        public static final String APPLICATION_VERSION = "v0.2.6";
 
         public static final String APPLICATION_VERSION_TEXT = "Версия приложения: " + APPLICATION_VERSION;
     }
