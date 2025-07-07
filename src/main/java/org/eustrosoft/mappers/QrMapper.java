@@ -1,5 +1,7 @@
 package org.eustrosoft.mappers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.dtos.QRChangeDto;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -36,7 +39,7 @@ public class QrMapper extends EntityMapper {
         QRDto dto = toDto((QRSimplestProjection) qr);
         dto.setName(qr.getName());
         dto.setDescription(qr.getDescription());
-        dto.setData(qr.getData());
+        dto.setData(toStrObjMap(qr.getData()));
         dto.setAction(qr.getAction());
         dto.setRedirect(qr.getRedirect());
         dto.setForm(formMapper.toDto(qr.getFormWithFieldsProjection()));
@@ -46,7 +49,7 @@ public class QrMapper extends EntityMapper {
     public QRDto toDto(QRProjection qr) {
         QRDto dto = toDto((QRSimplestProjection) qr);
         dto.setCode(qr.getCode());
-        dto.setData(qr.getData());
+        dto.setData(toStrObjMap(qr.getData()));
         dto.setAction(qr.getAction());
         dto.setRedirect(qr.getRedirect());
         dto.setForm(formMapper.toDto(qr.getForm()));
@@ -60,7 +63,7 @@ public class QrMapper extends EntityMapper {
             return null;
         }
         dto.setCode(qr.getCode());
-        dto.setData(qr.getData());
+        dto.setData(toStrObjMap(qr.getData()));
         dto.setAction(qr.getAction());
         dto.setRedirect(qr.getRedirect());
         dto.setForm(formMapper.toDto(qr.getFormWithFieldsProjection()));

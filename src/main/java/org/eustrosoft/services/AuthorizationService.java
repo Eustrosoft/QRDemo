@@ -3,6 +3,7 @@ package org.eustrosoft.services;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.eustrosoft.dtos.MessageResponseDto;
 import org.eustrosoft.dtos.RegistrationDto;
 import org.eustrosoft.dtos.UserLoginDto;
 import org.eustrosoft.dtos.UserLoginResponseDto;
@@ -54,7 +55,7 @@ public class AuthorizationService {
                     new JsonApiError(
                             HttpStatus.BAD_REQUEST, 1001L,
                             "exceptions.title.bad_credentials",
-                            "exceptions.detail.illegal_username_or_password",
+                            "exceptions.detail.user_does_not_exist",
                             new JsonApiError.Source("credentials")
                     )
             );
@@ -75,12 +76,12 @@ public class AuthorizationService {
                     new JsonApiError(
                             HttpStatus.UNPROCESSABLE_ENTITY, 1002L,
                             "exceptions.title.bad_credentials",
-                            "exceptions.detail.illegal_username_or_password",
+                            "exceptions.detail.user_does_not_exist",
                             new JsonApiError.Source("credentials")
                     )
             );
         }
-        return ResponseEntity.ok("logged out successfully.");
+        return ResponseEntity.ok(new MessageResponseDto("Logged out successfully"));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)

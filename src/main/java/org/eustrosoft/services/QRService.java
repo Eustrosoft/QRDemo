@@ -361,7 +361,7 @@ public class QRService {
         QRDto dto = qrMapper.toDto(qr);
         FormComplexProjection form = qr.getForm();
         if (form == null) {
-            dto.setData(EMPTY_JSON);
+            dto.setData(Collections.emptyMap());
             return dto;
         }
         Form publicForm = new Form();
@@ -413,9 +413,9 @@ public class QRService {
                 .collect(Collectors.toList());
     }
 
-    private String getDataBasedOnForm(QRProjection qr) throws JsonProcessingException {
+    private Map<String, Object> getDataBasedOnForm(QRProjection qr) throws JsonProcessingException {
         if (qr == null || qr.getForm() == null) {
-            return EMPTY_JSON;
+            return Collections.emptyMap();
         }
         String qrData = qr.getData() == null ? EMPTY_JSON : qr.getData();
         ObjectMapper mapper = new ObjectMapper();
@@ -427,7 +427,7 @@ public class QRService {
         List<FormField> formFields = form.getFields();
 
         if (formFields == null) {
-            return EMPTY_JSON;
+            return Collections.emptyMap();
         }
 
         Set<String> dataToStand = new HashSet<>();
@@ -436,13 +436,13 @@ public class QRService {
                 dataToStand.add(field.getName());
             }
         }
-        Map<Object, Object> processedData =
+        Map<String, Object> processedData =
                 data.entrySet()
                         .stream().filter(entry -> dataToStand.contains(entry.getKey()))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         if (processedData.isEmpty()) {
-            return EMPTY_JSON;
+            return Collections.emptyMap();
         }
-        return mapper.writeValueAsString(processedData);
+        return processedData;
     }
 }

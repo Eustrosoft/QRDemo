@@ -1,6 +1,5 @@
 package org.eustrosoft.dtos;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.eustrosoft.entitites.enums.QRAction;
 
 import java.util.List;
+import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -15,8 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class QRDto extends EntityDto {
     private Long code;
-    @JsonRawValue
-    private String data;
+    private Map<String, Object> data;
     private QRAction action;
     private String redirect;
     private FormDto form;

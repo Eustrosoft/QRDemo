@@ -1,16 +1,22 @@
 package org.eustrosoft.mappers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.dtos.EntityDto;
 import org.eustrosoft.entitites.DbEntity;
 import org.eustrosoft.repositories.projections.EntityProjection;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class EntityMapper {
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public EntityDto toDto(DbEntity entity) {
         if (entity == null) {
@@ -123,6 +129,17 @@ public class EntityMapper {
             entities.add(toEntityFromId(id, clazz));
         }
         return entities;
+    }
+
+    public Map<String, Object> toStrObjMap(String data) {
+        if (StringUtils.isBlank(data)) {
+            return Collections.emptyMap();
+        }
+        try {
+            return mapper.readValue(data, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            return Collections.emptyMap();
+        }
     }
 
 }
