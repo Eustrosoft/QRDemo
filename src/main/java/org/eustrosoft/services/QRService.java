@@ -12,6 +12,7 @@ import org.eustrosoft.controllers.request.QRRequestFilter;
 import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.dtos.FileUploadResponse;
 import org.eustrosoft.dtos.QRDto;
+import org.eustrosoft.entitites.DbEntity;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
 import org.eustrosoft.entitites.Participant;

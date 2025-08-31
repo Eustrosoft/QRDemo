@@ -18,7 +18,10 @@ import org.eustrosoft.exceptions.JsonApiError;
 import org.eustrosoft.exceptions.custom.IllegalActionException;
 import org.eustrosoft.mappers.FileMapper;
 import org.eustrosoft.repositories.FileRepository;
+import org.eustrosoft.repositories.projections.EntityProjection;
+import org.eustrosoft.repositories.projections.FileComplexProjection;
 import org.eustrosoft.repositories.projections.FileProjection;
+import org.eustrosoft.repositories.projections.FormQrsProjection;
 import org.eustrosoft.repositories.sub.FileDataRepository;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.services.caches.QRCacheControlService;
@@ -38,6 +41,7 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -89,6 +93,15 @@ public class FileService {
             return file;
         }
         throw new IllegalAccessException("File is not public or yours");
+    }
+
+    @Transactional(readOnly = true)
+    public List<EntityProjection> getRelated(Long id) throws IllegalAccessException {
+        FileComplexProjection file = repository.findById(id, FileComplexProjection.class).get();
+        List<EntityProjection> entities = new ArrayList<>();
+        entities.addAll(file.getQrs());
+        entities.addAll(file.getForms());
+        return entities;
     }
 
     @SneakyThrows

@@ -18,6 +18,7 @@ import org.eustrosoft.repositories.FormRepository;
 import org.eustrosoft.repositories.projections.EntityProjection;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.repositories.projections.FormComplexProjection;
+import org.eustrosoft.repositories.projections.FormQrsProjection;
 import org.eustrosoft.repositories.projections.FormSimpleProjection;
 import org.eustrosoft.repositories.projections.FormWithFieldsProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
@@ -74,6 +75,13 @@ public class FormService {
                 id, participantService.getCurrentOrThrow().getId(),
                 clazz
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<? extends EntityProjection> getRelated(Long id) throws IllegalAccessException {
+        return repository.findByIdAndParticipantId(
+                id, participantService.getCurrentOrThrow().getId(), FormQrsProjection.class
+        ).get().getQrs();
     }
 
     public Form create(Form form) throws IllegalAccessException {

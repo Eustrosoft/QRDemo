@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
+import org.eustrosoft.dtos.EntityDto;
 import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.dtos.FormChangeDto;
 import org.eustrosoft.dtos.FormCreationDto;
@@ -14,6 +16,7 @@ import org.eustrosoft.dtos.FormDto;
 import org.eustrosoft.dtos.FormFieldDto;
 import org.eustrosoft.mappers.FormFieldMapper;
 import org.eustrosoft.mappers.FormMapper;
+import org.eustrosoft.repositories.projections.EntityProjection;
 import org.eustrosoft.repositories.projections.FileProjection;
 import org.eustrosoft.services.FormService;
 import org.springframework.validation.annotation.Validated;
@@ -44,34 +47,42 @@ import java.util.stream.Collectors;
 @Tag(name = "Forms API")
 public class FormsController {
     private final FormService service;
-    private final FormMapper formMapper;
+    private final FormMapper mapper;
     private final FormFieldMapper formFieldMapper;
 
     @Operation(summary = "Find all forms for current user")
     @GetMapping
     public List<FormDto> findAll() throws Exception {
         return service.findAll().stream()
-                .map(formMapper::toDto).collect(Collectors.toList());
+                .map(mapper::toDto).collect(Collectors.toList());
     }
 
     @Operation(summary = "Find form by ID")
     @GetMapping("/{id}")
     public FormDto findById(@PathVariable Long id) throws IllegalAccessException {
-        return formMapper.toDto(service.get(id).get());
+        return mapper.toDto(service.get(id).get());
+    }
+
+    @Operation(summary = "Get usages in system")
+    @GetMapping("/{id}/related")
+    public List<EntityDto> findRelated(@PathVariable Long id) throws IllegalAccessException {
+        return service.getRelated(id).stream()
+                .map(item -> mapper.toDtoFromProjection(item, EntityDto.class))
+                .collect(Collectors.toList());
     }
 
     @Operation(summary = "Create new form")
     @PostMapping
     public FormDto createForm(@Valid @RequestBody FormCreationDto dto) throws IllegalAccessException {
-        return formMapper.toDto(
-                service.create(formMapper.fromCreationDto(dto))
+        return mapper.toDto(
+                service.create(mapper.fromCreationDto(dto))
         );
     }
 
     @Operation(summary = "Create default form with filled fields")
     @PostMapping("/default")
     public FormDto createDefaultForm() throws IllegalAccessException, JsonProcessingException {
-        return formMapper.toDto(service.createDefaultForm());
+        return mapper.toDto(service.createDefaultForm());
     }
 
     @Operation(summary = "Upload file in the form")
@@ -106,8 +117,8 @@ public class FormsController {
     public FormDto update(
             @Valid @RequestBody FormChangeDto dto
     ) throws IllegalAccessException, JsonProcessingException {
-        return formMapper.toDto(
-                service.update(formMapper.fromChangeDto(dto))
+        return mapper.toDto(
+                service.update(mapper.fromChangeDto(dto))
         );
     }
 

@@ -7,4 +7,6 @@ public interface EntityProjection extends SimpleProjection {
     String getName();
 
     String getDescription();
+
+    String getType();
 }

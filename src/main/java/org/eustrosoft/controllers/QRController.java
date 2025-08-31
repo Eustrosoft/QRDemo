@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.controllers.request.QRRequestFilter;
+import org.eustrosoft.dtos.EntityDto;
 import org.eustrosoft.dtos.FileChooseRequest;
 import org.eustrosoft.dtos.QRChangeDto;
 import org.eustrosoft.dtos.QRCreationDto;

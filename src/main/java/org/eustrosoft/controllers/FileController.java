@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
+import org.eustrosoft.dtos.EntityDto;
 import org.eustrosoft.dtos.FileChangeDto;
 import org.eustrosoft.dtos.FileDto;
 import org.eustrosoft.dtos.FileUploadResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Success"),
@@ -48,6 +50,14 @@ public class FileController {
     @GetMapping("/{id}")
     public FileDto findById(@PathVariable Long id) throws IllegalAccessException {
         return mapper.toDto(service.findById(id));
+    }
+
+    @Operation(summary = "Get usages in system")
+    @GetMapping("/{id}/related")
+    public List<EntityDto> findRelated(@PathVariable Long id) throws IllegalAccessException {
+        return service.getRelated(id).stream()
+                .map(item -> mapper.toDtoFromProjection(item, EntityDto.class))
+                .collect(Collectors.toList());
     }
 
     @Operation(summary = "Upload file by blob protocol")

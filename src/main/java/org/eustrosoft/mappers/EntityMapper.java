@@ -27,7 +27,8 @@ public class EntityMapper {
                 entity.getCreated(),
                 entity.getUpdated(),
                 entity.getName(),
-                entity.getDescription()
+                entity.getDescription(),
+                entity.getType()
         );
     }
 
@@ -62,6 +63,7 @@ public class EntityMapper {
             entityDto.setUpdated(projection.getUpdated());
             entityDto.setName(projection.getName());
             entityDto.setDescription(projection.getDescription());
+            entityDto.setType(projection.getType());
             return entityDto;
         } catch (Exception e) {
             return null;
