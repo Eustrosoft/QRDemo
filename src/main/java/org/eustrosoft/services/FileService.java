@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
+import org.eustrosoft.controllers.request.RelatedType;
 import org.eustrosoft.dtos.FileUploadResponse;
 import org.eustrosoft.entitites.Dictionary;
 import org.eustrosoft.entitites.File;
@@ -97,10 +98,21 @@ public class FileService {
 
     @Transactional(readOnly = true)
     public List<EntityProjection> getRelated(Long id) throws IllegalAccessException {
+        return getRelated(id, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EntityProjection> getRelated(Long id, RelatedType type) throws IllegalAccessException {
         FileComplexProjection file = repository.findById(id, FileComplexProjection.class).get();
         List<EntityProjection> entities = new ArrayList<>();
-        entities.addAll(file.getQrs());
-        entities.addAll(file.getForms());
+        if (type == null) { // TODO: think of better
+            entities.addAll(file.getQrs());
+            entities.addAll(file.getForms());
+        } else if (type == RelatedType.FM) {
+            entities.addAll(file.getForms());
+        } else if (type == RelatedType.QR) {
+            entities.addAll(file.getQrs());
+        }
         return entities;
     }
 

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.eustrosoft.controllers.request.FileReUploadRequest;
 import org.eustrosoft.controllers.request.FileUploadRequest;
 import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
+import org.eustrosoft.controllers.request.RelatedType;
 import org.eustrosoft.dtos.EntityDto;
 import org.eustrosoft.dtos.FileChangeDto;
 import org.eustrosoft.dtos.FileDto;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -54,8 +56,11 @@ public class FileController {
 
     @Operation(summary = "Get usages in system")
     @GetMapping("/{id}/related")
-    public List<EntityDto> findRelated(@PathVariable Long id) throws IllegalAccessException {
-        return service.getRelated(id).stream()
+    public List<EntityDto> findRelated(
+            @PathVariable Long id,
+            @RequestParam(name = "type", required = false) RelatedType type
+    ) throws IllegalAccessException {
+        return service.getRelated(id, type).stream()
                 .map(item -> mapper.toDtoFromProjection(item, EntityDto.class))
                 .collect(Collectors.toList());
     }
