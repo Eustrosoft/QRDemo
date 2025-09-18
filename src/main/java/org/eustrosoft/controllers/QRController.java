@@ -56,6 +56,12 @@ public class QRController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Get QR by id")
+    @GetMapping("/{id}")
+    public QRDto findById(@PathVariable Long id) throws IllegalAccessException {
+        return mapper.toDto(service.get(id).get());
+    }
+
     @Operation(summary = "Get QR by code")
     @GetMapping("/code")
     public QRDto findByCode(@RequestParam("q") String q) throws IllegalAccessException {
