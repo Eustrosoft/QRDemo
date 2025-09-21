@@ -148,6 +148,8 @@ function showAvatarDropdownContentListener() {
             avatarDropdownContent.appendChild(getHr())
             avatarDropdownContent.appendChild(getThemeSection())
             avatarDropdownContent.appendChild(getHr())
+            avatarDropdownContent.appendChild(getNewAppSection())
+            avatarDropdownContent.appendChild(getHr())
 
             // Exit section
             let exitSection = document.createElement('div')
@@ -230,6 +232,14 @@ function getHelpSection() {
     let helpLink = getLink('Помощь', '/help/', '')
     helpSection.appendChild(helpLink)
     return helpSection
+}
+
+function getNewAppSection() {
+    let newAppSection = document.createElement('div')
+    newAppSection.className = 'dropdown__content__section'
+    let newAppLink = getLink('Новое приложение', '/lk/v2/', '')
+    newAppSection.appendChild(newAppLink)
+    return newAppSection
 }
 
 function renderLoginForm(parent) {

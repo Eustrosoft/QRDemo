@@ -15,6 +15,7 @@ import org.eustrosoft.dtos.QRChangeDto;
 import org.eustrosoft.dtos.QRCreationDto;
 import org.eustrosoft.dtos.QRDto;
 import org.eustrosoft.mappers.QrMapper;
+import org.eustrosoft.repositories.projections.QRProjection;
 import org.eustrosoft.services.QRService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -59,7 +60,7 @@ public class QRController {
     @Operation(summary = "Get QR by id")
     @GetMapping("/{id}")
     public QRDto findById(@PathVariable Long id) throws IllegalAccessException {
-        return mapper.toDto(service.get(id).get());
+        return mapper.toDto(service.get(id, QRProjection.class).get());
     }
 
     @Operation(summary = "Get QR by code")
