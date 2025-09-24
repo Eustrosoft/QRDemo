@@ -256,6 +256,8 @@ function renderLoginForm(parent) {
         <!-- <br> Или <br>
         <a class="big_button" id="register" href="/signup/">Регистрация</a>
         -->
+        <br/>
+        <a class="big_button" id="new_version" href="/lk/v2/" style="text-decoration: none;">Новая версия личного кабинета</a>
     `
     parent.appendChild(loginPart)
     document.getElementById("login_submit")
