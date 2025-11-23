@@ -7,12 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.eustrosoft.controllers.request.FileUploadRequest;
-import org.eustrosoft.controllers.request.FileWithBlobUploadRequest;
 import org.eustrosoft.controllers.request.QRRequestFilter;
 import org.eustrosoft.dtos.FileChooseRequest;
-import org.eustrosoft.dtos.FileUploadResponse;
 import org.eustrosoft.dtos.QRDto;
-import org.eustrosoft.entitites.DbEntity;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
 import org.eustrosoft.entitites.Participant;
@@ -30,6 +27,7 @@ import org.eustrosoft.repositories.projections.FormComplexProjection;
 import org.eustrosoft.repositories.projections.QRProjection;
 import org.eustrosoft.repositories.projections.QRSimpleProjection;
 import org.eustrosoft.repositories.projections.QRSimplestProjection;
+import org.eustrosoft.repositories.specifications.QRSpecifications;
 import org.eustrosoft.security.SecurityComponent;
 import org.eustrosoft.services.caches.QRCacheControlService;
 import org.eustrosoft.utils.CommonUtils;
@@ -37,7 +35,6 @@ import org.eustrosoft.utils.JdbcBlobProcessor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -67,8 +64,6 @@ import java.util.zip.ZipOutputStream;
 
 import static org.eustrosoft.Constants.EMPTY_JSON;
 import static org.eustrosoft.configurations.QRCachingConfig.QR_CACHE_NAME;
-import static org.eustrosoft.repositories.specifications.QRSpecifications.betweenRange;
-import static org.eustrosoft.repositories.specifications.QRSpecifications.withParticipantId;
 import static org.eustrosoft.utils.CommonUtils.mergeDataAndGetString;
 import static org.eustrosoft.utils.CompressUtils.zipFile;
 
@@ -162,15 +157,13 @@ public class QRService {
         if (filter == null || filter.isEmptyFilters()) {
             return findAllMine();
         }
-        Long rangeId = filter.getRangeId();
-        QRRange qrRange = qrRangeService.getQRRange(rangeId);
+        ArrayList<Long> rangeIds = filter.getRangeId();
+        List<QRRange> qrRanges = qrRangeService.getQRRanges(rangeIds);
 
-        return qrRepository.findAll(
-                Specification
-                        .where(withParticipantId(participantService.getCurrentSimpleOrThrow().getParticipantId()))
-                        .and(betweenRange(qrRange.getFrom(), qrRange.getTo())),
-                Sort.by(Sort.Order.desc(QR.SortAttributeNames.ATTR_CREATED))
-        );
+        Long participantId = participantService.getCurrentSimpleOrThrow().getId();
+        QRSpecifications specifications = new QRSpecifications(participantId, qrRanges);
+
+        return qrRepository.findAll(specifications, Sort.by(Sort.Order.desc(QR.SortAttributeNames.ATTR_CREATED)));
     }
 
     @Transactional(readOnly = true)

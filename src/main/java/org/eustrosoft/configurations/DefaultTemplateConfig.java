@@ -1,6 +1,5 @@
 package org.eustrosoft.configurations;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eustrosoft.entitites.Form;
 import org.eustrosoft.entitites.FormField;
 import org.eustrosoft.entitites.enums.FormFieldType;

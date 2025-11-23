@@ -28,6 +28,7 @@ import java.util.Properties;
 public class QRDemoPropertiesReadPostProcessor implements EnvironmentPostProcessor {
     public static final String SETTINGS_KEY = "key";
     public static final String SETTINGS_VALUE = "value";
+
     private static final String PROPERTIES_DB_SOURCE_NAME = "qrDemoDatabaseProperties";
     private static final String PROPERTIES_FILE_SOURCE_NAME = "qrDemoFileProperties";
     private static final String PROPERTY_NAME_DB_CONFIG_LOCATION = "dbFileLocation";
@@ -35,6 +36,7 @@ public class QRDemoPropertiesReadPostProcessor implements EnvironmentPostProcess
     private static final String PROPERTY_NAME_DB_PASSWORD = "spring.datasource.password";
     private static final String PROPERTY_NAME_DB_URL = "spring.datasource.url";
     private static final String PROPERTY_NAME_DB_DRIVER = "spring.datasource.driver-class-name";
+
     private static final String SQL_SELECT_SETTINGS = "SELECT * FROM qrdemo.settings";
 
     @Override

@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS form_field
     name           VARCHAR(128)    NOT NULL,
     participant_id BIGINT          NOT NULL,
     form_id        BIGINT          NOT NULL    REFERENCES form(id),
-    field_order    INT             NOT NULL    DEFAULT 0,
+    field_order    INT,
     placeholder    VARCHAR(1024),
     field_type     VARCHAR(64)     NOT NULL,               -- text, color, file, number, date
     static         BOOLEAN         NOT NULL    DEFAULT TRUE,

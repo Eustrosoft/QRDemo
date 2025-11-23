@@ -12,12 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import static org.eustrosoft.Constants.QRDEMO;
+import static org.eustrosoft.utils.CommonUtils.iterableToList;
 
 @Service
 @Transactional
@@ -33,6 +35,11 @@ public class QRRangeService {
     }
 
     @Transactional(readOnly = true)
+    public List<QRRange> getQRRanges(ArrayList<Long> ids) {
+        return iterableToList(repository.findAllById(ids));
+    }
+
+    @Transactional(readOnly = true)
     public Collection<QRRange> getMyRanges() throws IllegalAccessException {
         Participant participant = participantService.findById(
                 participantService.getCurrentSimpleOrThrow().getId()
@@ -45,7 +52,7 @@ public class QRRangeService {
 
     @Transactional(readOnly = true)
     public List<QRRange> findAll() {
-        return CommonUtils.iterableToList(repository.findAll());
+        return iterableToList(repository.findAll());
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
