@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.eustrosoft.controllers.request.GSLabelsRequest;
 import org.eustrosoft.entitites.GSLabel;
 import org.eustrosoft.services.GSLabelService;
 import org.springframework.validation.annotation.Validated;
@@ -37,8 +38,8 @@ public class GSLabelController {
 
     @Operation(summary = "Find all GSLabel for current user")
     @GetMapping
-    public List<GSLabel> findAll() throws IllegalAccessException {
-        return service.findAllMine();
+    public List<GSLabel> findAll(GSLabelsRequest request) throws IllegalAccessException {
+        return service.findAllMine(request);
     }
 
     @Operation(summary = "Get GSLabel by id")

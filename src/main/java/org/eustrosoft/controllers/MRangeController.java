@@ -29,7 +29,7 @@ import java.util.List;
 })
 @Validated
 @RestController
-@RequestMapping("/v1/api/secured/m-ranges")
+@RequestMapping("/v1/api/admin/m-ranges")
 @RequiredArgsConstructor
 @Tag(name = "MRange API")
 public class MRangeController {

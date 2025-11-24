@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface GSLabelRepository extends CrudRepository<GSLabel, Long> {
     List<GSLabel> findAllByParticipantIdOrderByCreatedDesc(Long participantId);
+
+    List<GSLabel> findAllByParticipantIdAndQrIdOrderByCreatedDesc(Long participantId, Long qrId);
 }

@@ -1,6 +1,7 @@
 package org.eustrosoft.services;
 
 import lombok.RequiredArgsConstructor;
+import org.eustrosoft.controllers.request.PCodeRequest;
 import org.eustrosoft.entitites.PCode;
 import org.eustrosoft.entitites.Participant;
 import org.eustrosoft.repositories.PCodeRepository;
@@ -22,15 +23,22 @@ public class PCodeService {
     private final SecurityComponent securityComponent;
 
     @Transactional(readOnly = true)
-    public PCode get(Long docId, Long rowId) throws IllegalAccessException {
-        Optional<PCode> pCode = repository.findByDocIdAndRowId(docId, rowId);
+    public PCode get(Long docId) throws IllegalAccessException {
+        Optional<PCode> pCode = repository.findByDocId(docId);
         securityComponent.checkUserRightById(pCode.get()::getParticipantId);
         return pCode.get();
     }
 
     @Transactional(readOnly = true)
-    public List<PCode> findAllMine() throws IllegalAccessException {
+    public List<PCode> findAllMine(PCodeRequest request) throws IllegalAccessException {
         Long participantId = participantService.getCurrentSimpleOrThrow().getId();
+
+        Long qrId = request.getDocId();
+        if (qrId != null) {
+            return iterableToList(
+                    repository.findAllByParticipantIdAndDocId(participantId, qrId)
+            );
+        }
         return iterableToList(
                 repository.findAllByParticipantId(participantId)
         );
@@ -45,13 +53,13 @@ public class PCodeService {
 
     @Transactional(readOnly = true)
     public PCode update(PCode pCode) throws IllegalAccessException {
-        get(pCode.getDocId(), pCode.getRowId());
+        get(pCode.getDocId());
         return repository.save(pCode);
     }
 
     @Transactional
-    public void delete(Long docId, Long rowId) throws IllegalAccessException {
-        get(docId, rowId);
-        repository.deleteByDocIdAndRowId(docId, rowId);
+    public void delete(Long docId) throws IllegalAccessException {
+        get(docId);
+        repository.deleteByDocId(docId);
     }
 }

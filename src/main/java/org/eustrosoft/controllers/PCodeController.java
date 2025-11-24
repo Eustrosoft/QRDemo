@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.eustrosoft.controllers.request.PCodeRequest;
 import org.eustrosoft.entitites.PCode;
 import org.eustrosoft.services.PCodeService;
 import org.springframework.validation.annotation.Validated;
@@ -37,17 +38,14 @@ public class PCodeController {
 
     @Operation(summary = "Find all pCodes for current user")
     @GetMapping
-    public List<PCode> findAll() throws IllegalAccessException {
-        return service.findAllMine();
+    public List<PCode> findAll(PCodeRequest request) throws IllegalAccessException {
+        return service.findAllMine(request);
     }
 
-    @Operation(summary = "Get pCode by doc_id and row_id")
-    @GetMapping("/{docId}/{rowId}")
-    public PCode findById(
-            @PathVariable Long docId,
-            @PathVariable Long rowId
-    ) throws IllegalAccessException {
-        return service.get(docId, rowId);
+    @Operation(summary = "Get pCode by docId")
+    @GetMapping("/{docId}")
+    public PCode findById(@PathVariable Long docId) throws IllegalAccessException {
+        return service.get(docId);
     }
 
     @Operation(summary = "Create new pCode")
@@ -58,16 +56,15 @@ public class PCodeController {
 
     @Operation(summary = "Update pCode")
     @PutMapping
-    public PCode update(@Valid @RequestBody PCode pCode) throws IllegalAccessException, JsonProcessingException {
+    public PCode update(
+            @Valid @RequestBody PCode pCode
+    ) throws IllegalAccessException, JsonProcessingException {
         return service.update(pCode);
     }
 
-    @Operation(summary = "Delete pCode by docId and rowId")
-    @DeleteMapping("/{docId}/{rowId}")
-    public void delete(
-            @PathVariable Long docId,
-            @PathVariable Long rowId
-    ) throws IllegalAccessException {
-        service.delete(docId, rowId);
+    @Operation(summary = "Delete pCode by docId")
+    @DeleteMapping("/{docId}")
+    public void delete(@PathVariable Long docId) throws IllegalAccessException {
+        service.delete(docId);
     }
 }
