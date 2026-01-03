@@ -7,7 +7,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.eustrosoft.controllers.request.PCodeRequest;
+import org.eustrosoft.dtos.PCodeChangeDto;
+import org.eustrosoft.dtos.PCodeCreationDto;
+import org.eustrosoft.dtos.PCodeDto;
 import org.eustrosoft.entitites.PCode;
+import org.eustrosoft.mappers.PCodeMapper;
 import org.eustrosoft.services.PCodeService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,31 +39,32 @@ import java.util.List;
 @Tag(name = "PCode API")
 public class PCodeController {
     private final PCodeService service;
+    private final PCodeMapper mapper;
 
     @Operation(summary = "Find all pCodes for current user")
     @GetMapping
-    public List<PCode> findAll(PCodeRequest request) throws IllegalAccessException {
-        return service.findAllMine(request);
+    public List<PCodeDto> findAll(PCodeRequest request) throws IllegalAccessException {
+        return mapper.toListDto(service.findAllMine(request));
     }
 
     @Operation(summary = "Get pCode by docId")
     @GetMapping("/{docId}")
-    public PCode findById(@PathVariable Long docId) throws IllegalAccessException {
-        return service.get(docId);
+    public PCodeDto findById(@PathVariable Long docId) throws IllegalAccessException {
+        return mapper.toDto(service.get(docId));
     }
 
     @Operation(summary = "Create new pCode")
     @PostMapping
-    public PCode create(@Valid @RequestBody PCode pCode) throws Exception {
-        return service.create(pCode);
+    public PCodeDto create(@Valid @RequestBody PCodeCreationDto pCode) throws Exception {
+        return mapper.toDto(service.create(mapper.toModel(pCode)));
     }
 
     @Operation(summary = "Update pCode")
     @PutMapping
-    public PCode update(
-            @Valid @RequestBody PCode pCode
+    public PCodeDto update(
+            @Valid @RequestBody PCodeChangeDto pCode
     ) throws IllegalAccessException, JsonProcessingException {
-        return service.update(pCode);
+        return mapper.toDto(service.update(mapper.toModel(pCode)));
     }
 
     @Operation(summary = "Delete pCode by docId")

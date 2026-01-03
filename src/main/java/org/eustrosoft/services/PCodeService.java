@@ -44,14 +44,12 @@ public class PCodeService {
         );
     }
 
-    @Transactional(readOnly = true)
     public PCode create(PCode pCode) throws IllegalAccessException {
         Participant current = participantService.getCurrentOrThrow();
         pCode.setParticipantId(current.getId());
         return repository.save(pCode);
     }
 
-    @Transactional(readOnly = true)
     public PCode update(PCode pCode) throws IllegalAccessException {
         get(pCode.getDocId());
         return repository.save(pCode);
