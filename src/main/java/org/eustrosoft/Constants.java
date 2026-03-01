@@ -35,4 +35,5 @@ public class Constants {
 
     // Sequence names
     public static final String QRDEMO = "QRDEMO"; // range key
+    public static final String QRDEMO_PINS = "QRDEMO_PINS"; // range key
 }

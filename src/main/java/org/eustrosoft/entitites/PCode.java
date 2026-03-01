@@ -2,11 +2,16 @@ package org.eustrosoft.entitites;
 
 import lombok.Data;
 import org.eustrosoft.entitites.composite.PCodeCompositeId;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -18,12 +23,18 @@ public class PCode implements Serializable {
     public static final String TYPE = "PCD";
 
     @Id
-    @Column(name = "doc_id")
-    private Long docId;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "p_code_seq_gen")
+    @SequenceGenerator(
+            name = "p_code_seq_gen",
+            sequenceName = "p_code_seq",
+            allocationSize = 1
+    )
+    @Column(name = "row_id", nullable = false)
+    private Long rowId;
 
     @Id
-    @Column(name = "row_id")
-    private Long rowId;
+    @Column(name = "doc_id")
+    private Long docId;
 
     @Column(name = "participant_id")
     private Long participantId;

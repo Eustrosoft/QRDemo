@@ -27,7 +27,6 @@ public class PCodeMapper {
         pCode.setHFiles(dto.getHFiles());
         pCode.setP2Prompt(dto.getP2Prompt());
         pCode.setDocId(dto.getDocId());
-        pCode.setRowId(dto.getRowId());
         pCode.setP2Mode(dto.getP2Mode());
         return pCode;
     }
