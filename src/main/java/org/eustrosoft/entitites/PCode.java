@@ -2,8 +2,6 @@ package org.eustrosoft.entitites;
 
 import lombok.Data;
 import org.eustrosoft.entitites.composite.PCodeCompositeId;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

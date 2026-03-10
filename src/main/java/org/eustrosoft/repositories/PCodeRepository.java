@@ -16,5 +16,9 @@ public interface PCodeRepository extends CrudRepository<PCode, Long> {
 
     Optional<PCode> findByDocId(Long docId);
 
+    Optional<PCode> findByDocIdAndRowId(Long docId, Long rowId);
+
     void deleteByDocId(Long docId);
+
+    void deleteByDocIdAndRowId(Long docId, Long rowId);
 }

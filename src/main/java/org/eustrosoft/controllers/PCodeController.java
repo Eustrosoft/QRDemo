@@ -72,4 +72,10 @@ public class PCodeController {
     public void delete(@PathVariable Long docId) throws IllegalAccessException {
         service.delete(docId);
     }
+
+    @Operation(summary = "Delete pCode by docId")
+    @DeleteMapping("/{docId}/{rowId}")
+    public void delete(@PathVariable Long docId, @PathVariable Long rowId) throws IllegalAccessException {
+        service.delete(docId, rowId);
+    }
 }

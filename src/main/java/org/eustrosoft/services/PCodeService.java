@@ -30,6 +30,13 @@ public class PCodeService {
     }
 
     @Transactional(readOnly = true)
+    public PCode get(Long docId, Long rowId) throws IllegalAccessException {
+        Optional<PCode> pCode = repository.findByDocIdAndRowId(docId, rowId);
+        securityComponent.checkUserRightById(pCode.get()::getParticipantId);
+        return pCode.get();
+    }
+
+    @Transactional(readOnly = true)
     public List<PCode> findAllMine(PCodeRequest request) throws IllegalAccessException {
         Long participantId = participantService.getCurrentSimpleOrThrow().getId();
 
@@ -51,7 +58,8 @@ public class PCodeService {
     }
 
     public PCode update(PCode pCode) throws IllegalAccessException {
-        get(pCode.getDocId());
+        PCode foundPCode = get(pCode.getDocId());
+        pCode.setParticipantId(foundPCode.getParticipantId());
         return repository.save(pCode);
     }
 
@@ -59,5 +67,11 @@ public class PCodeService {
     public void delete(Long docId) throws IllegalAccessException {
         get(docId);
         repository.deleteByDocId(docId);
+    }
+
+    @Transactional
+    public void delete(Long docId, Long rowId) throws IllegalAccessException {
+        get(docId, rowId);
+        repository.deleteByDocIdAndRowId(docId, rowId);
     }
 }
